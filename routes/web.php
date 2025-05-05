@@ -16,10 +16,6 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('welcome');
-
-Route::get('/test', function () {
     return Inertia::render('test');
 })->name('test');
 
@@ -40,3 +36,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+Route::get('/login', function () {
+    return Inertia::render('login');
+})->name('login');

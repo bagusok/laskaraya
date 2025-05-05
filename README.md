@@ -1,8 +1,5 @@
-<p align="center" style='font-size: 4rem; font-weight: bold'>Laskaraya</p>
-
-<p align="center">
-Ini adalah project pencatatan prestasi
-</p>
+<h1 align="center">Laskaraya</h1>
+<p align="center">Ini adalah project pencatatan prestasi</p>
 
 ## Instalation
 

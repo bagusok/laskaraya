@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "app": "concurrently -n \"PHP,VITE,TSC\" -c \"yellow.bold,cyan.bold,magenta.bold\" \"php artisan serve\" \"npm run dev\"",
     "build": "vite build",
     "build:ssr": "vite build && vite build --ssr",
     "dev": "vite",
