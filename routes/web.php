@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,3 +22,21 @@ Route::get('/', function () {
 Route::get('/test', function () {
     return Inertia::render('test');
 })->name('test');
+
+Route::group(['prefix' => 'auth'], function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('dashboard/index')->with([
+            'user' => auth()->user(),
+        ]);
+    })->name('dashboard');
+
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+});

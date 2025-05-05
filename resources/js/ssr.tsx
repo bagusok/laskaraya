@@ -4,6 +4,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import ReactDOMServer from "react-dom/server";
 import { type RouteName, route } from "ziggy-js";
 import ThemeWrapper from "./layouts/theme-wrapper";
+import { Toaster } from "react-hot-toast";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -38,6 +39,7 @@ createServer((page) =>
       return (
         <ThemeWrapper>
           <App {...props} />
+          <Toaster position="top-right" />
         </ThemeWrapper>
       );
     },
