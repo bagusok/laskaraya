@@ -16,8 +16,8 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('test');
-})->name('test');
+    return Inertia::render('index');
+})->name('index');
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -25,18 +25,12 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('dashboard/index')->with([
-            'user' => auth()->user(),
-        ]);
+Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
+    Route::get('/', function () {
+        return Inertia::render('dashboard/index');
     })->name('dashboard');
-
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
-
-Route::get('/login', function () {
-    return Inertia::render('login');
-})->name('login');

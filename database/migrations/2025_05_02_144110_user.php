@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'dosen', 'mahasiswa'])->default('mahasiswa');
+            $is_verified = $table->boolean('is_verified')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Head, useForm } from "@inertiajs/react";
+import { Select } from "@radix-ui/react-select";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -14,11 +21,11 @@ export default function Register() {
     email: "",
     identifier: "",
     phone: "",
-    faculty: "",
+    role: "",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     post(route("register.post"), {
       onSuccess: (data) => {
@@ -114,16 +121,23 @@ export default function Register() {
             )}
           </div>
           <div className="form-group">
-            <Label className="text-sm">Fakultas</Label>
-            <Input
-              type="text"
-              name="faculty"
-              placeholder="Teknologi Informasi"
-              value={data.faculty}
-              onChange={(e) => setData("faculty", e.target.value)}
-            />
-            {errors.faculty && (
-              <small className="text-xs text-red-500">{errors.faculty}</small>
+            <Label className="text-sm">Role</Label>
+            <Select
+              onValueChange={(value) => setData("role", value)}
+              defaultOpen={false}
+              defaultValue={data.role}
+              value={data.role}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mahasiswa">Mahasiswa</SelectItem>
+                <SelectItem value="dosen">Dosen</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.role && (
+              <small className="text-xs text-red-500">{errors.role}</small>
             )}
           </div>
           <div className="form-group">

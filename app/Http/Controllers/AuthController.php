@@ -33,7 +33,7 @@ class AuthController extends Controller
         }
 
         // If login fails, redirect back with an error message
-        return redirect()->back()->withErrors(['message' => 'Invalid credentials']);
+        return redirect()->back()->withErrors(['message' => 'Email atau password salah']);
     }
 
     public function register(Request $request)
@@ -42,8 +42,8 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'identifier' => 'required|string|max:255|unique:users,identifier',
+            'role' => 'required|in:mahasiswa,dosen',
             'phone' => 'required|string|max:255|unique:users,phone',
-            'faculty' => 'required|string|max:255',
             'password' => 'required|string|min:8',
         ]);
 
@@ -52,9 +52,13 @@ class AuthController extends Controller
             'email' => $request->email,
             'identifier' => $request->identifier,
             'phone' => $request->phone,
-            'faculty' => $request->faculty,
+            'role' => $request->role,
             'password' => bcrypt($request->password),
         ]);
+
+        if (!$user) {
+            return redirect()->back()->withErrors(['message' => 'Registration failed']);
+        }
 
         // auth()->login($user);
 
