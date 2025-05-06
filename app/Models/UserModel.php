@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class UserModel extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
+
     protected $table = 'users';
+
     protected $fillable = [
         'name',
         'email',
@@ -18,6 +20,7 @@ class UserModel extends Authenticatable
         'faculty',
         'password',
         'role',
+        'is_verified',
         'remember_token',
     ];
 
@@ -25,4 +28,18 @@ class UserModel extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected $casts = [
+        'is_verified' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Override the default username field for authentication.
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'identifier';
+    }
 }

@@ -2,6 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Head, useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import LoginForm from "@/components/ui/login/loginForm";
+import Carousel from "@/components/ui/carousel";
 
 export default function Login() {
   const { data, setData, processing, post, errors } = useForm({
@@ -71,11 +72,7 @@ export default function Login() {
               />
             </div>
             <div className="hidden md:block md:w-1/2 relative overflow-hidden p-4 rounded-2xl">
-              <img
-                src="/menang.jpg"
-                alt="Trophy Display"
-                className="w-full h-full object-cover rounded-2xl"
-              />
+              <Carousel />
             </div>
           </div>
         </div>

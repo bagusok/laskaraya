@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -12,62 +13,38 @@ class AuthController extends Controller
     {
         return Inertia::render('auth/login', []);
     }
-    public function showRegisterForm()
-    {
-        return Inertia::render('auth/register', []);
-    }
 
     public function login(Request $request)
     {
         // Validate the request data
         $request->validate([
-            'email' => 'required|email',
+            'identifier' => 'required|string',
             'password' => 'required|string|min:8',
         ]);
 
-        if (auth()->attempt($request->only('email', 'password'))) {
+        // Attempt to authenticate using the identifier field
+        $credentials = [
+            'identifier' => $request->identifier,
+            'password' => $request->password,
+        ];
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate(); // Regenerate session to prevent fixation
             Inertia::share([
-                'user' => auth()->user(),
+                'user' => Auth::user(),
             ]);
-            return redirect()->route('dashboard')->with('success', 'Login successful');
+            return redirect()->route('dashboard')->with('success', 'Login berhasil');
         }
 
         // If login fails, redirect back with an error message
-        return redirect()->back()->withErrors(['message' => 'Email atau password salah']);
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'identifier' => 'required|string|max:255|unique:users,identifier',
-            'role' => 'required|in:mahasiswa,dosen',
-            'phone' => 'required|string|max:255|unique:users,phone',
-            'password' => 'required|string|min:8',
-        ]);
-
-        $user = UserModel::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'identifier' => $request->identifier,
-            'phone' => $request->phone,
-            'role' => $request->role,
-            'password' => bcrypt($request->password),
-        ]);
-
-        if (!$user) {
-            return redirect()->back()->withErrors(['message' => 'Registration failed']);
-        }
-
-        // auth()->login($user);
-
-        return to_route(route: 'login')->with('success', 'Registration successful. Please log in.');
+        return redirect()->back()->withErrors(['identifier' => 'Identifier atau password salah']);
     }
 
     public function logout(Request $request)
     {
-        auth()->logout();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect()->route('login')->with('success', 'Logout successful');
     }
 }

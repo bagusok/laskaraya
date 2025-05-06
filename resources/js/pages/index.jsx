@@ -20,10 +20,10 @@ export default function Welcome() {
   return (
     <>
       <Head title="Welcome" />
-      <main className="min-h-dvh bg-gradient-to-b from-white to-blue-50 relative overflow-hidden bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_0.5px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_0.5px)] bg-[size:24rem_9rem]">
+      <main className="min-h-dvh bg-gradient-to-b from-white to-blue-50 relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full filter blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+          <div className="absolute top-0 right-0 0 w-96 h-96 bg-blue-200 rounded-full filter blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
         </div>
 
         <div className="min-h-dvh grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-8 relative z-10">
@@ -53,7 +53,7 @@ export default function Welcome() {
               <div className="h-1.5 w-32 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 flex gap-4">
               {isAuthenticated ? (
                 <Link href={route("dashboard")}>
                   <Button
@@ -65,18 +65,7 @@ export default function Welcome() {
                     <ChevronRight className="transform transition-transform duration-500 group-hover:translate-x-1" />
                   </Button>
                 </Link>
-              ) : (
-                <Link href={route("login")}>
-                  <Button
-                    className="cursor-default group h-14 w-44 rounded-full px-10 text-xl font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-500 flex items-center gap-3 shadow-lg hover:shadow-xl"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                  >
-                    Login
-                    <ChevronRight className="transform transition-transform duration-500 group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -85,8 +74,8 @@ export default function Welcome() {
             <div
               className="absolute w-72 h-72 rounded-full bg-blue-100/80 backdrop-blur-sm transition-all duration-700"
               style={{
-                top: `30%`,
-                right: `20%`,
+                top: `20%`,
+                right: `30%`,
                 transform: `translate(${scrollY * 0.02}px, -${scrollY * 0.05}px)`,
               }}
             ></div>
@@ -94,8 +83,8 @@ export default function Welcome() {
             <div
               className="absolute w-48 h-48 rounded-full bg-purple-100/80 backdrop-blur-sm transition-all duration-700"
               style={{
-                bottom: `25%`,
-                left: `20%`,
+                bottom: `35%`,
+                left: `30%`,
                 transform: `translate(${scrollY * 0.04}px, ${scrollY * 0.03}px)`,
               }}
             ></div>
@@ -114,8 +103,23 @@ export default function Welcome() {
           </div>
         </div>
 
+        {/* Login Button */}
+        {!isAuthenticated && (
+          <div className="absolute top-10 right-8 z-20">
+            <Link href={route("login")}>
+              <Button
+                className="cursor-default group h-14 w-36 rounded-sm px-10 text-xl font-medium bg-blue-500 text-white hover:bg-blue-600  transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                Login
+              </Button>
+            </Link>
+          </div>
+        )}
+
         {/* Contact link */}
-        <div className="absolute top-8 right-8 backdrop-blur-sm bg-white/30 px-4 py-2 rounded-full">
+        <div className="absolute top-8 left-8 backdrop-blur-sm bg-white/30 px-4 py-2 rounded-full">
           <div className="text-sm text-gray-800 flex items-center gap-2">
             <i className="fas fa-headset"></i>
             <span>Need help?</span>
@@ -126,8 +130,10 @@ export default function Welcome() {
               contact us
             </a>
           </div>
+
         </div>
       </main>
     </>
   );
+
 }

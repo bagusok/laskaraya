@@ -29,8 +29,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 });
 
-Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
+Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/', function () {
-        return Inertia::render('dashboard/index');
+        return Inertia::render('dashboard/admin/admin'); // Point to your Dashboard.jsx
     })->name('dashboard');
 });
