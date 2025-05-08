@@ -10,7 +10,7 @@ export default function Login() {
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     post(route("login.post"), {
       onSuccess: (data) => {

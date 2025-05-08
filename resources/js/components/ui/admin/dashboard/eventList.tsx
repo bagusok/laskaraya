@@ -2,7 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 
-export default function EventList({ events, className }) {
+interface Event {
+  name: string;
+  date: string;
+  category: string;
+}
+
+interface EventListProps {
+  events: Event[];
+  className?: string;
+}
+
+export default function EventList({ events, className }: EventListProps) {
     const colorClass = className || "bg-gradient-to-br from-white to-blue-50/20";
 
     return (

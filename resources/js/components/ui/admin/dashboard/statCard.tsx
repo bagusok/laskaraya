@@ -1,6 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { ReactNode } from "react";
 
-export default function StatCard({ label, value, icon, className }) {
+interface StatCardProps {
+    label: string;
+    value: string | number;
+    icon: ReactNode;
+    className?: string;
+}
+
+export default function StatCard({ label, value, icon, className }: StatCardProps) {
     const colorClass = className || "bg-gradient-to-br from-white to-blue-50/20";
 
     return (

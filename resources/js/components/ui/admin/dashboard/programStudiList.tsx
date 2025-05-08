@@ -2,7 +2,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Pencil } from "lucide-react";
 
-export default function ProgramStudiList({ programs, className }) {
+interface Program {
+  id: number;
+  name: string;
+  students: number;
+  competitions: number;
+}
+
+interface ProgramStudiListProps {
+  programs: Program[];
+  className?: string;
+}
+
+export default function ProgramStudiList({ programs, className }: ProgramStudiListProps) {
     const colorClass = className || "bg-gradient-to-br from-white to-blue-50/20";
 
     return (

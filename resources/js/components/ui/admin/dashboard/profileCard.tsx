@@ -2,7 +2,19 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Pencil } from "lucide-react";
 
-export default function ProfileCard({ user, showEditButton = true, className }) {
+interface User {
+  name?: string;
+  email?: string;
+  role?: string;
+}
+
+interface ProfileCardProps {
+  user: User;
+  showEditButton?: boolean;
+  className?: string;
+}
+
+export default function ProfileCard({ user, showEditButton = true, className }: ProfileCardProps) {
     const colorClass = className || "bg-gradient-to-br from-white to-blue-50/20";
 
     return (

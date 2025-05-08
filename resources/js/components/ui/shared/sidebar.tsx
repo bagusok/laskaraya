@@ -3,25 +3,53 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { usePage } from "@inertiajs/react";
 import { ChevronRight, LogOut, X } from "lucide-react";
+import { SidebarProps, NavItem } from "../../../types/sidebar";
+import { getPath, normalizePath } from "../../../lib/sidebar.utils";
 
-export default function Sidebar({ navItems = [], sidebarOpen = false, onClose }) {
+export default function Sidebar({ navItems = [], sidebarOpen = false, onClose, currentUrl }: SidebarProps) {
     const { url } = usePage();
     const [isHovered, setIsHovered] = useState(false);
     const [selectedItem, setSelectedItem] = useState("");
-    const [openMenus, setOpenMenus] = useState({});
+    const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
 
     useEffect(() => {
-        setSelectedItem(url);
-    }, [url]);
+        setSelectedItem(currentUrl);
+        navItems.forEach((item, index) => {
+            if (item.subItems?.some(subItem => currentUrl.startsWith(subItem.href))) {
+                setOpenMenus(prev => ({ ...prev, [index]: true }));
+            }
+        });
+    }, [currentUrl, navItems]);
 
-    const isItemSelected = (href) => selectedItem === href || url.startsWith(href);
-    const toggleSubmenu = (index) => {
+    const isItemSelected = (href: string) => {
+        if (!href) return false;
+
+        let path = href;
+        try {
+            if (!href.startsWith('/') && !href.startsWith('http')) {
+                path = getPath(route(href));
+            } else {
+                path = getPath(href);
+            }
+        } catch {
+            path = getPath(href);
+        }
+
+        const normCurrent = normalizePath(currentUrl);
+        const normPath = normalizePath(path);
+
+        if (normPath === '/') {
+            return normCurrent === '/';
+        }
+        return normCurrent === normPath || normCurrent.startsWith(normPath + '/');
+    };
+
+    const toggleSubmenu = (index: number) => {
         setOpenMenus(prev => ({ ...prev, [index]: !prev[index] }));
     };
 
     return (
         <>
-            {/* Desktop Sidebar (always visible on lg screens) */}
             <div
                 className="hidden lg:block fixed inset-y-0 left-0 z-40 w-72 bg-white border-r"
                 onMouseEnter={() => setIsHovered(true)}
@@ -78,17 +106,17 @@ export default function Sidebar({ navItems = [], sidebarOpen = false, onClose })
                                     </>
                                 ) : (
                                     <Link
-                                        href={item.href}
+                                        href={item.href || ''}
                                         className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-300
-                                        ${isItemSelected(item.href)
+                                        ${isItemSelected(item.href || '')
                                             ? " text-purple-700 shadow-sm shadow-purple-300 border-none"
                                             : "text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-white"}`}
                                     >
-                                        <span className={`text-xl transition-colors duration-300 ${isItemSelected(item.href) ? "text-purple-600" : "text-purple-500 group-hover:text-purple-600"}`}>
+                                        <span className={`text-xl transition-colors duration-300 ${isItemSelected(item.href || '') ? "text-purple-600" : "text-purple-500 group-hover:text-purple-600"}`}>
                                             {item.icon}
                                         </span>
-                                        <span className={`text-base ${isItemSelected(item.href) ? "font-medium" : ""}`}>{item.label}</span>
-                                        {isItemSelected(item.href) && (
+                                        <span className={`text-base ${isItemSelected(item.href || '') ? "font-medium" : ""}`}>{item.label}</span>
+                                        {isItemSelected(item.href || '') && (
                                             <div className="ml-auto w-1 h-6 bg-purple-500 rounded-full animate-pulse" />
                                         )}
                                     </Link>
@@ -177,17 +205,17 @@ export default function Sidebar({ navItems = [], sidebarOpen = false, onClose })
                                     </>
                                 ) : (
                                     <Link
-                                        href={item.href}
+                                        href={item.href || ''}
                                         className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-300
-                                        ${isItemSelected(item.href)
+                                        ${isItemSelected(item.href || '')
                                             ? " text-purple-700 shadow-sm shadow-purple-300 border-none"
                                             : "text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-white"}`}
                                     >
-                                        <span className={`text-xl transition-colors duration-300 ${isItemSelected(item.href) ? "text-purple-600" : "text-purple-500 group-hover:text-purple-600"}`}>
+                                        <span className={`text-xl transition-colors duration-300 ${isItemSelected(item.href || '') ? "text-purple-600" : "text-purple-500 group-hover:text-purple-600"}`}>
                                             {item.icon}
                                         </span>
-                                        <span className={`text-base ${isItemSelected(item.href) ? "font-medium" : ""}`}>{item.label}</span>
-                                        {isItemSelected(item.href) && (
+                                        <span className={`text-base ${isItemSelected(item.href || '') ? "font-medium" : ""}`}>{item.label}</span>
+                                        {isItemSelected(item.href || '') && (
                                             <div className="ml-auto w-1 h-6 bg-purple-500 rounded-full animate-pulse" />
                                         )}
                                     </Link>

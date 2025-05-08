@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 
-export default function Header({ user, onToggleSidebar }) {
+interface HeaderProps {
+  user: {
+    name?: string;
+  };
+  onToggleSidebar: () => void;
+  title?: string;
+}
+
+export default function Header({ user, onToggleSidebar, title = "Dashboard" }: HeaderProps) {
     const [time, setTime] = useState(new Date());
 
     useEffect(() => {
@@ -25,7 +33,7 @@ export default function Header({ user, onToggleSidebar }) {
 
                     <div className="group w-full sm:w-auto">
                         <h1 className="text-3xl sm:text-5xl font-bold text-blue-900 mb-2 tracking-tight hover:tracking-wide transition-all duration-300">
-                            Dashboard
+                            {title}
                         </h1>
                         <p className="text-sm sm:text-lg font-medium text-gray-600 tracking-wide relative before:content-[''] before:absolute before:-bottom-2 before:left-0 before:w-0 before:h-[1px] before:bg-gray-400 group-hover:before:w-full before:transition-all before:duration-300">
                             Selamat datang kembali, <span className='text-purple-600'>{user?.name || 'Admin'}</span>

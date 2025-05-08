@@ -2,7 +2,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 
-export default function PeriodList({ periods, className }) {
+interface Period {
+  id: number;
+  name: string;
+  status: string;
+  events: number;
+}
+
+interface PeriodListProps {
+  periods: Period[];
+  className?: string;
+}
+
+export default function PeriodList({ periods, className }: PeriodListProps) {
     const colorClass = className || "bg-gradient-to-br from-white to-blue-50/20";
 
     return (
