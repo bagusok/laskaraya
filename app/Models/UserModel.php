@@ -42,4 +42,26 @@ class UserModel extends Authenticatable
     {
         return 'identifier';
     }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function mahasiswa()
+    {
+        return $this->hasOne(MahasiswaModel::class, 'user_id', 'id');
+    }
+
+    public function dosen()
+    {
+        return $this->hasOne(DosenModel::class, 'user_id', 'id');
+    }
+
+    public function profile()
+    {
+        return $this->role === 'mahasiswa'
+            ? $this->mahasiswa()
+            : ($this->role === 'dosen' ? $this->dosen() : null);
+    }
 }

@@ -37,6 +37,8 @@ return new class extends Migration
             $table->enum('gender', ['L', 'P'])->nullable();
             $table->string('birth_place')->nullable();
             $table->date('birth_date')->nullable();
+
+            $table->timestamps();
         });
 
         Schema::create('dosen_profiles', function (Blueprint $table) {
@@ -45,10 +47,13 @@ return new class extends Migration
             $table->string('address')->nullable();
 
             $table->string('faculty')->nullable();
+            $table->string('major')->nullable();
 
             $table->enum('gender', ['L', 'P'])->nullable();
             $table->string('birth_place')->nullable();
             $table->date('birth_date')->nullable();
+
+            $table->timestamps();
         });
     }
 
