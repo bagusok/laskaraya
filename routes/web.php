@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\userController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,18 +31,12 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
-Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('/', function () {
-        return Inertia::render('dashboard/admin/admin'); // Point to your Dashboard.tsx
-    })->name('dashboard');
+Route::group(['prefix' => 'users', 'middleware' => ['auth', 'role:admin']], function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::post('/add', [UserController::class, 'postCreate'])->name('users.create');
 
- });
- Route::group(['prefix' => 'users'], function () {
-    Route::get('/', [userController::class, 'index'])->name('users.index');
-    Route::get('/add', [userController::class, 'create'])->name('users.add');
-    Route::get('/{user}/edit', [userController::class, 'edit'])->name('users.edit');
-    Route::get('/{user}/delete', [userController::class, 'delete'])->name('users.delete');
-    Route::delete('/{user}', [userController::class, 'destroy'])->name('users.destroy');
- });
-
+    Route::put('/edit/{id}', [UserController::class, 'postEdit'])->name('users.edit');
+    Route::get('/edit/{id}', [UserController::class, 'editDetail'])->name('users.edit.detail');
+});
