@@ -39,4 +39,5 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth', 'role:admin']], func
 
     Route::put('/edit/{id}', [UserController::class, 'postEdit'])->name('users.edit');
     Route::get('/edit/{id}', [UserController::class, 'editDetail'])->name('users.edit.detail');
+    Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });

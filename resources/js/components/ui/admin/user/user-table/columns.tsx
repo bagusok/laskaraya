@@ -3,6 +3,7 @@ import { User } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import EditUserModal from "../editUserModal";
 import { Trash2 } from "lucide-react";
+import DelUserModal from "../delUserModal";
 
 export const userDataTableColumns = (): ColumnDef<User>[] => [
     {
@@ -49,14 +50,10 @@ export const userDataTableColumns = (): ColumnDef<User>[] => [
             <div className="flex items-center gap-2">
                 <EditUserModal userId={row.original.id} />
 
-                <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => console.log("Delete ID: ", row.original.id)}
-                    className="hover:bg-red-100/30 hover:text-red-600 text-red-300"
-                >
-                    <Trash2 className="h-4 w-4" />
-                </Button>
+                <DelUserModal
+                    userId={row.original.id}
+                    userName={row.original.name}
+                />
             </div>
         )
     }

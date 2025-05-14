@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -53,12 +54,23 @@ class UserController extends Controller
         ]);
     }
 
-    public function destroy(UserModel $user)
-    {
+public function destroy($id)
+{
+    try {
+    $user = UserModel::findOrFail($id);
+    if ($user ->role === 'mahasiswa') {
+        $user->mahasiswa()->delete();
         $user->delete();
-
-        return redirect()->back()->with('success', 'User berhasil dihapus');
+    } elseif ($user->role === 'dosen') {
+        $user->dosen()->delete();
+        $user->delete();
     }
+        return redirect()->back()->with('success', 'User berhasil dihapus');
+    } catch (\Exception $e) {
+        Log::error("Error deleting user: " . $e->getMessage());
+        return redirect()->back()->withErrors(['error' => 'Failed to delete user.']);
+    }
+}
 
     public function create()
     {
@@ -182,10 +194,4 @@ class UserController extends Controller
         }
     }
 
-    public function delete(UserModel $user)
-    {
-        return Inertia::render('dashboard/admin/users/userDelete', [
-            'user' => $user
-        ]);
-    }
 }
