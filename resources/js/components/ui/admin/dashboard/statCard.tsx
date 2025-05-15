@@ -1,6 +1,6 @@
-import "../../../../../css/dashboard-admin.css";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReactNode } from "react";
+import "../../../../../css/dashboard-admin.css";
 
 interface StatCardProps {
     label: string;
@@ -20,7 +20,7 @@ export default function StatCard({
 
     return (
         <div className="admin-stat">
-            <div className="admin-stat-value flex items-center gap-2">
+            <div className="admin-stat-value flex items-center gap-2 ">
                 {icon && <span>{icon}</span>}
                 {value}
             </div>

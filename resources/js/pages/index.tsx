@@ -7,51 +7,61 @@ import About from "@/components/about";
 import Team from "@/components/team";
 import Footer from "@/components/footer";
 import "../../css/index.css";
+import LoadingScreen from "@/components/loadingScreen";
 
 export default function Welcome() {
     const [scrollY, setScrollY] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const { isAuthenticated } = useAuth();
     const heroRef = useRef<HTMLDivElement>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const revealElements = () => {
-            const elements = document.querySelectorAll(".reveal-item");
-            elements.forEach((element) => {
-                const elementTop = (
-                    element as HTMLElement
-                ).getBoundingClientRect().top;
-                const elementVisible = 150;
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add("is-revealed");
-                }
-            });
-        };
-
-        const handleScroll = () => {
-            setScrollY(window.scrollY);
-            revealElements();
-        };
-
-        const handleMouseMove = (e: MouseEvent) => {
-            if (heroRef.current) {
-                const rect = heroRef.current.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                setMousePosition({ x, y });
-            }
-        };
-
-        // Reveal on mount
-        revealElements();
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        window.addEventListener("mousemove", handleMouseMove);
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            window.removeEventListener("mousemove", handleMouseMove);
-        };
+        // Simulasi loading, bisa diganti dengan event onReady/data fetch
+        const timer = setTimeout(() => setLoading(false), 1200);
+        return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        if (!loading) {
+            const revealElements = () => {
+                const elements = document.querySelectorAll(".reveal-item");
+                elements.forEach((element) => {
+                    const elementTop = (
+                        element as HTMLElement
+                    ).getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add("is-revealed");
+                    }
+                });
+            };
+
+            const handleScroll = () => {
+                setScrollY(window.scrollY);
+                revealElements();
+            };
+
+            const handleMouseMove = (e: MouseEvent) => {
+                if (heroRef.current) {
+                    const rect = heroRef.current.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    setMousePosition({ x, y });
+                }
+            };
+
+            // Reveal on mount
+            revealElements();
+            window.addEventListener("scroll", handleScroll, { passive: true });
+            window.addEventListener("mousemove", handleMouseMove);
+
+            return () => {
+                window.removeEventListener("scroll", handleScroll);
+                window.removeEventListener("mousemove", handleMouseMove);
+            };
+        }
+    }, [loading]);
 
     // Calculate parallax effects
     const calculateParallax = (factor: number) => {
@@ -59,6 +69,8 @@ export default function Welcome() {
             transform: `translate(${mousePosition.x * factor}px, ${mousePosition.y * factor}px)`
         };
     };
+
+    if (loading) return <LoadingScreen />;
 
     return (
         <>
@@ -127,8 +139,7 @@ export default function Welcome() {
                                 style={{ transitionDelay: "100ms" }}
                             >
                                 Platform modern untuk pendataan dan visualisasi
-                                prestasi mahasiswa dengan user interface yang
-                                intuitif.
+                                prestasi mahasiswa.
                             </p>
 
                             <div

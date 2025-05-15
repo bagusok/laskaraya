@@ -18,7 +18,7 @@ export default function AdminDashboard() {
                 <div className="lg:hidden space-y-6">
                     <ProfileCard user={user} className="" />
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-10">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
                     {stats.map((stat, index) => (
                         <StatCard
                             key={index}

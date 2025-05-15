@@ -52,6 +52,7 @@
     "clsx": "^2.1.1",
     "concurrently": "^9.0.1",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.11.3",
     "globals": "^15.14.0",
     "install": "^0.13.0",
     "jotai": "^2.12.3",
