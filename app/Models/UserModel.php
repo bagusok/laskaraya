@@ -21,7 +21,7 @@ class UserModel extends Authenticatable
         'role',
         'is_verified',
         'remember_token',
-        'profile_picture',
+        'image',
     ];
 
     protected $hidden = [
@@ -33,6 +33,10 @@ class UserModel extends Authenticatable
         'is_verified' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+    ];
+
+    protected $appends = [
+        'image_url',
     ];
 
     /**
@@ -65,11 +69,11 @@ class UserModel extends Authenticatable
             : ($this->role === 'dosen' ? $this->dosen() : null);
     }
 
-    public function getProfilePictureUrlAttribute()
+    public function getImageUrlAttribute()
     {
-        if ($this->profile_picture) {
-            return asset('storage/profile_pictures/' . $this->profile_picture);
+        if ($this->image) {
+            return asset('storage/profile_pictures/' . $this->image);
         }
-        return asset('images/default-profile.png');
+        return asset('default-profile.svg');
     }
 }

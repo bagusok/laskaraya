@@ -29,7 +29,18 @@ export default function ProfileCard({
                     <CardContent className="p-6">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-16 h-16 bg-purple-100/40 text-sepia-700 rounded-full flex items-center justify-center mb-4 ring-2 ring-sepia-200 transition-all duration-300 hover:ring-sepia-400 hover:bg-purple-100/60">
-                                <User size={32} className="text-sepia-600" />
+                                {user?.image_url ? (
+                                    <img
+                                        src={user.image_url}
+                                        alt="Foto Profil"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    <User
+                                        size={32}
+                                        className="text-sepia-600"
+                                    />
+                                )}
                             </div>
                             <h3 className="font-bold text-gray-800 text-lg hover:text-sepia-700 transition-colors duration-300">
                                 {user?.name || "Admin"}

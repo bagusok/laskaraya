@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -21,6 +22,8 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        Log::info($request->all());
+
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -31,7 +34,7 @@ class ProfileController extends Controller
             'role' => 'required|in:admin,dosen,mahasiswa',
             'is_verified' => 'boolean',
             'password' => 'nullable|min:8',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         try {
@@ -42,18 +45,18 @@ class ProfileController extends Controller
                 $validated['password'] = Hash::make($validated['password']);
             }
 
-            // Handle profile picture upload
-            if ($request->hasFile('profile_picture')) {
-                // Delete old profile picture if exists
-                if ($user->profile_picture && Storage::exists('public/profile_pictures/' . $user->profile_picture)) {
-                    Storage::delete('public/profile_pictures/' . $user->profile_picture);
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($user->image && Storage::exists('public/profile_pictures/' . $user->image)) {
+                    Storage::delete('public/profile_pictures/' . $user->image);
                 }
 
-                // Store new profile picture
-                $file = $request->file('profile_picture');
+                // Store new image
+                $file = $request->file('image');
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $file->storeAs('public/profile_pictures', $filename);
-                $validated['profile_picture'] = $filename;
+                $validated['image'] = $filename;
             }
 
             // Update user data

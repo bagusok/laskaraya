@@ -61,31 +61,30 @@ export default function EditProfile() {
                                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-200">
                                         <img
                                             src={
-                                                previewImage ||
-                                                user?.profile_picture_url
+                                                previewImage || user?.image_url
                                             }
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <label
-                                        htmlFor="profile_picture"
+                                        htmlFor="image"
                                         className="absolute bottom-0 right-0 bg-purple-500 text-white p-2 rounded-full cursor-pointer hover:bg-purple-600 transition-colors"
                                     >
                                         <Camera size={20} />
                                     </label>
                                     <input
                                         type="file"
-                                        id="profile_picture"
+                                        id="image"
                                         accept="image/*"
                                         className="hidden"
-                                        {...register("profile_picture")}
+                                        {...register("image")}
                                         onChange={handleImageChange}
                                     />
                                 </div>
-                                {errors.profile_picture && (
+                                {errors.image && (
                                     <p className="text-sm text-red-500">
-                                        {errors.profile_picture.message}
+                                        {errors.image.message}
                                     </p>
                                 )}
                             </div>
