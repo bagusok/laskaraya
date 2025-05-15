@@ -1,0 +1,171 @@
+/* Dashboard Admin Custom CSS - Modern, Glass, Shadcn Harmony */
+:root {
+    --admin-primary: #7c3aed;
+    --admin-secondary: #2563eb;
+    --admin-bg: #f8fafc;
+    --admin-card-bg: rgba(255, 255, 255, 0.85);
+    --admin-glass: rgba(255, 255, 255, 0.6);
+    --admin-shadow: 0 8px 32px 0 rgba(60, 60, 120, 0.12);
+    --admin-radius: 1.5rem;
+    --admin-blur: 16px;
+    --admin-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+}
+
+.admin-dashboard-bg {
+    min-height: 100vh;
+    background: var(--admin-gradient);
+    padding: 2rem 0;
+}
+
+.admin-card {
+    background: var(--admin-card-bg);
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow);
+    backdrop-filter: blur(var(--admin-blur));
+    border: 1.5px solid #ede9fe;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+.admin-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 40px 0 rgba(124, 58, 237, 0.13);
+}
+
+.admin-card-header {
+    padding: 1.5rem 2rem 0.5rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--admin-primary);
+    letter-spacing: -0.01em;
+}
+
+.admin-card-content {
+    padding: 1.5rem 2rem 2rem 2rem;
+}
+
+.admin-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--admin-glass);
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px 0 rgba(60, 60, 120, 0.08);
+    padding: 1.5rem 1rem;
+    margin: 0.5rem 0;
+    transition:
+        box-shadow 0.2s,
+        transform 0.2s;
+}
+.admin-stat:hover {
+    box-shadow: 0 8px 24px 0 rgba(124, 58, 237, 0.13);
+    transform: scale(1.04);
+}
+.admin-stat-label {
+    font-size: 1rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+.admin-stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--admin-secondary);
+    letter-spacing: -0.03em;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    background: var(--admin-glass);
+    border-right: 2px solid #ede9fe;
+    box-shadow: 0 8px 32px 0 rgba(60, 60, 120, 0.1);
+    backdrop-filter: blur(var(--admin-blur));
+    min-height: 100vh;
+    padding-top: 2rem;
+    transition: box-shadow 0.2s;
+}
+.admin-sidebar .sidebar-logo {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.admin-sidebar .sidebar-logo img {
+    width: 120px;
+    filter: drop-shadow(0 2px 8px #ede9fe);
+}
+.admin-sidebar .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.admin-sidebar .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    border-radius: 1rem;
+    color: #4b5563;
+    font-weight: 500;
+    font-size: 1.08rem;
+    transition:
+        background 0.2s,
+        color 0.2s,
+        box-shadow 0.2s;
+    position: relative;
+}
+.admin-sidebar .sidebar-link.active,
+.admin-sidebar .sidebar-link:hover {
+    background: linear-gradient(90deg, #ede9fe 0%, #f3f4f6 100%);
+    color: var(--admin-primary);
+    box-shadow: 0 2px 8px 0 rgba(124, 58, 237, 0.08);
+}
+.admin-sidebar .sidebar-link .sidebar-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--admin-primary);
+    margin-right: 0.5rem;
+    opacity: 0.7;
+}
+
+.admin-sidebar .sidebar-link .sidebar-icon {
+    font-size: 1.3rem;
+    color: var(--admin-primary);
+    transition: color 0.2s;
+}
+.admin-sidebar .sidebar-link.active .sidebar-icon,
+.admin-sidebar .sidebar-link:hover .sidebar-icon {
+    color: var(--admin-secondary);
+}
+
+.admin-sidebar .sidebar-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #a1a1aa;
+    margin: 1.5rem 0 0.5rem 1.5rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .admin-sidebar {
+        min-width: 60px;
+        padding-top: 1rem;
+    }
+    .admin-sidebar .sidebar-logo img {
+        width: 60px;
+    }
+    .admin-sidebar .sidebar-link {
+        padding: 0.7rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-dashboard-bg {
+        padding: 0.5rem 0;
+    }
+    .admin-card {
+        padding: 1rem;
+    }
+}

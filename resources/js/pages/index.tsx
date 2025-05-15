@@ -3,9 +3,9 @@ import { Head, Link } from "@inertiajs/react";
 import { useState, useEffect, useRef } from "react";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 import useAuth from "@/hooks/use-auth";
-import About from "@/components/About";
-import Team from "@/components/Team";
-import Footer from "@/components/Footer";
+import About from "@/components/about";
+import Team from "@/components/team";
+import Footer from "@/components/footer";
 import "../../css/index.css";
 
 export default function Welcome() {

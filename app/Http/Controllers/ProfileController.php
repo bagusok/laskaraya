@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -29,21 +30,44 @@ class ProfileController extends Controller
             'phone' => 'required|string|max:20',
             'role' => 'required|in:admin,dosen,mahasiswa',
             'is_verified' => 'boolean',
-            'password' => 'nullable|min:8'
+            'password' => 'nullable|min:8',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        // Hapus password dari data jika kosong
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        } else {
-            $validated['password'] = Hash::make($validated['password']);
-        }
-
         try {
+            // Hapus password dari data jika kosong
+            if (empty($validated['password'])) {
+                unset($validated['password']);
+            } else {
+                $validated['password'] = Hash::make($validated['password']);
+            }
+
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($user->profile_picture && Storage::exists('public/profile_pictures/' . $user->profile_picture)) {
+                    Storage::delete('public/profile_pictures/' . $user->profile_picture);
+                }
+
+                // Store new profile picture
+                $file = $request->file('profile_picture');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('public/profile_pictures', $filename);
+                $validated['profile_picture'] = $filename;
+            }
+
+            // Update user data
             $user->update($validated);
-            return redirect()->route('dashboard')->with('success', 'Profil berhasil diperbarui');
+
+            // Refresh user data
+            $user->refresh();
+
+            return back()->with([
+                'success' => 'Profil berhasil diperbarui',
+                'user' => $user
+            ]);
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui profil']);
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui profil: ' . $e->getMessage()]);
         }
     }
 }

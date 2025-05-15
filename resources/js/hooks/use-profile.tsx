@@ -5,6 +5,7 @@ import { useState } from "react";
 import useAuth from "@/hooks/use-auth";
 import { profileSchema } from "../types/profile.d";
 import type { ProfileFormData } from "../types/profile.d";
+import toast from "react-hot-toast";
 
 export function useProfileForm() {
     const { user } = useAuth();
@@ -16,16 +17,7 @@ export function useProfileForm() {
         formState: { errors },
         setValue,
         reset
-    } = useForm<{
-        name: string;
-        email: string;
-        identifier: string;
-        phone: string;
-        faculty: string | null;
-        role: "admin" | "dosen" | "mahasiswa";
-        is_verified: boolean;
-        password?: string;
-    }>({
+    } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             name: user?.name || "",
@@ -42,36 +34,57 @@ export function useProfileForm() {
     const onSubmit: SubmitHandler<ProfileFormData> = async (data) => {
         setIsLoading(true);
         try {
-            await router.put(
-                route("profile.update"),
-                {
-                    ...data,
-                    _method: "PUT"
-                },
-                {
-                    onSuccess: () => {
+            const formData = new FormData();
+
+            // Add _method for Laravel to handle PUT request
+            formData.append("_method", "PUT");
+
+            // Append all form fields to FormData
+            Object.keys(data).forEach((key) => {
+                if (key === "profile_picture" && data[key]?.[0]) {
+                    formData.append(key, data[key][0]);
+                } else if (key !== "profile_picture") {
+                    formData.append(
+                        key,
+                        String(data[key as keyof ProfileFormData])
+                    );
+                }
+            });
+
+            await router.put(route("profile.update"), formData, {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    // Reset form dengan data terbaru dari response
+                    if (page.props.user) {
                         reset({
-                            name: data.name,
-                            email: data.email,
-                            identifier: data.identifier,
-                            phone: data.phone,
-                            faculty: data.faculty,
-                            role: data.role as "admin" | "dosen" | "mahasiswa",
-                            is_verified: data.is_verified,
+                            name: page.props.user.name,
+                            email: page.props.user.email,
+                            identifier: page.props.user.identifier,
+                            phone: page.props.user.phone,
+                            faculty: page.props.user.faculty,
+                            role: page.props.user.role as
+                                | "admin"
+                                | "dosen"
+                                | "mahasiswa",
+                            is_verified: page.props.user.is_verified,
                             password: ""
                         });
-                        router.visit(route("dashboard"));
-                    },
-                    onError: (errors) => {
-                        console.error(errors);
-                    },
-                    onFinish: () => {
-                        setIsLoading(false);
+                        toast.success("Profil berhasil diperbarui");
                     }
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    Object.keys(errors).forEach((key) => {
+                        toast.error(errors[key]);
+                    });
+                },
+                onFinish: () => {
+                    setIsLoading(false);
                 }
-            );
+            });
         } catch (error) {
             console.error(error);
+            toast.error("Terjadi kesalahan saat memperbarui profil");
             setIsLoading(false);
         }
     };

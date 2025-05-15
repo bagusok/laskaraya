@@ -14,6 +14,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { router } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
+import { useState } from "react";
+import { Camera } from "lucide-react";
 
 export default function EditProfile() {
     const {
@@ -25,6 +27,19 @@ export default function EditProfile() {
         isLoading,
         user
     } = useProfileForm();
+
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     return (
         <AdminLayout>
@@ -39,7 +54,42 @@ export default function EditProfile() {
                         <form
                             onSubmit={handleSubmit(onSubmit as any)}
                             className="space-y-6"
+                            encType="multipart/form-data"
                         >
+                            <div className="flex flex-col items-center space-y-4 mb-6">
+                                <div className="relative">
+                                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-200">
+                                        <img
+                                            src={
+                                                previewImage ||
+                                                user?.profile_picture_url
+                                            }
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <label
+                                        htmlFor="profile_picture"
+                                        className="absolute bottom-0 right-0 bg-purple-500 text-white p-2 rounded-full cursor-pointer hover:bg-purple-600 transition-colors"
+                                    >
+                                        <Camera size={20} />
+                                    </label>
+                                    <input
+                                        type="file"
+                                        id="profile_picture"
+                                        accept="image/*"
+                                        className="hidden"
+                                        {...register("profile_picture")}
+                                        onChange={handleImageChange}
+                                    />
+                                </div>
+                                {errors.profile_picture && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.profile_picture.message}
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label

@@ -21,6 +21,7 @@ class UserModel extends Authenticatable
         'role',
         'is_verified',
         'remember_token',
+        'profile_picture',
     ];
 
     protected $hidden = [
@@ -62,5 +63,13 @@ class UserModel extends Authenticatable
         return $this->role === 'mahasiswa'
             ? $this->mahasiswa()
             : ($this->role === 'dosen' ? $this->dosen() : null);
+    }
+
+    public function getProfilePictureUrlAttribute()
+    {
+        if ($this->profile_picture) {
+            return asset('storage/profile_pictures/' . $this->profile_picture);
+        }
+        return asset('images/default-profile.png');
     }
 }

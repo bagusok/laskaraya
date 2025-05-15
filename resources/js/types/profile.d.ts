@@ -10,6 +10,8 @@ export interface User {
     faculty?: string;
     role?: UserRole;
     is_verified?: boolean;
+    profile_picture?: string;
+    profile_picture_url?: string;
 }
 
 export interface ProfileFormData {
@@ -17,12 +19,11 @@ export interface ProfileFormData {
     email: string;
     identifier: string;
     phone: string;
-    faculty: string;
-    role: string;
+    faculty: string | null;
+    role: UserRole;
     is_verified: boolean;
-    password: string | undefined;
-    password_confirmation: string | undefined;
-    current_password: string | undefined;
+    password?: string;
+    profile_picture?: FileList;
 }
 
 export const profileSchema = z.object({
@@ -37,7 +38,8 @@ export const profileSchema = z.object({
         .string()
         .min(8, "Password minimal 8 karakter")
         .optional()
-        .or(z.literal(""))
+        .or(z.literal("")),
+    profile_picture: z.any().optional()
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
