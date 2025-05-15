@@ -1,11 +1,13 @@
 import "../css/app.css";
+import "../css/animations.css";
+import "../css/landing.css";
 
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
 import ThemeWrapper from "./layouts/theme-wrapper";
 import { Toaster } from "react-hot-toast";
-import QueryClientWrapper from "./layouts/query-client-wrapper";
+import { QueryClientWrapper } from "./layouts/query-client-wrapper";
 
 const appName = import.meta.env.VITE_APP_NAME || "LASKARAYA";
 

@@ -17,7 +17,6 @@ class UserModel extends Authenticatable
         'email',
         'identifier',
         'phone',
-        'faculty',
         'password',
         'role',
         'is_verified',

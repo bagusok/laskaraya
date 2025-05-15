@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,4 +41,10 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth', 'role:admin']], func
     Route::put('/edit/{id}', [UserController::class, 'postEdit'])->name('users.edit');
     Route::get('/edit/{id}', [UserController::class, 'editDetail'])->name('users.edit.detail');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+// Profile routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });

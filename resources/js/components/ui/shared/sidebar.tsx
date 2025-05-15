@@ -51,7 +51,7 @@ export default function Sidebar({ navItems = [], sidebarOpen = false, onClose, c
     return (
         <>
             <div
-                className="hidden lg:block fixed inset-y-0 left-0 z-40 w-72 bg-white border-r"
+                className="hidden lg:block fixed inset-y-0 left-0 z-40 w-72 "
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >

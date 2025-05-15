@@ -1,0 +1,254 @@
+/* Swiss Creative Design System */
+:root {
+    --primary: #2563eb;
+    --secondary: #7c3aed;
+    --accent: #60a5fa;
+    --background: #ffffff;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --card-bg: #f8fafc;
+    --card-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.08);
+    --spacing-unit: 8px;
+    --radius: 18px;
+}
+
+/* Typography */
+.swiss-title {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.swiss-text {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+}
+
+/* Section Decorative Shapes */
+.section-deco {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+}
+.deco-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--secondary);
+    opacity: 0.12;
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    animation: float 6s ease-in-out infinite;
+}
+.deco-line {
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+    opacity: 0.18;
+    position: absolute;
+    right: 8%;
+    bottom: 12%;
+    animation: slideInLine 8s infinite alternate;
+}
+
+@keyframes slideInLine {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(30px);
+    }
+}
+
+/* About Section */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: calc(var(--spacing-unit) * 5);
+    padding: calc(var(--spacing-unit) * 8) 0;
+    position: relative;
+}
+
+.feature-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: calc(var(--spacing-unit) * 5) calc(var(--spacing-unit) * 3);
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.4s;
+    z-index: 1;
+}
+.feature-card:hover {
+    transform: translateY(-8px) scale(1.03) rotate(-1deg);
+    box-shadow: 0 16px 40px 0 rgba(31, 41, 55, 0.13);
+}
+.feature-card::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary) 60%, var(--secondary));
+    opacity: 0.08;
+    border-radius: 50%;
+    z-index: 0;
+}
+.feature-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    box-shadow: 0 2px 8px 0 rgba(60, 60, 120, 0.08);
+    transition: transform 0.4s;
+    z-index: 2;
+}
+.feature-card:hover .feature-icon {
+    transform: scale(1.12) rotate(8deg);
+}
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+
+/* Team Section */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: calc(var(--spacing-unit) * 5);
+    padding: calc(var(--spacing-unit) * 8) 0;
+    position: relative;
+}
+.team-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    position: relative;
+    transition:
+        transform 0.4s,
+        box-shadow 0.4s;
+    z-index: 1;
+    padding-bottom: 2.5rem;
+}
+.team-card:hover {
+    transform: scale(1.04) rotate(1deg);
+    box-shadow: 0 16px 40px 0 rgba(31, 41, 55, 0.13);
+}
+.team-image {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+        135deg,
+        var(--primary) 30%,
+        var(--secondary) 100%
+    );
+}
+.team-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.team-card:hover .team-image img {
+    transform: scale(1.08) rotate(-2deg);
+}
+.team-info {
+    padding: 2rem 1.5rem 0.5rem 1.5rem;
+    background: transparent;
+    text-align: center;
+}
+.team-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+}
+.team-role {
+    color: var(--secondary);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+.team-social {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.team-card:hover .team-social {
+    opacity: 1;
+    transform: translateY(0);
+}
+.social-icon {
+    color: var(--text-light);
+    background: #fff;
+    border-radius: 50%;
+    padding: 0.5rem;
+    box-shadow: 0 2px 8px 0 rgba(60, 60, 120, 0.08);
+    transition: all 0.3s;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.social-icon:hover {
+    color: var(--primary);
+    background: var(--accent);
+    transform: translateY(-4px) scale(1.1);
+}
+
+/* Animations */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-18px);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .feature-grid,
+    .team-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: calc(var(--spacing-unit) * 3);
+    }
+}
+@media (max-width: 600px) {
+    .feature-grid,
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: calc(var(--spacing-unit) * 2);
+        padding: calc(var(--spacing-unit) * 3) 0;
+    }
+    .feature-card,
+    .team-card {
+        padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
+    }
+}
