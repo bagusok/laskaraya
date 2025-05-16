@@ -1,5 +1,7 @@
 import { Award, Users, BookOpen } from "lucide-react";
 import { memo } from "react";
+import useScrollReveal from "@/hooks/useScrollReveal";
+import "@/../css/scroll-reveal.css";
 
 const features = [
     {
@@ -45,6 +47,7 @@ const FeatureCard = memo(
 FeatureCard.displayName = "FeatureCard";
 
 const AboutSection = memo(() => {
+    useScrollReveal();
     return (
         <section className="py-20 bg-white relative overflow-hidden" id="about">
             {/* Dekorasi */}

@@ -1,6 +1,8 @@
 import { Github, Linkedin, Mail } from "lucide-react";
 import teamMembers from "../lib/team.utils";
 import { memo } from "react";
+import useScrollReveal from "@/hooks/useScrollReveal";
+import "@/../css/scroll-reveal.css";
 
 const TeamMember = memo(({ member }: { member: (typeof teamMembers)[0] }) => (
     <div className="team-card reveal-element">
@@ -51,6 +53,7 @@ const TeamMember = memo(({ member }: { member: (typeof teamMembers)[0] }) => (
 TeamMember.displayName = "TeamMember";
 
 const TeamSection = memo(() => {
+    useScrollReveal();
     return (
         <section className="py-20 bg-white relative overflow-hidden">
             {/* Dekorasi */}

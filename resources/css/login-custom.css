@@ -1,0 +1,38 @@
+/* Animasi fade-in untuk card login */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-fade-in {
+    animation: fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Efek border glow untuk card */
+.login-glow {
+    box-shadow:
+        0 0 16px 2px rgba(139, 92, 246, 0.25),
+        0 2px 8px 0 rgba(139, 92, 246, 0.1);
+    border: 2px solid #a78bfa;
+}
+
+/* Efek hover tombol custom */
+.login-btn-glow:hover {
+    box-shadow: 0 0 12px 2px #a78bfa99;
+    background: linear-gradient(90deg, #a78bfa 0%, #6366f1 100%);
+    color: #fff;
+}
+
+/* Logo animasi */
+.login-logo-animate {
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.login-logo-animate:hover {
+    transform: scale(1.08) rotate(-3deg);
+}

@@ -12,18 +12,19 @@
     --radius: 18px;
     --transition-standard: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: "Urbanist", "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Typography */
 .swiss-title {
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-family: "Urbanist", "Helvetica Neue", Arial, sans-serif;
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.1;
 }
 
 .swiss-text {
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-family: "Urbanist", "Helvetica Neue", Arial, sans-serif;
     font-weight: 400;
     letter-spacing: 0.01em;
     line-height: 1.5;
