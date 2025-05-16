@@ -1,19 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Pencil } from "lucide-react";
+import { User, Eye } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import type { User as UserType } from "@/types/profile";
 import "../../../../../css/dashboard-admin.css";
 
 interface ProfileCardProps {
     user: UserType;
-    showEditButton?: boolean;
+    showDetailButton?: boolean;
     className?: string;
 }
 
 export default function ProfileCard({
     user,
-    showEditButton = true,
+    showDetailButton = true,
     className
 }: ProfileCardProps) {
     const colorClass =
@@ -51,15 +51,46 @@ export default function ProfileCard({
                             <div className="w-full py-2 px-3 bg-purple-50/50 rounded-md text-center text-sm text-sepia-700 font-medium mb-3 transition-all duration-300 hover:bg-purple-100/70">
                                 {user?.role || "Administrator"}
                             </div>
-                            {showEditButton && (
-                                <Link href={route("profile.edit")}>
+
+                            {/* Tampilkan data dosen jika ada */}
+                            {user?.dosen && (
+                                <div className="w-full space-y-2 mb-3 text-left">
+                                    <div className="text-sm text-gray-600">
+                                        <span className="font-medium">
+                                            Fakultas:
+                                        </span>{" "}
+                                        {user.dosen.faculty}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        <span className="font-medium">
+                                            Jurusan:
+                                        </span>{" "}
+                                        {user.dosen.major}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        <span className="font-medium">
+                                            Alamat:
+                                        </span>{" "}
+                                        {user.dosen.address}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        <span className="font-medium">
+                                            Jenis Kelamin:
+                                        </span>{" "}
+                                        {user.dosen.gender}
+                                    </div>
+                                </div>
+                            )}
+
+                            {showDetailButton && (
+                                <Link href={route("profile.show")}>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="p-2 text-sepia-600 hover:text-sepia-800 hover:bg-blue-100/50 border border-blue-200 rounded-md transition-all duration-300 hover:border-sepia-400"
+                                        className="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-100/50 border border-purple-200 rounded-md transition-all duration-300 hover:border-purple-400"
                                     >
-                                        Edit Profil
-                                        <Pencil size={16} className="ml-2" />
+                                        Lihat Detail
+                                        <Eye size={16} className="ml-2" />
                                     </Button>
                                 </Link>
                             )}

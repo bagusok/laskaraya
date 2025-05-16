@@ -6,9 +6,12 @@ import useAuth from "@/hooks/use-auth";
 import { profileSchema } from "../types/profile.d";
 import type { ProfileFormData } from "../types/profile.d";
 import toast from "react-hot-toast";
+import { usePage } from "@inertiajs/react";
+import type { User } from "@/types/profile";
 
 export function useProfileForm() {
-    const { user } = useAuth();
+    const { props } = usePage();
+    const user = props.user as User;
     const [isLoading, setIsLoading] = useState(false);
 
     const {
@@ -20,13 +23,19 @@ export function useProfileForm() {
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            name: user?.name || "",
-            email: user?.email || "",
-            identifier: user?.identifier || "",
-            phone: user?.phone || "",
-            faculty: user?.faculty || null,
-            role: (user?.role as "admin" | "dosen" | "mahasiswa") || "admin",
-            is_verified: user?.is_verified || false,
+            name: user.name,
+            email: user.email,
+            identifier: user.identifier,
+            phone: user.phone,
+            role: user.role,
+            is_verified: user.is_verified,
+            // Set default values for dosen data if exists
+            address: user.dosen?.address || "",
+            faculty: user.dosen?.faculty || "",
+            major: user.dosen?.major || "",
+            gender: user.dosen?.gender || undefined,
+            birth_place: user.dosen?.birth_place || "",
+            birth_date: user.dosen?.birth_date || "",
             password: ""
         }
     });
@@ -34,14 +43,19 @@ export function useProfileForm() {
     useEffect(() => {
         if (user) {
             reset({
-                name: user.name || "",
-                email: user.email || "",
-                identifier: user.identifier || "",
-                phone: user.phone || "",
-                faculty: user.faculty || null,
-                role: (user.role as "admin" | "dosen" | "mahasiswa") || "admin",
-                is_verified: user.is_verified || false,
-                password: ""
+                name: user.name,
+                email: user.email,
+                identifier: user.identifier,
+                phone: user.phone,
+                role: user.role,
+                is_verified: user.is_verified,
+                password: "",
+                address: user.dosen?.address || "",
+                faculty: user.dosen?.faculty || "",
+                major: user.dosen?.major || "",
+                gender: user.dosen?.gender || undefined,
+                birth_place: user.dosen?.birth_place || "",
+                birth_date: user.dosen?.birth_date || ""
             });
         }
     }, [user, reset]);
@@ -49,28 +63,34 @@ export function useProfileForm() {
     const onSubmit: SubmitHandler<ProfileFormData> = async (data) => {
         setIsLoading(true);
         try {
-            console.log("data.image", data.image);
             const formData = new FormData();
             formData.append("_method", "PUT");
-            // Hanya field yang diperlukan backend
-            formData.append("name", data.name || "");
-            formData.append("email", data.email || "");
-            formData.append("identifier", data.identifier || "");
-            formData.append("phone", data.phone || "");
-            formData.append("role", data.role || "admin");
-            formData.append("is_verified", data.is_verified ? "1" : "0");
-            if (data.password) formData.append("password", data.password);
 
-            // Tambahkan logging untuk image
-            console.log("Image data:", data.image);
+            // Hanya field yang diperlukan backend
+            formData.append("name", data.name);
+            formData.append("email", data.email);
+            formData.append("identifier", data.identifier);
+            formData.append("phone", data.phone);
+            formData.append("role", data.role);
+            formData.append("is_verified", data.is_verified ? "1" : "0");
+            if (data.password && data.password.length > 0) {
+                formData.append("password", data.password);
+            }
+
             if (data.image && data.image[0]) {
-                console.log("Appending image to FormData");
                 formData.append("image", data.image[0]);
             }
 
-            console.log("FormData to send:");
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ": " + pair[1]);
+            // Append dosen data if role is dosen or admin
+            if (data.role === "dosen" || data.role === "admin") {
+                if (data.address) formData.append("address", data.address);
+                if (data.faculty) formData.append("faculty", data.faculty);
+                if (data.major) formData.append("major", data.major);
+                if (data.gender) formData.append("gender", data.gender);
+                if (data.birth_place)
+                    formData.append("birth_place", data.birth_place);
+                if (data.birth_date)
+                    formData.append("birth_date", data.birth_date);
             }
 
             await router.post(route("profile.update"), formData, {
@@ -82,13 +102,16 @@ export function useProfileForm() {
                             email: page.props.user.email,
                             identifier: page.props.user.identifier,
                             phone: page.props.user.phone,
-                            faculty: page.props.user.faculty,
-                            role: page.props.user.role as
-                                | "admin"
-                                | "dosen"
-                                | "mahasiswa",
+                            role: page.props.user.role,
                             is_verified: page.props.user.is_verified,
-                            password: ""
+                            password: "",
+                            address: page.props.user.dosen?.address || "",
+                            faculty: page.props.user.dosen?.faculty || "",
+                            major: page.props.user.dosen?.major || "",
+                            gender: page.props.user.dosen?.gender || undefined,
+                            birth_place:
+                                page.props.user.dosen?.birth_place || "",
+                            birth_date: page.props.user.dosen?.birth_date || ""
                         });
                         toast.success("Profil berhasil diperbarui");
                     }
@@ -104,7 +127,7 @@ export function useProfileForm() {
                 }
             });
         } catch (error) {
-            console.error(error);
+            console.error("Error updating profile:", error);
             toast.error("Terjadi kesalahan saat memperbarui profil");
             setIsLoading(false);
         }

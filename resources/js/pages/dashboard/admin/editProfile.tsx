@@ -15,7 +15,7 @@ import { router } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
 import { useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, ArrowLeft } from "lucide-react";
 
 export default function EditProfile() {
     const {
@@ -43,7 +43,18 @@ export default function EditProfile() {
 
     return (
         <AdminLayout>
-            <div className="container mx-auto py-6">
+            <div className="container mx-auto">
+                <div className="flex items-center gap-4 mb-6">
+                    <Button
+                        variant="outline"
+                        onClick={() => router.visit(route("profile.show"))}
+                        className="flex items-center gap-2"
+                    >
+                        <ArrowLeft size={16} />
+                        Kembali
+                    </Button>
+                </div>
+
                 <Card className="border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all bg-gradient-to-br from-white to-blue-50/20">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-gray-800">
@@ -142,12 +153,12 @@ export default function EditProfile() {
                                         htmlFor="identifier"
                                         className="text-gray-700"
                                     >
-                                        Identifier
+                                        NIP/NIM
                                     </Label>
                                     <Input
                                         id="identifier"
                                         {...register("identifier")}
-                                        placeholder="Masukkan identifier"
+                                        placeholder="Masukkan NIP/NIM"
                                         className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                     />
                                     {errors.identifier && (
@@ -212,64 +223,183 @@ export default function EditProfile() {
                                     )}
                                 </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="is_verified"
-                                        {...register("is_verified")}
-                                        className="border-purple-200 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                                    />
+                                <div className="space-y-2">
                                     <Label
-                                        htmlFor="is_verified"
+                                        htmlFor="password"
                                         className="text-gray-700"
                                     >
-                                        Verifikasi Akun
+                                        Password
                                     </Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        {...register("password")}
+                                        placeholder="Masukkan password baru (opsional)"
+                                        className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                    />
+                                    {errors.password && (
+                                        <p className="text-sm text-red-500">
+                                            {errors.password.message}
+                                        </p>
+                                    )}
                                 </div>
 
-                                <div className="space-y-2 col-span-2">
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                                        Ubah Password
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Tambahan field untuk dosen */}
+                                {(user?.role === "dosen" ||
+                                    user?.role === "admin") && (
+                                    <>
                                         <div className="space-y-2">
                                             <Label
-                                                htmlFor="password"
+                                                htmlFor="address"
                                                 className="text-gray-700"
                                             >
-                                                Password Baru
+                                                Alamat
                                             </Label>
                                             <Input
-                                                id="password"
-                                                type="password"
-                                                {...register("password")}
-                                                placeholder="Masukkan password baru (opsional)"
+                                                id="address"
+                                                {...register("address")}
+                                                placeholder="Masukkan alamat"
                                                 className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                             />
-                                            {errors.password && (
+                                            {errors.address && (
                                                 <p className="text-sm text-red-500">
-                                                    {errors.password.message}
+                                                    {errors.address.message}
                                                 </p>
                                             )}
                                         </div>
-                                    </div>
-                                </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="faculty"
+                                                className="text-gray-700"
+                                            >
+                                                Fakultas
+                                            </Label>
+                                            <Input
+                                                id="faculty"
+                                                {...register("faculty")}
+                                                placeholder="Masukkan fakultas"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            {errors.faculty && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.faculty.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="major"
+                                                className="text-gray-700"
+                                            >
+                                                Jurusan
+                                            </Label>
+                                            <Input
+                                                id="major"
+                                                {...register("major")}
+                                                placeholder="Masukkan jurusan"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            {errors.major && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.major.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="gender"
+                                                className="text-gray-700"
+                                            >
+                                                Jenis Kelamin
+                                            </Label>
+                                            <Select
+                                                onValueChange={(value) =>
+                                                    setValue(
+                                                        "gender",
+                                                        value === "L"
+                                                            ? "L"
+                                                            : "P"
+                                                    )
+                                                }
+                                                defaultValue={
+                                                    user?.dosen?.gender === "L"
+                                                        ? "L"
+                                                        : user?.dosen
+                                                                ?.gender === "P"
+                                                          ? "P"
+                                                          : undefined
+                                                }
+                                            >
+                                                <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+                                                    <SelectValue placeholder="Pilih jenis kelamin" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="L">
+                                                        L
+                                                    </SelectItem>
+                                                    <SelectItem value="P">
+                                                        P
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.gender && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.gender.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="birth_place"
+                                                className="text-gray-700"
+                                            >
+                                                Tempat Lahir
+                                            </Label>
+                                            <Input
+                                                id="birth_place"
+                                                {...register("birth_place")}
+                                                placeholder="Masukkan tempat lahir"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            {errors.birth_place && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.birth_place.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="birth_date"
+                                                className="text-gray-700"
+                                            >
+                                                Tanggal Lahir
+                                            </Label>
+                                            <Input
+                                                id="birth_date"
+                                                type="date"
+                                                {...register("birth_date")}
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            {errors.birth_date && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.birth_date.message}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
-                            <div className="flex justify-end space-x-4">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() =>
-                                        router.visit(route("dashboard"))
-                                    }
-                                    className="border-purple-200 text-purple-600 hover:bg-purple-50 hover:text-purple-700"
-                                >
-                                    Batal
-                                </Button>
+                            <div className="flex justify-end">
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                                    className="bg-purple-500 hover:bg-purple-600"
                                 >
                                     {isLoading
                                         ? "Menyimpan..."
