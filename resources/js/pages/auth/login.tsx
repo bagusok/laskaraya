@@ -6,6 +6,7 @@ import Carousel from "@/components/ui/carousel";
 import { ArrowLeft } from "lucide-react";
 import LoadingScreen from "@/components/loadingScreen";
 import { useState } from "react";
+import "@/../css/login-custom.css";
 
 export default function Login() {
     const { data, setData, processing, post, errors } = useForm({
@@ -38,7 +39,7 @@ export default function Login() {
             <div className="min-h-screen p-6 md:p-0 bg-gradient-to-br from-white to-blue-50 flex items-center justify-center relative overflow-hidden">
                 <button
                     onClick={() => router.visit("/")}
-                    className="absolute top-6 left-2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 hover:bg-purple-100 border border-purple-200 text-purple-700 font-semibold shadow-sm transition-all"
+                    className="absolute top-6 left-2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 hover:bg-purple-100 border border-purple-200 text-purple-700 font-semibold shadow-sm transition-all login-btn-glow"
                 >
                     <ArrowLeft size={18} />
                     Kembali
@@ -47,7 +48,7 @@ export default function Login() {
                     <img
                         src="/logol.svg"
                         alt="Laskaraya Logo"
-                        className="w-40 h-auto"
+                        className="w-40 h-auto login-logo-animate"
                     />
                 </div>
 
@@ -74,7 +75,7 @@ export default function Login() {
           </div>
         )} */}
 
-                <div className="w-full max-w-4xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm shadow-purple-300 overflow-hidden border-2 border-purple-700 z-10 hover:shadow-lg transform hover:-translate-y-0.5 duration-500">
+                <div className="w-full max-w-4xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm shadow-purple-300 overflow-hidden border-2 border-purple-700 z-10 hover:shadow-lg transform hover:-translate-y-0.5 duration-500 login-fade-in login-glow">
                     <div className="flex flex-col md:flex-row p-4">
                         <div className="w-full md:w-1/2 p-10">
                             <h2 className="text-[35px] font-bold text-transparent bg-clip-text bg-gray-700 mb-10 text-center">

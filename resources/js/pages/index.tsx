@@ -164,8 +164,8 @@ export default function Welcome() {
                             </div>
 
                             <div
-                                className="stats-container reveal-item"
-                                style={{ transitionDelay: "300ms" }}
+                                className="stats-container"
+                                style={{ transitionDelay: "500ms" }}
                             >
                                 <div className="stat-item">
                                     <div className="stat-number">500+</div>
