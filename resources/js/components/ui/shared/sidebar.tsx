@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { usePage } from "@inertiajs/react";
-import { ChevronRight, LogOut, X } from "lucide-react";
+import { ChevronRight, LogOut, X, BookOpen } from "lucide-react";
 import { SidebarProps, NavItem } from "../../../types/sidebar";
 import { getPath, normalizePath } from "../../../lib/sidebar.utils";
 
