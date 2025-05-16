@@ -54,23 +54,23 @@ class UserController extends Controller
         ]);
     }
 
-public function destroy($id)
-{
-    try {
-    $user = UserModel::findOrFail($id);
-    if ($user ->role === 'mahasiswa') {
-        $user->mahasiswa()->delete();
-        $user->delete();
-    } elseif ($user->role === 'dosen') {
-        $user->dosen()->delete();
-        $user->delete();
+    public function destroy($id)
+    {
+        try {
+            $user = UserModel::findOrFail($id);
+            if ($user->role === 'mahasiswa') {
+                $user->mahasiswa()->delete();
+                $user->delete();
+            } elseif ($user->role === 'dosen') {
+                $user->dosen()->delete();
+                $user->delete();
+            }
+            return redirect()->back()->with('success', 'User berhasil dihapus');
+        } catch (\Exception $e) {
+            Log::error("Error deleting user: " . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Failed to delete user.']);
+        }
     }
-        return redirect()->back()->with('success', 'User berhasil dihapus');
-    } catch (\Exception $e) {
-        Log::error("Error deleting user: " . $e->getMessage());
-        return redirect()->back()->withErrors(['error' => 'Failed to delete user.']);
-    }
-}
 
     public function create()
     {
@@ -193,5 +193,4 @@ public function destroy($id)
                 ->withErrors(['error' => 'Terjadi kesalahan saat memperbarui user']);
         }
     }
-
 }

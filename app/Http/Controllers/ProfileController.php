@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ProfileController extends Controller
 {
@@ -72,10 +73,16 @@ class ProfileController extends Controller
                     Storage::delete('public/profile_pictures/' . $user->image);
                 }
 
-                // Store new image
+
+
                 $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/profile_pictures', $filename);
+
+                $webp_image = Image::read($file)->toWebp();
+
+                $filename = hash('sha256', $user->id) . '.webp';
+
+                Storage::put('public/profile_pictures/' . $filename, $webp_image);
+
                 $validated['image'] = $filename;
             }
 
