@@ -1,6 +1,50 @@
 import { Award, Users, BookOpen } from "lucide-react";
+import { memo } from "react";
 
-export default function About() {
+const features = [
+    {
+        icon: Award,
+        title: "Pencatatan Prestasi",
+        description:
+            "Catat dan kelola semua prestasi akademik Anda dengan mudah dan terstruktur"
+    },
+    {
+        icon: Users,
+        title: "Kolaborasi",
+        description:
+            "Berkolaborasi dengan teman dan dosen untuk mencapai prestasi bersama"
+    },
+    {
+        icon: BookOpen,
+        title: "Pembelajaran",
+        description:
+            "Akses materi dan sumber belajar untuk meningkatkan prestasi akademik"
+    }
+] as const;
+
+const FeatureCard = memo(
+    ({
+        icon: Icon,
+        title,
+        description
+    }: {
+        icon: typeof Award;
+        title: string;
+        description: string;
+    }) => (
+        <div className="feature-card text-center reveal-element">
+            <div className="feature-icon">
+                <Icon className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="swiss-title feature-title mb-3">{title}</h3>
+            <p className="swiss-text text-base text-gray-600">{description}</p>
+        </div>
+    )
+);
+
+FeatureCard.displayName = "FeatureCard";
+
+const AboutSection = memo(() => {
     return (
         <section className="py-20 bg-white relative overflow-hidden" id="about">
             {/* Dekorasi */}
@@ -17,44 +61,20 @@ export default function About() {
                     </p>
                 </div>
                 <div className="feature-grid">
-                    <div className="feature-card text-center reveal-element">
-                        <div className="feature-icon">
-                            <Award className="w-10 h-10 text-white" />
-                        </div>
-                        <h3 className="swiss-title feature-title mb-3">
-                            Pencatatan Prestasi
-                        </h3>
-                        <p className="swiss-text text-base text-gray-600">
-                            Catat dan kelola semua prestasi akademik Anda dengan
-                            mudah dan terstruktur
-                        </p>
-                    </div>
-                    <div className="feature-card text-center reveal-element">
-                        <div className="feature-icon">
-                            <Users className="w-10 h-10 text-white" />
-                        </div>
-                        <h3 className="swiss-title feature-title mb-3">
-                            Kolaborasi
-                        </h3>
-                        <p className="swiss-text text-base text-gray-600">
-                            Berkolaborasi dengan teman dan dosen untuk mencapai
-                            prestasi bersama
-                        </p>
-                    </div>
-                    <div className="feature-card text-center reveal-element">
-                        <div className="feature-icon">
-                            <BookOpen className="w-10 h-10 text-white" />
-                        </div>
-                        <h3 className="swiss-title feature-title mb-3">
-                            Pembelajaran
-                        </h3>
-                        <p className="swiss-text text-base text-gray-600">
-                            Akses materi dan sumber belajar untuk meningkatkan
-                            prestasi akademik
-                        </p>
-                    </div>
+                    {features.map((feature) => (
+                        <FeatureCard
+                            key={feature.title}
+                            icon={feature.icon}
+                            title={feature.title}
+                            description={feature.description}
+                        />
+                    ))}
                 </div>
             </div>
         </section>
     );
-}
+});
+
+AboutSection.displayName = "AboutSection";
+
+export default AboutSection;

@@ -76,10 +76,16 @@ export default function EditProfile() {
                                     <input
                                         type="file"
                                         id="image"
+                                        name="image"
                                         accept="image/*"
                                         className="hidden"
-                                        {...register("image")}
-                                        onChange={handleImageChange}
+                                        onChange={(e) => {
+                                            handleImageChange(e);
+                                            setValue(
+                                                "image",
+                                                e.target.files ?? undefined
+                                            );
+                                        }}
                                     />
                                 </div>
                                 {errors.image && (

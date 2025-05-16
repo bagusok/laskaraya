@@ -1,105 +1,96 @@
 import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
 
+const quickLinks = [
+    { href: "#", label: "Beranda" },
+    { href: "#", label: "Tentang" },
+    { href: "#", label: "Fitur" },
+    { href: "#", label: "Kontak" }
+];
+
+const contactInfo = [
+    { label: "Email", value: "info@laskaraya.com" },
+    { label: "Phone", value: "+62 123 4567 890" },
+    { label: "Alamat", value: "Jl. Contoh No. 123" }
+];
+
+const socialLinks = [
+    { icon: Facebook, href: "#" },
+    { icon: Twitter, href: "#" },
+    { icon: Instagram, href: "#" },
+    { icon: Mail, href: "#" }
+];
+
+const FooterLink = ({
+    href,
+    children
+}: {
+    href: string;
+    children: React.ReactNode;
+}) => (
+    <a href={href} className="text-gray-400 hover:text-white transition-colors">
+        {children}
+    </a>
+);
+
+const FooterSection = ({
+    title,
+    children
+}: {
+    title: string;
+    children: React.ReactNode;
+}) => (
+    <div>
+        <h4 className="text-lg font-semibold mb-4">{title}</h4>
+        {children}
+    </div>
+);
+
 export default function Footer() {
     return (
         <footer className="bg-gray-900 text-white">
             <div className="max-w-7xl mx-auto px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold">Laskaraya</h3>
-                        <p className="text-gray-400">
-                            Platform pencatatan prestasi mahasiswa yang
-                            memudahkan dalam mengelola dan melacak pencapaian
-                            akademik
-                        </p>
-                    </div>
-
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">
-                            Tautan Cepat
-                        </h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    Beranda
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    Tentang
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    Fitur
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    Kontak
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">Kontak</h4>
-                        <ul className="space-y-2">
-                            <li className="text-gray-400">
-                                Email: info@laskaraya.com
-                            </li>
-                            <li className="text-gray-400">
-                                Phone: +62 123 4567 890
-                            </li>
-                            <li className="text-gray-400">
-                                Alamat: Jl. Contoh No. 123
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">
-                            Ikuti Kami
-                        </h4>
-                        <div className="flex space-x-4">
-                            <a
-                                href="#"
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <Facebook className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <Twitter className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <Instagram className="w-5 h-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <Mail className="w-5 h-5" />
-                            </a>
+                    <FooterSection title="Laskaraya">
+                        <div className="space-y-4">
+                            <p className="text-gray-400">
+                                Platform pencatatan prestasi mahasiswa yang
+                                memudahkan dalam mengelola dan melacak
+                                pencapaian akademik
+                            </p>
                         </div>
-                    </div>
+                    </FooterSection>
+
+                    <FooterSection title="Tautan Cepat">
+                        <ul className="space-y-2">
+                            {quickLinks.map((link) => (
+                                <li key={link.label}>
+                                    <FooterLink href={link.href}>
+                                        {link.label}
+                                    </FooterLink>
+                                </li>
+                            ))}
+                        </ul>
+                    </FooterSection>
+
+                    <FooterSection title="Kontak">
+                        <ul className="space-y-2">
+                            {contactInfo.map((info) => (
+                                <li key={info.label} className="text-gray-400">
+                                    {info.label}: {info.value}
+                                </li>
+                            ))}
+                        </ul>
+                    </FooterSection>
+
+                    <FooterSection title="Ikuti Kami">
+                        <div className="flex space-x-4">
+                            {socialLinks.map((social, index) => (
+                                <FooterLink key={index} href={social.href}>
+                                    <social.icon className="w-5 h-5" />
+                                </FooterLink>
+                            ))}
+                        </div>
+                    </FooterSection>
                 </div>
 
                 <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">

@@ -22,8 +22,6 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        Log::info($request->all());
-
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -65,9 +63,8 @@ class ProfileController extends Controller
             // Refresh user data
             $user->refresh();
 
-            return back()->with([
-                'success' => 'Profil berhasil diperbarui',
-                'user' => $user
+            return redirect()->route('dashboard')->with([
+                'success' => 'Profil berhasil diperbarui'
             ]);
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui profil: ' . $e->getMessage()]);

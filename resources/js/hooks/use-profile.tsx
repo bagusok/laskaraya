@@ -60,8 +60,13 @@ export function useProfileForm() {
             formData.append("role", data.role || "admin");
             formData.append("is_verified", data.is_verified ? "1" : "0");
             if (data.password) formData.append("password", data.password);
-            if (data.image && data.image[0])
+
+            // Tambahkan logging untuk image
+            console.log("Image data:", data.image);
+            if (data.image && data.image[0]) {
+                console.log("Appending image to FormData");
                 formData.append("image", data.image[0]);
+            }
 
             console.log("FormData to send:");
             for (let pair of formData.entries()) {

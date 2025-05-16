@@ -164,27 +164,15 @@ body:hover .cursor-outline {
 .login-button {
     position: relative;
     padding: 0.5rem 1.5rem;
-    background: #2563eb;
+    background: var(--blue-600);
     color: #fff;
     font-weight: 500;
     border: none;
     border-radius: 10px;
     overflow: hidden;
     transition:
-        background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    -webkit-transition:
-        background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    -moz-transition:
-        background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    -ms-transition:
-        background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    -o-transition:
-        background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background 0.3s var(--easing-standard),
+        color 0.3s var(--easing-standard);
     box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.08);
 }
 
