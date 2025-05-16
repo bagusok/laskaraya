@@ -25,7 +25,7 @@ export const navItems: NavItem[] = [
   {
     label: "Manajemen Program Studi",
     icon: <BookOpen />,
-    href: "/dashboard/study-programs"
+    href: route('programStudi')
   },
   {
     label: "Sistem Informasi",
