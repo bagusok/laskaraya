@@ -10,7 +10,7 @@ import {
 import { Button } from "../../button";
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { router, useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
 
 export default function DelUserModal({
@@ -22,24 +22,24 @@ export default function DelUserModal({
 }) {
     const [open, setOpen] = useState(false);
 
-    const { data, setData, errors, delete: del, processing } = useForm();
+    const { delete: del, processing } = useForm();
 
-     const handleDelete = () => {
-            del(route("users.destroy", userId), {
-                onSuccess: (data) => {
-                    toast.success(data.props.success);
-                    console.log("User deleted successfully!");
-                    setOpen(false);
-                },
-                onError: (errors) => {
-                    Object.keys(errors).forEach((key) => {
-                        toast.error(errors[key]);
-                    });
+    const handleDelete = () => {
+        del(route("users.destroy", userId), {
+            onSuccess: (data) => {
+                toast.success(data.props.success);
+                console.log("User deleted successfully!");
+                setOpen(false);
+            },
+            onError: (errors) => {
+                Object.keys(errors).forEach((key) => {
+                    toast.error(errors[key]);
+                });
 
-                    console.error(errors);
-                }
-            });
-        };
+                console.error(errors);
+            }
+        });
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -78,9 +78,10 @@ export default function DelUserModal({
                         <button
                             type="button"
                             onClick={handleDelete}
-                            className="px-6 py-2 bg-red-800 text-white hover:bg-red-900 transition-colors text-sm rounded-lg font-medium"
+                            className="px-6 py-2 bg-red-800 text-white hover:bg-red-900 transition-colors text-sm rounded-lg font-medium disabled:opacity-70"
+                            disabled={processing}
                         >
-                            Hapus
+                            {processing ? "Menghapus..." : "Hapus"}
                         </button>
                     </div>
                 </DialogFooter>
