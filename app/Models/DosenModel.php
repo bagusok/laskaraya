@@ -15,6 +15,7 @@ class DosenModel extends Model
     protected $fillable = [
         'address',
         'faculty',
+        'major',
         'gender',
         'birth_place',
         'birth_date',
