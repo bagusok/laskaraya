@@ -15,6 +15,14 @@ export interface DosenProfile {
     updated_at: string;
 }
 
+export interface MahasiswaProfile {
+    id: number;
+    user_id: number;
+    prodi_id: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -28,6 +36,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     dosen?: DosenProfile;
+    mahasiswa?: MahasiswaProfile;
 }
 
 export interface ProfileFormData {
@@ -45,6 +54,7 @@ export interface ProfileFormData {
     gender?: "L" | "P";
     birth_place?: string;
     birth_date?: string;
+    prodi_id?: number;
 }
 
 export const profileSchema = z.object({
@@ -65,7 +75,8 @@ export const profileSchema = z.object({
     major: z.string().optional(),
     gender: z.enum(["L", "P"]).optional(),
     birth_place: z.string().optional(),
-    birth_date: z.string().optional()
+    birth_date: z.string().optional(),
+    prodi_id: z.number().optional()
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;

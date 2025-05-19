@@ -26,7 +26,7 @@ export default function ProdiDetail({
                 <div className="flex items-center gap-4 mb-6">
                     <Button
                         variant="outline"
-                        onClick={() => router.visit(route("prodi.index"))}
+                        onClick={() => router.visit(route("programStudi"))}
                         className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-500 hover:text-purple-900 transition-colors duration-200"
                     >
                         <ArrowLeft size={16} />

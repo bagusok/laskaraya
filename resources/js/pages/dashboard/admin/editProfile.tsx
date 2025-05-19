@@ -412,7 +412,7 @@ export default function EditProfile() {
                                         <select
                                             id="prodi_id"
                                             {...register("prodi_id")}
-                                            defaultValue={user?.prodi_id || ""}
+                                            defaultValue={user?.mahasiswa?.prodi_id || ""}
                                             className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                         >
                                             <option value="">

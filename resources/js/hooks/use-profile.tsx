@@ -36,7 +36,8 @@ export function useProfileForm() {
             gender: user.dosen?.gender || undefined,
             birth_place: user.dosen?.birth_place || "",
             birth_date: user.dosen?.birth_date || "",
-            password: ""
+            password: "",
+            prodi_id: user.mahasiswa?.prodi_id
         }
     });
 
@@ -55,7 +56,8 @@ export function useProfileForm() {
                 major: user.dosen?.major || "",
                 gender: user.dosen?.gender || undefined,
                 birth_place: user.dosen?.birth_place || "",
-                birth_date: user.dosen?.birth_date || ""
+                birth_date: user.dosen?.birth_date || "",
+                prodi_id: user.mahasiswa?.prodi_id
             });
         }
     }, [user, reset]);
@@ -93,6 +95,11 @@ export function useProfileForm() {
                     formData.append("birth_date", data.birth_date);
             }
 
+            // Append mahasiswa data if role is mahasiswa
+            if (data.role === "mahasiswa" && data.prodi_id) {
+                formData.append("prodi_id", data.prodi_id.toString());
+            }
+
             await router.post(route("profile.update"), formData, {
                 preserveScroll: true,
                 onSuccess: (page) => {
@@ -111,7 +118,8 @@ export function useProfileForm() {
                             gender: page.props.user.dosen?.gender || undefined,
                             birth_place:
                                 page.props.user.dosen?.birth_place || "",
-                            birth_date: page.props.user.dosen?.birth_date || ""
+                            birth_date: page.props.user.dosen?.birth_date || "",
+                            prodi_id: page.props.user.mahasiswa?.prodi_id
                         });
                         toast.success("Profil berhasil diperbarui");
                     }
