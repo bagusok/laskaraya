@@ -21,7 +21,7 @@ export default function ProfileCard({
 
     return (
         <div className="admin-card">
-            <div className="admin-card-header">Profil Admin</div>
+            <div className="admin-card-header">Profil</div>
             <div className="admin-card-content">
                 <Card
                     className={`border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all ${colorClass}`}
