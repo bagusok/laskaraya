@@ -42,7 +42,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                     />
                 </div>
 
-                <main className="px-4 sm:px-6 lg:px-12 pt-6 lg:pt-12 pb-16">
+                <main className="px-4 sm:px-6 lg:px-12 pt-6 lg:pt-1 pb-12">
                     {children}
                 </main>
             </div>

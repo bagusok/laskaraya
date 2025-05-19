@@ -9,7 +9,8 @@ export const defaultValues: Partial<User> = {
     faculty: "",
     password: "",
     role: "Mahasiswa",
-    is_verified: false
+    is_verified: false,
+    prodi_id: undefined
 };
 
 export function handleChangeForm(

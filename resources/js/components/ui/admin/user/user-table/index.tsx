@@ -2,7 +2,7 @@ import { Input } from "../../../input";
 import DataTable from "@/components/ui/shared/dataTable";
 import { userDataTableColumns } from "./columns";
 import { User } from "@/types";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState, useEffect } from "react";
 import {
     Pagination,
     PaginationContent,
@@ -30,6 +30,8 @@ export default function UsersTable({ users }: { users: PaginatedProps<User> }) {
 
     const [searchQuery, setSearchQuery] = useState<string>("");
 
+    const [role, setRole] = useState<string>("all");
+
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
 
@@ -38,6 +40,21 @@ export default function UsersTable({ users }: { users: PaginatedProps<User> }) {
             data: {
                 search: search,
                 search_query: searchQuery
+            },
+            preserveScroll: true,
+            preserveState: true
+        });
+    };
+
+    // Sync filter role & search
+    const handleFilter = (roleValue: string) => {
+        setRole(roleValue);
+        router.visit(route("users.index"), {
+            method: "get",
+            data: {
+                search,
+                search_query: searchQuery,
+                role: roleValue !== "all" ? roleValue : undefined
             },
             preserveScroll: true,
             preserveState: true
@@ -60,15 +77,61 @@ export default function UsersTable({ users }: { users: PaginatedProps<User> }) {
                     onValueChange={(v) =>
                         setSearch(v as "name" | "email" | "identifier")
                     }
-                    value="name"
+                    value={search}
                 >
-                    <SelectTrigger className="w-full sm:w-auto border-purple-200 hover:bg-purple-100/30 hover:text-purple-600">
+                    <SelectTrigger className="w-full sm:w-auto border-purple-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200/50 hover:bg-purple-50/40 hover:text-purple-700 transition-colors">
                         <SelectValue placeholder="Kolom" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="name">Nama</SelectItem>
-                        <SelectItem value="email">Email</SelectItem>
-                        <SelectItem value="identifier">NIM/NIP</SelectItem>
+                        <SelectItem
+                            value="name"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Nama
+                        </SelectItem>
+                        <SelectItem
+                            value="email"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Email
+                        </SelectItem>
+                        <SelectItem
+                            value="identifier"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            NIM/NIP
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select onValueChange={handleFilter} value={role}>
+                    <SelectTrigger className="w-full sm:w-auto border-purple-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200/50 hover:bg-purple-50/40 hover:text-purple-700 transition-colors">
+                        <SelectValue placeholder="Semua Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            value="all"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Semua Role
+                        </SelectItem>
+                        <SelectItem
+                            value="admin"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Admin
+                        </SelectItem>
+                        <SelectItem
+                            value="dosen"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Dosen
+                        </SelectItem>
+                        <SelectItem
+                            value="mahasiswa"
+                            className="hover:bg-purple-50 focus:bg-purple-100/60 data-[state=checked]:bg-purple-100/60 data-[highlighted]:bg-purple-50/80"
+                        >
+                            Mahasiswa
+                        </SelectItem>
                     </SelectContent>
                 </Select>
             </form>

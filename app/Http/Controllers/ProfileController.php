@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
+use App\Models\DosenModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -32,8 +33,8 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = Auth::user();
-
+        /** @var UserModel $user */
+        $user = UserModel::find(Auth::id());
         $data = $request->all();
         Log::info('DATA YANG DITERIMA:', $data);
         if (array_key_exists('password', $data) && $data['password'] === '') {
@@ -73,16 +74,10 @@ class ProfileController extends Controller
                     Storage::delete('public/profile_pictures/' . $user->image);
                 }
 
-
-
                 $file = $request->file('image');
-
                 $webp_image = Image::read($file)->toWebp();
-
                 $filename = hash('sha256', $user->id) . '.webp';
-
                 Storage::put('public/profile_pictures/' . $filename, $webp_image);
-
                 $validated['image'] = $filename;
             }
 

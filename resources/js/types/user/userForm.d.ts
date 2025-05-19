@@ -5,4 +5,6 @@ export interface UserFormProps {
     onSubmit: (values: Partial<User>) => void;
     onCancel: () => void;
     mode: "add" | "edit";
+    prodi_id?: number;
+    prodiList: { id: number; nama: string }[];
 }

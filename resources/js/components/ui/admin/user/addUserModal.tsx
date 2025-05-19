@@ -13,7 +13,7 @@ import { useForm } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import { useState } from "react";
 
-export default function AddUserModal() {
+export default function AddUserModal({ prodiList = [] }) {
     const [open, setOpen] = useState(false);
 
     const { data, setData, errors, post, processing } = useForm({
@@ -24,7 +24,8 @@ export default function AddUserModal() {
         faculty: "",
         role: "mahasiswa",
         password: "",
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
+        prodi_id: ""
     });
 
     const handleSubmit = () => {
@@ -43,6 +44,8 @@ export default function AddUserModal() {
             }
         });
     };
+
+    console.log("prodiList", prodiList);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -255,6 +258,36 @@ export default function AddUserModal() {
                             )}
                         </div>
                     )}
+                    {/* Prodi Field */}
+                    <div>
+                        <label
+                            htmlFor="prodi_id"
+                            className="block text-xs uppercase tracking-wider text-purple-900 mb-1 font-medium"
+                        >
+                            Program Studi
+                        </label>
+                        <select
+                            name="prodi_id"
+                            value={data.prodi_id || ""}
+                            onChange={(e) =>
+                                setData("prodi_id", e.target.value)
+                            }
+                            className="w-full py-1.5 border-b border-gray-300 focus:border-purple-700 focus:outline-none bg-transparent"
+                            required
+                        >
+                            <option value="">Pilih Program Studi</option>
+                            {prodiList.map((prodi: any) => (
+                                <option key={prodi.id} value={prodi.id}>
+                                    {prodi.nama}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.prodi_id && (
+                            <small className="text-red-400 italic text-xs">
+                                * {errors.prodi_id}
+                            </small>
+                        )}
+                    </div>
                     {/* Password Field */}
                     <div className="md:col-span-2">
                         <label

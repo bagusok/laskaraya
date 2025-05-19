@@ -62,7 +62,7 @@ export default function Sidebar({
     return (
         <>
             <div
-                className="hidden lg:block fixed inset-y-0 left-0 z-40 w-72 "
+                className="hidden lg:block fixed inset-y-0 left-0 z-40 w-72"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >

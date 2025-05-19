@@ -26,9 +26,11 @@ export default function EditUserModal({ userId }: { userId: number }) {
         faculty: "",
         role: "mahasiswa",
         password: "",
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
+        prodi_id: ""
     });
 
+    const [prodiList, setProdiList] = useState([]);
     const userDetail = useMutation({
         mutationKey: ["userDetail", userId],
         mutationFn: (id: number) =>
@@ -50,7 +52,8 @@ export default function EditUserModal({ userId }: { userId: number }) {
                         year:
                             user.role == "mahasiswa"
                                 ? user.mahasiswa?.year
-                                : new Date().getFullYear()
+                                : new Date().getFullYear(),
+                        prodi_id: user.prodi_id || ""
                     });
                 })
                 .catch((err) => {
@@ -78,6 +81,9 @@ export default function EditUserModal({ userId }: { userId: number }) {
     useEffect(() => {
         if (open) {
             userDetail.mutate(userId);
+            fetch("/program-studi/get-all")
+                .then((res) => res.json())
+                .then((data) => setProdiList(data));
         }
     }, [userId, open]);
 
@@ -225,6 +231,39 @@ export default function EditUserModal({ userId }: { userId: number }) {
                                 {errors.faculty && (
                                     <small className="text-red-400 italic text-xs">
                                         * {errors.faculty}
+                                    </small>
+                                )}
+                            </div>
+                            {/* Prodi Field */}
+                            <div>
+                                <label
+                                    htmlFor="prodi_id"
+                                    className="block text-xs uppercase tracking-wider text-purple-900 mb-1 font-medium"
+                                >
+                                    Program Studi
+                                </label>
+                                <select
+                                    name="prodi_id"
+                                    id="prodi_id"
+                                    value={data.prodi_id || ""}
+                                    onChange={(e) =>
+                                        setData("prodi_id", e.target.value)
+                                    }
+                                    className="w-full py-1.5 border-b border-gray-300 focus:border-purple-700 focus:outline-none bg-transparent"
+                                    required
+                                >
+                                    <option value="">
+                                        Pilih Program Studi
+                                    </option>
+                                    {prodiList.map((prodi: any) => (
+                                        <option key={prodi.id} value={prodi.id}>
+                                            {prodi.nama}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.prodi_id && (
+                                    <small className="text-red-400 italic text-xs">
+                                        * {errors.prodi_id}
                                     </small>
                                 )}
                             </div>
