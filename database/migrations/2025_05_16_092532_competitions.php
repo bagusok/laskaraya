@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('image');
             $table->string('author');
             $table->enum('level', ['1', '2', '3', '4', '5']);
-            $table->enum('status', ['accepted', 'rejected', 'pending']);
+            $table->enum('status', ['ongoing', 'completed', 'canceled']);
+            $table->enum('verified_status', ['accepted', 'rejected', 'pending']);
             $table->text('description');
             $table->date('start_date');
             $table->date('end_date');
