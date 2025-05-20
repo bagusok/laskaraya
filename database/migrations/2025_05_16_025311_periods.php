@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('periods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('competition_id')->constrained('competitions')->onDelete('cascade');
             $table->string('name');
             $table->date('year');
             $table->timestamps();
