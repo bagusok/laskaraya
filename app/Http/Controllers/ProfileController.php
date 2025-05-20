@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
+use App\Models\DosenModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -16,7 +17,7 @@ class ProfileController extends Controller
 {
     public function show()
     {
-        $user = Auth::user()->load('dosen');
+        $user = Auth::user()->load(['dosen', 'mahasiswa']);
         return Inertia::render('dashboard/admin/profileDetail', [
             'user' => $user
         ]);
@@ -24,7 +25,7 @@ class ProfileController extends Controller
 
     public function edit()
     {
-        $user = Auth::user()->load('dosen');
+        $user = Auth::user()->load(['dosen', 'mahasiswa']);
         return Inertia::render('dashboard/admin/editProfile', [
             'user' => $user
         ]);
@@ -32,7 +33,12 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        /** @var UserModel $user */
         $user = Auth::user();
+
+        if (!$user) {
+            return back()->withErrors(['error' => 'User tidak ditemukan']);
+        }
 
         $data = $request->all();
         Log::info('DATA YANG DITERIMA:', $data);
@@ -55,7 +61,8 @@ class ProfileController extends Controller
             'major' => 'nullable|string|max:255',
             'gender' => 'nullable|in:L,P',
             'birth_place' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date'
+            'birth_date' => 'nullable|date',
+            'prodi_id' => 'nullable|exists:program_studi,id'
         ])->validate();
 
         try {
@@ -73,16 +80,10 @@ class ProfileController extends Controller
                     Storage::delete('public/profile_pictures/' . $user->image);
                 }
 
-
-
                 $file = $request->file('image');
-
                 $webp_image = Image::read($file)->toWebp();
-
                 $filename = hash('sha256', $user->id) . '.webp';
-
                 Storage::put('public/profile_pictures/' . $filename, $webp_image);
-
                 $validated['image'] = $filename;
             }
 
@@ -107,10 +108,24 @@ class ProfileController extends Controller
                 }
             }
 
+            // Update mahasiswa data if role is mahasiswa
+            if ($validated['role'] === 'mahasiswa' && isset($validated['prodi_id'])) {
+                $mahasiswaData = [
+                    'prodi_id' => $validated['prodi_id']
+                ];
+
+                if ($user->mahasiswa) {
+                    $user->mahasiswa->update($mahasiswaData);
+                } else {
+                    $user->mahasiswa()->create($mahasiswaData);
+                }
+            }
+
             return redirect()->route('profile.show')->with([
                 'success' => 'Profil berhasil diperbarui'
             ]);
         } catch (\Exception $e) {
+            Log::error('Error updating profile: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui profil: ' . $e->getMessage()]);
         }
     }

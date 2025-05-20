@@ -22,6 +22,7 @@ class UserModel extends Authenticatable
         'is_verified',
         'remember_token',
         'image',
+        'prodi_id',
     ];
 
     protected $hidden = [
@@ -75,5 +76,10 @@ class UserModel extends Authenticatable
             return asset('storage/profile_pictures/' . $this->image);
         }
         return asset('default-profile.svg');
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(ProgramStudiModel::class, 'prodi_id');
     }
 }

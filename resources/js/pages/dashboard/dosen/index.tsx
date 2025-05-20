@@ -10,32 +10,52 @@ import {
     lombaKompetisi
 } from "@/lib/dosenData";
 import { Head, Link } from "@inertiajs/react";
+import { motion } from "framer-motion";
 
 export default function DosenDashboard() {
     const { user } = useAuth();
 
     return (
-
         <DosenLayout>
             <Head title="Dosen" />
-            <section className="mb-10">
+            <motion.section
+                className="mb-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+            >
                 <div className="lg:hidden space-y-6">
                     <ProfileCard user={user} />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
                     {statsDosen.map((stat, index) => (
-                        <StatCard
+                        <motion.div
                             key={index}
-                            label={stat.label}
-                            value={stat.value}
-                            icon={stat.icon}
-                        />
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                                duration: 0.4,
+                                ease: "easeOut",
+                                delay: index * 0.05
+                            }}
+                        >
+                            <StatCard
+                                label={stat.label}
+                                value={stat.value}
+                                icon={stat.icon}
+                            />
+                        </motion.div>
                     ))}
                 </div>
-            </section>
+            </motion.section>
 
             {/* Main content grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <motion.div
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+            >
                 <div className="lg:col-span-8 space-y-6">
                     <MahasiswaBimbinganList data={mahasiswaBimbingan} />
                     <LombaKompetisiList data={lombaKompetisi} />
@@ -43,7 +63,7 @@ export default function DosenDashboard() {
                 <div className="hidden lg:block lg:col-span-4 space-y-6">
                     <ProfileCard user={user} />
                 </div>
-            </div>
+            </motion.div>
         </DosenLayout>
     );
 }

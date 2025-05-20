@@ -53,4 +53,9 @@ Route::middleware(['auth'])->group(function () {
 
 Route::group(['prefix' => 'prodi', 'middleware' => ['auth', 'role:admin']], function () {
     Route::get('/', [ProgramStudiController::class, 'index'])->name('programStudi');
+    Route::post('/add', [ProgramStudiController::class, 'store'])->name('prodi.create');
+    Route::put('/edit/{id}', [ProgramStudiController::class, 'update'])->name('prodi.update');
+    Route::delete('/{id}', [ProgramStudiController::class, 'destroy'])->name('prodi.destroy');
+    Route::get('/{id}', [ProgramStudiController::class, 'show'])->name('prodi.detail');
+    // (opsional) Route::get('/edit/{id}', [ProgramStudiController::class, 'edit'])->name('prodi.edit');
 });

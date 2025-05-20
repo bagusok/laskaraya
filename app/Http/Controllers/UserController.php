@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
+use App\Models\ProgramStudiModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        $prodiList = ProgramStudiModel::all(['id', 'nama']);
 
         $search = $request->input('search', null);
         $searchQuery = $request->input('search_query', null);
@@ -19,6 +21,7 @@ class UserController extends Controller
         $order = $request->input('order', 'desc');
         $page = $request->input('page', 1);
         $limit = $request->input('limit', 10);
+        $role = $request->input('role', null);
 
         $request->validate([
             'search_query' => 'nullable|string|max:255',
@@ -26,19 +29,25 @@ class UserController extends Controller
             'sort' => 'nullable|string|in:created_at,name,email',
             'order' => 'nullable|string|in:asc,desc',
             'page' => 'nullable|integer|min:1',
-            'limit' => 'nullable|integer|min:1|max:100'
+            'limit' => 'nullable|integer|min:1|max:100',
+            'role' => 'nullable|string|in:admin,dosen,mahasiswa',
         ]);
 
-        $users = UserModel::with(['mahasiswa', 'dosen'])->when($searchQuery, function ($query) use ($search, $searchQuery) {
-            if ($search === 'name') {
-                return $query->where('name', 'like', '%' . $searchQuery . '%');
-            } elseif ($search === 'email') {
-                return $query->where('email', 'like', '%' . $searchQuery . '%');
-            } elseif ($search === 'identifier') {
-                return $query->where('identifier', 'like', '%' . $searchQuery . '%');
-            }
-        })
-            ->orderBy($sort, $order)
+        $users = UserModel::with(['mahasiswa', 'dosen'])
+            ->when($role, function ($query) use ($role) {
+                $query->where('role', $role);
+            })
+            ->when($searchQuery, function ($query) use ($search, $searchQuery) {
+                if ($search === 'name') {
+                    return $query->where('name', 'like', '%' . $searchQuery . '%');
+                } elseif ($search === 'email') {
+                    return $query->where('email', 'like', '%' . $searchQuery . '%');
+                } elseif ($search === 'identifier') {
+                    return $query->where('identifier', 'like', '%' . $searchQuery . '%');
+                }
+            })
+            ->orderByRaw("CASE WHEN role = 'admin' THEN 0 ELSE 1 END")
+            ->orderBy('name', 'asc')
             ->paginate($limit)
             ->withQueryString();
 
@@ -51,6 +60,7 @@ class UserController extends Controller
                 'total_page' => $users->total() / $users->perPage(),
                 'total_data' => $users->total(),
             ],
+            'prodiList' => $prodiList,
         ]);
     }
 
@@ -91,7 +101,7 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:15',
             'faculty' => 'nullable|string|max:255',
             'year' => 'required_if:role,mahasiswa|integer|min:2000',
-
+            'prodi_id' => 'required|exists:prodi,id',
         ]);
 
         DB::beginTransaction();
@@ -103,7 +113,7 @@ class UserController extends Controller
                 'password' => bcrypt($request->input('password')),
                 'role' => $request->input('role'),
                 'phone' => $request->input('phone'),
-
+                'prodi_id' => $request->input('prodi_id'),
             ]);
 
             if ($request->input('role') === 'mahasiswa') {
@@ -150,6 +160,7 @@ class UserController extends Controller
             'phone'      => 'nullable|string|max:15',
             'faculty'    => 'nullable|string|max:255',
             'year'       => 'required_if:role,mahasiswa|integer|min:2000',
+            'prodi_id'   => 'required|exists:prodi,id',
         ]);
 
         DB::beginTransaction();
@@ -164,6 +175,7 @@ class UserController extends Controller
             }
             $user->role  = $request->input('role');
             $user->phone = $request->input('phone');
+            $user->prodi_id = $request->input('prodi_id');
             $user->save();
 
             if ($request->input('role') === 'mahasiswa') {

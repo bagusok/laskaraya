@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin', 'dosen', 'mahasiswa'])->default('mahasiswa');
             $is_verified = $table->boolean('is_verified')->default(false);
+            $table->unsignedBigInteger('prodi_id')->nullable();
+            $table->foreign('prodi_id')->references('id')->on('prodi')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -62,8 +64,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::dropIfExists('mahasiswa_profiles');
-        // Schema::dropIfExists('dosen_profiles');
+        Schema::dropIfExists('mahasiswa_profiles');
+        Schema::dropIfExists('dosen_profiles');
         Schema::dropIfExists('users');
     }
 };

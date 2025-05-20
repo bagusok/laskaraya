@@ -19,6 +19,7 @@ class MahasiswaModel extends Model
         'gender',
         'birth_place',
         'birth_date',
+        'prodi_id'
     ];
 
     public function user()

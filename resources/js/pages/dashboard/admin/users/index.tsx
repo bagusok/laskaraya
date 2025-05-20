@@ -6,9 +6,11 @@ import { PaginatedProps } from "@/types/paginatedProps";
 import AddUserModal from "@/components/ui/admin/user/addUserModal";
 
 export default function UserManagement({
-    users
+    users,
+    prodiList
 }: {
     users: PaginatedProps<User>;
+    prodiList: any[];
 }) {
     return (
         <AdminLayout title="Manajemen Pengguna">
@@ -18,7 +20,7 @@ export default function UserManagement({
                         <CardTitle className="text-xl font-bold text-gray-900">
                             Manajemen Pengguna
                         </CardTitle>
-                        <AddUserModal />
+                        <AddUserModal prodiList={prodiList as never[]} />
                     </div>
                 </CardHeader>
                 <CardContent>

@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { router } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, ArrowLeft } from "lucide-react";
 
 export default function EditProfile() {
@@ -29,6 +29,7 @@ export default function EditProfile() {
     } = useProfileForm();
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [prodiList, setProdiList] = useState([]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -41,6 +42,12 @@ export default function EditProfile() {
         }
     };
 
+    useEffect(() => {
+        fetch("/program-studi/get-all")
+            .then((res) => res.json())
+            .then((data) => setProdiList(data));
+    }, []);
+
     return (
         <AdminLayout>
             <div className="container mx-auto">
@@ -48,7 +55,7 @@ export default function EditProfile() {
                     <Button
                         variant="outline"
                         onClick={() => router.visit(route("profile.show"))}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-500 hover:text-purple-900 transition-colors duration-200"
                     >
                         <ArrowLeft size={16} />
                         Kembali
@@ -392,6 +399,40 @@ export default function EditProfile() {
                                             )}
                                         </div>
                                     </>
+                                )}
+
+                                {user?.role === "mahasiswa" && (
+                                    <div className="space-y-2">
+                                        <Label
+                                            htmlFor="prodi_id"
+                                            className="text-gray-700"
+                                        >
+                                            Program Studi
+                                        </Label>
+                                        <select
+                                            id="prodi_id"
+                                            {...register("prodi_id")}
+                                            defaultValue={user?.mahasiswa?.prodi_id || ""}
+                                            className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                        >
+                                            <option value="">
+                                                Pilih Program Studi
+                                            </option>
+                                            {prodiList.map((prodi: any) => (
+                                                <option
+                                                    key={prodi.id}
+                                                    value={prodi.id}
+                                                >
+                                                    {prodi.nama}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.prodi_id && (
+                                            <p className="text-sm text-red-500">
+                                                {errors.prodi_id.message}
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 

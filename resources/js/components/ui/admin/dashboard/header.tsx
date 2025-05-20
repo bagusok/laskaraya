@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Menu } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Menu } from "lucide-react";
 
 interface HeaderProps {
-  user: {
-    name?: string;
-  };
-  onToggleSidebar: () => void;
-  title?: string;
+    user: {
+        name?: string;
+    };
+    onToggleSidebar: () => void;
+    title?: string;
 }
 
-export default function Header({ user, onToggleSidebar, title = "Dashboard" }: HeaderProps) {
+export default function Header({
+    user,
+    onToggleSidebar,
+    title = "Dashboard"
+}: HeaderProps) {
     const [time, setTime] = useState(new Date());
 
     useEffect(() => {
@@ -36,17 +40,25 @@ export default function Header({ user, onToggleSidebar, title = "Dashboard" }: H
                             {title}
                         </h1>
                         <p className="text-sm sm:text-lg font-medium text-gray-600 tracking-wide relative before:content-[''] before:absolute before:-bottom-2 before:left-0 before:w-0 before:h-[1px] before:bg-gray-400 group-hover:before:w-full before:transition-all before:duration-300">
-                            Selamat datang kembali, <span className='text-purple-600'>{user?.name || 'Admin'}</span>
+                            Selamat datang kembali,{" "}
+                            <span className="text-purple-600">
+                                {user?.name || "Admin"}
+                            </span>
                         </p>
                     </div>
                 </div>
 
                 <div className="bg-white to-purple-50/30 px-6 py-3 rounded-lg hover:bg-white hover:shadow-sm shadow-purple-100 transition-all duration-300 border border-purple-100 w-full sm:w-auto">
                     <p className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                        {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date().toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric"
+                        })}
                     </p>
                     <p className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors text-left mt-1">
-                        {time.toLocaleTimeString('id-ID')}
+                        {time.toLocaleTimeString("id-ID")}
                     </p>
                 </div>
             </div>
