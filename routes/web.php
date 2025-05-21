@@ -68,3 +68,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/dashboard/skills/{id}', [SkillController::class, 'destroy'])->name('skills.destroy');
 });
 
+// CRUD Skill untuk dosen
+Route::middleware(['auth', 'role:dosen'])->prefix('dashboard/dosen/skills')->group(function () {
+    Route::get('/', [SkillController::class, 'indexDosen'])->name('dosen.skills.index');
+    Route::post('/', [SkillController::class, 'storeDosen'])->name('dosen.skills.store');
+    Route::put('/{id}', [SkillController::class, 'updateDosen'])->name('dosen.skills.update');
+    Route::delete('/{id}', [SkillController::class, 'destroyDosen'])->name('dosen.skills.destroy');
+});

@@ -89,8 +89,11 @@ export const navItemsDosen = [
             {
                 label: "Tambah Lomba",
                 href: "/dashboard/dosen/lomba/tambah"
+            },
+            {
+                label: "Manajemen Ketrampilan",
+                href: "/dashboard/dosen/skills"
             }
         ]
     }
 ];
-
