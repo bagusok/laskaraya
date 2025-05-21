@@ -23,6 +23,9 @@ export default function SkillsManagement() {
     const [deleteSkill, setDeleteSkill] = useState<Skill | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    // FIX: Properly type and extract skills from usePage props
+    const skills = usePage<{ skills: Skill[] }>().props.skills;
+
     const handleAdd = () => {
         setEditData(null);
         setModalOpen(true);
