@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProgramStudiController;
+use App\Http\Controllers\SkillController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -59,3 +60,11 @@ Route::group(['prefix' => 'prodi', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/{id}', [ProgramStudiController::class, 'show'])->name('prodi.detail');
     // (opsional) Route::get('/edit/{id}', [ProgramStudiController::class, 'edit'])->name('prodi.edit');
 });
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard/skills', [SkillController::class, 'index'])->name('skills.index');
+    Route::post('/dashboard/skills', [SkillController::class, 'store'])->name('skills.store');
+    Route::put('/dashboard/skills/{id}', [SkillController::class, 'update'])->name('skills.update');
+    Route::delete('/dashboard/skills/{id}', [SkillController::class, 'destroy'])->name('skills.destroy');
+});
+

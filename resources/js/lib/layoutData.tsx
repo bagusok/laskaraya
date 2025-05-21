@@ -33,6 +33,10 @@ export const navItems: NavItem[] = [
             {
                 label: "Manajemen Periode",
                 href: "/dashboard/competitions/periods"
+            },
+            {
+                label: "Manajemen Atribut",
+                href: "/dashboard/skills"
             }
         ]
     },
