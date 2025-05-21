@@ -70,7 +70,7 @@ export const navItemsDosen = [
         subItems: [
             {
                 label: "Daftar Mahasiswa Bimbingan",
-                href: "/dashboard/dosen/mahasiswa"
+                href: route("dosen.bimbingan")
             },
             {
                 label: "Prestasi Mahasiswa",

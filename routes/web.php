@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\DosenController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -74,4 +75,13 @@ Route::middleware(['auth', 'role:dosen'])->prefix('dashboard/dosen/skills')->gro
     Route::post('/', [SkillController::class, 'storeDosen'])->name('dosen.skills.store');
     Route::put('/{id}', [SkillController::class, 'updateDosen'])->name('dosen.skills.update');
     Route::delete('/{id}', [SkillController::class, 'destroyDosen'])->name('dosen.skills.destroy');
+});
+
+
+Route::group(['prefix' => 'bimbingan', 'middleware' => ['auth', 'role:dosen']], function () {
+    Route::get('/', [DosenController::class, 'index'])->name('dosen.bimbingan');
+    Route::post('/', [DosenController::class, 'create'])->name('dosen.bimbingan.create');
+    Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.bimbingan.show');
+    Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.bimbingan.update');
+    Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.bimbingan.destroy');
 });
