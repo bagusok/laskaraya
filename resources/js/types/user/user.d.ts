@@ -20,3 +20,19 @@ export interface Column {
     accessorKey: string;
     cell?: (row: User) => ReactNode;
 }
+
+export interface MahasiswaBimbingan {
+    id?: number;
+    name: string;
+    identifier: string;
+    email: string;
+    phone: string;
+    faculty: string;
+    prodi_id?: number;
+    tahun: number;
+    status: string;
+    prestasi?: string;
+    kategori?: string;
+    created_at?: string;
+    updated_at?: string;
+}
