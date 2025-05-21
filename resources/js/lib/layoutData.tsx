@@ -32,7 +32,7 @@ export const navItems: NavItem[] = [
             },
             {
                 label: "Manajemen Periode",
-                href: "/dashboard/competitions/periods"
+                href: route("period")
             },
             {
                 label: "Manajemen Atribut",

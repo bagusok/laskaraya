@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\PeriodController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -84,4 +85,12 @@ Route::group(['prefix' => 'bimbingan', 'middleware' => ['auth', 'role:dosen']], 
     Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.bimbingan.show');
     Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.bimbingan.update');
     Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.bimbingan.destroy');
+});
+
+Route::prefix('period')->group(function () {
+    Route::get('/', [PeriodController::class, 'index'])->name('period');
+    Route::post('/', [PeriodController::class, 'store'])->name('period.store');
+    Route::put('/{id}', [PeriodController::class, 'update'])->name('period.update');
+    Route::delete('/{id}', [PeriodController::class, 'destroy'])->name('period.destroy');
+    Route::get('/{id}', [PeriodController::class, 'show'])->name('period.show');
 });

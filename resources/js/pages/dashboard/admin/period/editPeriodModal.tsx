@@ -1,45 +1,48 @@
+import { useForm } from "@inertiajs/react";
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogFooter,
+    DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
-import { useForm } from "@inertiajs/react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
 
-export default function EditProdiModal({
-    prodiId,
-    prodiName,
+export default function EditPeriodModal({
+    open,
+    onClose,
+    period,
     onSuccess
 }: {
-    prodiId: number;
-    prodiName: string;
+    open: boolean;
+    onClose: () => void;
+    period: any;
     onSuccess?: () => void;
 }) {
-    const [open, setOpen] = useState(false);
-    const { data, setData, errors, put, processing } = useForm({
-        name: prodiName || ""
+    const { data, setData, put, processing, errors, reset } = useForm({
+        name: period?.name || "",
+        year: period?.year || new Date().getFullYear()
     });
 
     useEffect(() => {
         if (open) {
-            setData("name", prodiName || "");
+            setData({
+                name: period?.name || "",
+                year: period?.year || new Date().getFullYear()
+            });
         }
-    }, [open, prodiName]);
+    }, [open, period]);
 
-    const handleSubmit = () => {
-        put(route("prodi.update", prodiId), {
-            onSuccess: (data) => {
-                toast.success(
-                    data.props.success || "Berhasil mengubah program studi"
-                );
-                setOpen(false);
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(`/period/${period.id}`, {
+            onSuccess: () => {
+                toast.success("Berhasil mengubah periode");
+                reset();
+                onClose();
                 if (onSuccess) onSuccess();
             },
             onError: (errors) => {
@@ -51,21 +54,12 @@ export default function EditProdiModal({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    size="icon"
-                    variant="outline"
-                    className="hover:bg-purple-100/30 hover:text-purple-600 text-purple-300"
-                >
-                    <Pencil className="h-4 w-4" />
-                </Button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle asChild>
                         <h2 className="text-xl font-normal text-purple-900 mb-4 tracking-tight">
-                            Edit Program Studi
+                            Edit Periode
                         </h2>
                     </DialogTitle>
                 </DialogHeader>
@@ -75,19 +69,46 @@ export default function EditProdiModal({
                             htmlFor="name"
                             className="block text-xs uppercase tracking-wider text-purple-900 mb-1 font-medium"
                         >
-                            Nama Program Studi
+                            Nama Periode
                         </label>
-                        <input
-                            name="name"
+                        <select
                             id="name"
+                            className="w-full py-1.5 border-b border-gray-300 focus:border-purple-700 focus:outline-none bg-transparent appearance-none text-base text-purple-900 font-medium uppercase tracking-wide"
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
-                            className="w-full py-1.5 border-b border-gray-300 focus:border-purple-700 focus:outline-none transition-colors text-base bg-transparent"
                             required
-                        />
+                        >
+                            <option value="">Pilih Periode</option>
+                            <option value="Ganjil">Ganjil</option>
+                            <option value="Genap">Genap</option>
+                        </select>
                         {errors.name && (
                             <small className="text-red-400 italic text-xs">
                                 * {errors.name}
+                            </small>
+                        )}
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="year"
+                            className="block text-xs uppercase tracking-wider text-purple-900 mb-1 font-medium"
+                        >
+                            Tahun
+                        </label>
+                        <input
+                            type="number"
+                            id="year"
+                            className="w-full py-1.5 border-b border-gray-300 focus:border-purple-700 focus:outline-none transition-colors text-base bg-transparent"
+                            value={data.year}
+                            onChange={(e) =>
+                                setData("year", Number(e.target.value))
+                            }
+                            required
+                            min={2000}
+                        />
+                        {errors.year && (
+                            <small className="text-red-400 italic text-xs">
+                                * {errors.year}
                             </small>
                         )}
                     </div>
@@ -105,7 +126,7 @@ export default function EditProdiModal({
                         <button
                             type="button"
                             onClick={handleSubmit}
-                            disabled={processing || !data.name.trim()}
+                            disabled={processing}
                             className="w-full md:w-auto px-6 py-2 bg-purple-800 text-white hover:bg-purple-900 transition-colors text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                         >
                             {processing ? "Loading..." : "Simpan"}
