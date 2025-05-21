@@ -40,4 +40,3 @@ export default function AddSkillModal({ onSubmit, initialData, open, onClose }: 
         </div>
     );
 }
-

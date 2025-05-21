@@ -42,4 +42,3 @@ class SkillController extends Controller
         return redirect()->back()->with('success', 'Skill berhasil dihapus');
     }
 }
-

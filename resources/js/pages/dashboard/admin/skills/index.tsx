@@ -6,7 +6,6 @@ import AddSkillModal from "@/components/ui/admin/skill/addSkillModal";
 import React, { useState } from "react";
 import { router, usePage } from "@inertiajs/react";
 import type { Skill } from "@/types/skill";
-
 import {
     Dialog,
     DialogClose,
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 
 export default function SkillsManagement() {
-    const skills = usePage<{ skills: Skill[] }>().props.skills;
     const [modalOpen, setModalOpen] = useState(false);
     const [editData, setEditData] = useState<Skill | null>(null);
     // State untuk dialog hapus
