@@ -230,7 +230,7 @@ export default function Competitions({
                         Menunggu Verifikasi
                     </Button>
                 </div>
-                <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border">
+                <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border overflow-x-auto">
                     {competitions.isLoading && (
                         <div className="flex items-center justify-center w-full h-96">
                             <p className="text-muted-foreground">Loading...</p>
