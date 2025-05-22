@@ -1,5 +1,5 @@
 /* Swiss Creative Design System */
-:root {
+/* :root {
     --primary: #2563eb;
     --secondary: #7c3aed;
     --accent: #60a5fa;
@@ -13,7 +13,7 @@
     --transition-standard: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: "Urbanist", "Helvetica Neue", Arial, sans-serif;
-}
+} */
 
 /* Typography */
 .swiss-title {
