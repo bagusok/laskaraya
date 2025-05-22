@@ -11,7 +11,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
 import { useState, useEffect } from "react";
@@ -29,7 +29,7 @@ export default function EditProfile() {
     } = useProfileForm();
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [prodiList, setProdiList] = useState([]);
+    const prodiList = (usePage().props.prodiList ?? []) as any[];
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -41,12 +41,6 @@ export default function EditProfile() {
             reader.readAsDataURL(file);
         }
     };
-
-    useEffect(() => {
-        fetch("/program-studi/get-all")
-            .then((res) => res.json())
-            .then((data) => setProdiList(data));
-    }, []);
 
     return (
         <AdminLayout>
@@ -280,37 +274,17 @@ export default function EditProfile() {
                                                 htmlFor="faculty"
                                                 className="text-gray-700"
                                             >
-                                                Fakultas
+                                                Jurusan
                                             </Label>
                                             <Input
                                                 id="faculty"
                                                 {...register("faculty")}
-                                                placeholder="Masukkan fakultas"
+                                                placeholder="Masukkan jurusan"
                                                 className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                             />
                                             {errors.faculty && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.faculty.message}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="major"
-                                                className="text-gray-700"
-                                            >
-                                                Jurusan
-                                            </Label>
-                                            <Input
-                                                id="major"
-                                                {...register("major")}
-                                                placeholder="Masukkan jurusan"
-                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
-                                            />
-                                            {errors.major && (
-                                                <p className="text-sm text-red-500">
-                                                    {errors.major.message}
                                                 </p>
                                             )}
                                         </div>
@@ -398,6 +372,46 @@ export default function EditProfile() {
                                                 </p>
                                             )}
                                         </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="major"
+                                                className="text-gray-700"
+                                            >
+                                                Program Studi
+                                            </Label>
+                                            <Select
+                                                onValueChange={(value) =>
+                                                    setValue("major", value)
+                                                }
+                                                defaultValue={
+                                                    user?.dosen?.major || ""
+                                                }
+                                            >
+                                                <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+                                                    <SelectValue placeholder="Pilih Program Studi" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {prodiList.map(
+                                                        (prodi: any) => (
+                                                            <SelectItem
+                                                                key={prodi.id}
+                                                                value={
+                                                                    prodi.nama
+                                                                }
+                                                            >
+                                                                {prodi.nama}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.major && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.major.message}
+                                                </p>
+                                            )}
+                                        </div>
                                     </>
                                 )}
 
@@ -407,12 +421,14 @@ export default function EditProfile() {
                                             htmlFor="prodi_id"
                                             className="text-gray-700"
                                         >
-                                            Program Studi
+                                            Prodi
                                         </Label>
                                         <select
                                             id="prodi_id"
                                             {...register("prodi_id")}
-                                            defaultValue={user?.mahasiswa?.prodi_id || ""}
+                                            defaultValue={
+                                                user?.mahasiswa?.prodi_id || ""
+                                            }
                                             className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
                                         >
                                             <option value="">

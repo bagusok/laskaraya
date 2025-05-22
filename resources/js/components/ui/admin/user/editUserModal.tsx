@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../../button";
 import { Pencil } from "lucide-react";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -30,7 +30,7 @@ export default function EditUserModal({ userId }: { userId: number }) {
         prodi_id: ""
     });
 
-    const [prodiList, setProdiList] = useState([]);
+    const { prodiList } = usePage().props as unknown as { prodiList: any[] };
     const userDetail = useMutation({
         mutationKey: ["userDetail", userId],
         mutationFn: (id: number) =>
@@ -81,9 +81,6 @@ export default function EditUserModal({ userId }: { userId: number }) {
     useEffect(() => {
         if (open) {
             userDetail.mutate(userId);
-            fetch("/program-studi/get-all")
-                .then((res) => res.json())
-                .then((data) => setProdiList(data));
         }
     }, [userId, open]);
 

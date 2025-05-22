@@ -34,7 +34,11 @@ export const navItems: NavItem[] = [
             },
             {
                 label: "Manajemen Periode",
-                href: "/dashboard/competitions/periods"
+                href: route("period")
+            },
+            {
+                label: "Manajemen Atribut",
+                href: "/dashboard/skills"
             }
         ]
     },
@@ -68,7 +72,7 @@ export const navItemsDosen = [
         subItems: [
             {
                 label: "Daftar Mahasiswa Bimbingan",
-                href: "/dashboard/dosen/mahasiswa"
+                href: route("dosen.bimbingan")
             },
             {
                 label: "Prestasi Mahasiswa",
@@ -87,6 +91,10 @@ export const navItemsDosen = [
             {
                 label: "Tambah Lomba",
                 href: "/dashboard/dosen/lomba/tambah"
+            },
+            {
+                label: "Manajemen Ketrampilan",
+                href: "/dashboard/dosen/skills"
             }
         ]
     }

@@ -10,9 +10,8 @@ class PeriodModel extends Model
     use HasFactory;
 
     protected $table = 'periods';
-
-
     protected $fillable = [
+        'competition_id',
         'name',
         'year',
     ];

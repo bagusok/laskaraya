@@ -28,7 +28,7 @@ class ProgramStudiController extends Controller
             'nama' => 'required|string|max:255',
         ]);
         $prodi = \App\Models\ProgramStudiModel::create($validated);
-        return response()->json($prodi, 201);
+        return redirect()->back()->with('success', 'Berhasil menambah program studi');
     }
 
     public function update(Request $request, $id)
@@ -38,14 +38,14 @@ class ProgramStudiController extends Controller
         ]);
         $prodi = \App\Models\ProgramStudiModel::findOrFail($id);
         $prodi->update($validated);
-        return response()->json($prodi);
+        return redirect()->back()->with('success', 'Berhasil mengubah program studi');
     }
 
     public function destroy($id)
     {
         $prodi = \App\Models\ProgramStudiModel::findOrFail($id);
         $prodi->delete();
-        return response()->json(['message' => 'Prodi berhasil dihapus']);
+        return redirect()->back()->with('success', 'Berhasil menghapus program studi');
     }
 
     public function show($id)

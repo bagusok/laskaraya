@@ -38,19 +38,46 @@ export default function ProgramStudiIndex({
         setOpenDialog(true);
     };
     const handleSave = () => {
-        // Implementasi simpan ke backend jika perlu
-        setOpenDialog(false);
-        setInputValue("");
-        setEditIndex(null);
+        if (editIndex === null) {
+            // TAMBAH
+            router.post(
+                route("prodi.create"),
+                { nama: inputValue },
+                {
+                    onSuccess: () => {
+                        setOpenDialog(false);
+                        setInputValue("");
+                        setEditIndex(null);
+                    }
+                }
+            );
+        } else {
+            // EDIT
+            router.put(
+                route("prodi.update", prodiList[editIndex].id),
+                { nama: inputValue },
+                {
+                    onSuccess: () => {
+                        setOpenDialog(false);
+                        setInputValue("");
+                        setEditIndex(null);
+                    }
+                }
+            );
+        }
     };
     const handleOpenDelete = (idx: number) => {
         setDeleteIndex(idx);
         setOpenDeleteDialog(true);
     };
     const handleDelete = () => {
-        // Implementasi hapus ke backend jika perlu
-        setOpenDeleteDialog(false);
-        setDeleteIndex(null);
+        if (deleteIndex !== null) {
+            setOpenDeleteDialog(false);
+            router.delete(route("prodi.destroy", prodiList[deleteIndex].id), {
+                onSuccess: () => {}
+            });
+            setDeleteIndex(null);
+        }
     };
     const handleCloseDialog = () => {
         setOpenDialog(false);

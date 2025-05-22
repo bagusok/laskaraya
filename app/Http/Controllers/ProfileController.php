@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
+use App\Models\ProgramStudiModel;
 
 class ProfileController extends Controller
 {
@@ -26,8 +27,10 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user()->load(['dosen', 'mahasiswa']);
+        $prodiList = ProgramStudiModel::all(['id', 'nama']);
         return Inertia::render('dashboard/admin/editProfile', [
-            'user' => $user
+            'user' => $user,
+            'prodiList' => $prodiList,
         ]);
     }
 
