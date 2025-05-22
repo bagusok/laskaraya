@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -59,3 +60,7 @@ Route::group(['prefix' => 'prodi', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/{id}', [ProgramStudiController::class, 'show'])->name('prodi.detail');
     // (opsional) Route::get('/edit/{id}', [ProgramStudiController::class, 'edit'])->name('prodi.edit');
 });
+
+include __DIR__ . '/admin.php';
+include __DIR__ . '/mahasiswa.php';
+include __DIR__ . '/dosen.php';

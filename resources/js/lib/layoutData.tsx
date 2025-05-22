@@ -5,7 +5,6 @@ import {
     CalendarDays,
     BookOpen,
     FileCheck,
-    UserCircle,
     Trophy
 } from "lucide-react";
 import { NavItem } from "../types/layout";
@@ -25,7 +24,10 @@ export const navItems: NavItem[] = [
         label: "Manajemen Lomba",
         icon: <CalendarDays />,
         subItems: [
-            { label: "Manajemen Data", href: "/dashboard/competitions/manage" },
+            {
+                label: "Manajemen Data",
+                href: route("admin.competitions.index")
+            },
             {
                 label: "Verifikasi Data",
                 href: "/dashboard/competitions/verify"
