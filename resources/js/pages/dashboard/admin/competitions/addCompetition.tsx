@@ -23,9 +23,10 @@ import { useForm } from "@inertiajs/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { CalendarIcon, ImageIcon, Plus, Upload, X } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import toast from "react-hot-toast";
+import ReactSelect from "react-select";
 
 type Props = {
     categories: {
@@ -36,6 +37,10 @@ type Props = {
         id: number;
         name: string;
         year: string;
+    }[];
+    skills: {
+        id: number;
+        name: string;
     }[];
 };
 
@@ -50,9 +55,10 @@ type FormData = {
     description: string;
     start_date: string;
     end_date: string;
+    skills: number[];
 };
 
-export default function AddCompetition({ categories, periods }: Props) {
+export default function AddCompetition({ categories, periods, skills }: Props) {
     const query = useQueryClient();
 
     const { data, setData, errors, post, processing } = useForm<FormData>({
@@ -65,7 +71,8 @@ export default function AddCompetition({ categories, periods }: Props) {
         status: "",
         description: "",
         start_date: "",
-        end_date: ""
+        end_date: "",
+        skills: []
     });
 
     const [date, setDate] = useState<DateRange | undefined>({
@@ -96,14 +103,19 @@ export default function AddCompetition({ categories, periods }: Props) {
         }, {});
     }, [periods]);
 
-    console.log(periods);
+    useEffect(() => {
+        if (date?.from && date?.to) {
+            setData("start_date", format(date.from, "yyyy-MM-dd"));
+            setData("end_date", format(date.to, "yyyy-MM-dd"));
+        }
+    }, [date]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (date?.from && date?.to) {
-            setData("start_date", format(date.from, "yyyy-MM-dd"));
-            setData("end_date", format(date.to, "yyyy-MM-dd"));
+        if (!data.start_date || !data.end_date) {
+            toast.error("Silakan pilih tanggal mulai dan akhir.");
+            return;
         }
 
         post(route("admin.competitions.create.post"), {
@@ -351,72 +363,110 @@ export default function AddCompetition({ categories, periods }: Props) {
                                 )}
                             </div>
                         </div>
-                        <div className="w-full">
-                            <Label className="uppercase text-purple-900">
-                                Tanggal Mulai - Selesai
-                            </Label>
-                            <div className="grid-gap-2 mt-2">
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            id="date"
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-[300px] justify-start text-left font-normal",
-                                                !date && "text-muted-foreground"
-                                            )}
-                                        >
-                                            <CalendarIcon />
-                                            {date?.from ? (
-                                                date.to ? (
-                                                    <>
-                                                        {format(
+                        <div className="w-full flex flex-col md:flex-row gap-5">
+                            <div className="w-full">
+                                <Label className="uppercase text-purple-900">
+                                    Tanggal Mulai - Selesai
+                                </Label>
+                                <div className="grid-gap-2 mt-2">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                id="date"
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-[300px] justify-start text-left font-normal",
+                                                    !date &&
+                                                        "text-muted-foreground"
+                                                )}
+                                            >
+                                                <CalendarIcon />
+                                                {date?.from ? (
+                                                    date.to ? (
+                                                        <>
+                                                            {format(
+                                                                date.from,
+                                                                "LLL dd, y"
+                                                            )}{" "}
+                                                            -{" "}
+                                                            {format(
+                                                                date.to,
+                                                                "LLL dd, y"
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        format(
                                                             date.from,
                                                             "LLL dd, y"
-                                                        )}{" "}
-                                                        -{" "}
-                                                        {format(
-                                                            date.to,
-                                                            "LLL dd, y"
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    format(
-                                                        date.from,
-                                                        "LLL dd, y"
+                                                        )
                                                     )
-                                                )
-                                            ) : (
-                                                <span>Pick a date</span>
-                                            )}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                        className="w-auto p-0"
-                                        align="start"
-                                    >
-                                        <Calendar
-                                            initialFocus
-                                            mode="range"
-                                            defaultMonth={date?.from}
-                                            selected={date}
-                                            onSelect={setDate}
-                                            numberOfMonths={2}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                            className="w-auto p-0"
+                                            align="start"
+                                        >
+                                            <Calendar
+                                                initialFocus
+                                                mode="range"
+                                                defaultMonth={date?.from}
+                                                selected={date}
+                                                onSelect={setDate}
+                                                numberOfMonths={2}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                {errors.start_date && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.start_date}
+                                    </small>
+                                )}
+                                {errors.end_date && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.end_date}
+                                    </small>
+                                )}
                             </div>
-                            {errors.start_date && (
-                                <small className="text-xs text-red-500">
-                                    * {errors.start_date}
-                                </small>
-                            )}
-                            {errors.end_date && (
-                                <small className="text-xs text-red-500">
-                                    * {errors.end_date}
-                                </small>
-                            )}
+                            <div className="w-full">
+                                <Label className="uppercase text-purple-900">
+                                    Skill yang dibutuhkan
+                                </Label>
+                                <ReactSelect
+                                    isMulti
+                                    options={skills.map((skill) => ({
+                                        value: skill.id,
+                                        label: skill.name
+                                    }))}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={(selectedOptions) => {
+                                        const selectedSkillIds = (
+                                            selectedOptions || []
+                                        ).map((option) => option.value);
+                                        setData("skills", selectedSkillIds); // Hanya kirim ID ke backend
+                                    }}
+                                    value={skills
+                                        .filter((skill) =>
+                                            data.skills.includes(skill.id)
+                                        )
+                                        .map((skill) => ({
+                                            value: skill.id,
+                                            label: skill.name
+                                        }))}
+                                />
+
+                                {errors.skills && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.skills}
+                                    </small>
+                                )}
+                            </div>
                         </div>
+
                         <div className="w-full">
                             <Label className="uppercase text-purple-900">
                                 Deskripsi

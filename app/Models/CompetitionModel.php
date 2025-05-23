@@ -38,6 +38,11 @@ class CompetitionModel extends Model
         return $this->belongsTo(PeriodModel::class, 'period_id');
     }
 
+    public function skills()
+    {
+        return $this->belongsToMany(SkillModel::class, 'skill_to_competitions', 'competition_id', 'skill_id');
+    }
+
     public function getImageAttribute($value)
     {
         if (!$value) {

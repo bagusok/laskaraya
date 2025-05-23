@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryModel;
 use App\Models\CompetitionModel;
 use App\Models\PeriodModel;
+use App\Models\SkillModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -15,8 +16,6 @@ class AdminCompetitionController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-
         $pending = CompetitionModel::where('verified_status', 'pending')->count();
         $ongoing = CompetitionModel::where([
             'status' => 'ongoing',
@@ -41,11 +40,13 @@ class AdminCompetitionController extends Controller
     {
         $categories = CategoryModel::all();
         $periods = PeriodModel::orderBy('year', 'desc')->get();
+        $skills = SkillModel::all();
 
 
         return Inertia::render('dashboard/admin/competitions/addCompetition')->with([
             'categories' => $categories,
             'periods' => $periods,
+            'skills' => $skills,
         ]);
     }
 
@@ -106,6 +107,8 @@ class AdminCompetitionController extends Controller
             'description' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'skills' => 'required|array',
+            'skills.*' => 'exists:skills,id',
         ]);
 
         $image = $request->file('image');
@@ -128,6 +131,12 @@ class AdminCompetitionController extends Controller
             'end_date' => $request->end_date,
         ]);
 
+        if ($request->has('skills')) {
+            $competition->skills()->attach($request->skills);
+        }
+
+
+
         if (!$competition) {
             return back()->with('error', 'Failed to create competition.');
         }
@@ -140,6 +149,8 @@ class AdminCompetitionController extends Controller
         $competition = CompetitionModel::findOrFail($id);
         $categories = CategoryModel::all();
         $periods = PeriodModel::orderBy('year', 'desc')->get();
+        $skills = SkillModel::all();
+        $selectedSkills = $competition->skills->pluck('id')->toArray();
 
         if (!$competition) {
             return back()->with('error', 'Competition not found.');
@@ -149,6 +160,9 @@ class AdminCompetitionController extends Controller
             'competition' => $competition,
             'categories' => $categories,
             'periods' => $periods,
+            'skills' => $skills,
+            'selectedSkills' => $selectedSkills,
+
         ]);
     }
 
@@ -167,6 +181,8 @@ class AdminCompetitionController extends Controller
             'description' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'skills' => 'required|array',
+            'skills.*' => 'exists:skills,id',
         ]);
 
         $competition = CompetitionModel::findOrFail($id);
@@ -196,6 +212,13 @@ class AdminCompetitionController extends Controller
         $competition->description = $request->description;
         $competition->start_date = $request->start_date;
         $competition->end_date = $request->end_date;
+
+        // Update skills
+        if ($request->has('skills')) {
+            $competition->skills()->sync($request->skills);
+        } else {
+            $competition->skills()->detach();
+        }
 
         $competition->save();
 
