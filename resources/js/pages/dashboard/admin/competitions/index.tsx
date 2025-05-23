@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataTable from "@/components/ui/shared/dataTable";
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Award, Calendar, CheckCircle, Clock, Trophy } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { competitionColumns } from "./competition-table/columns";
 import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
 
@@ -36,44 +36,33 @@ export default function Competitions({
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [competitionId, setCompetitionId] = useState(0);
 
-    const competitions = useInfiniteQuery({
-        queryKey: ["competitions", competitionStatus],
-        initialPageParam: 1,
-        queryFn: async ({ pageParam }) => {
+    const [page, setPage] = useState(1);
+
+    const competitions = useQuery({
+        queryKey: ["competitions", competitionStatus, page],
+
+        queryFn: async () => {
             const statusParams =
-                competitionStatus == CompetitionFilterTable.PENDING
-                    ? {
-                          verif_status: "pending"
-                      }
-                    : {
-                          status: competitionStatus
-                      };
+                competitionStatus === CompetitionFilterTable.PENDING
+                    ? { verif_status: CompetitionFilterTable.PENDING }
+                    : { status: competitionStatus };
 
             const res = await axios.get(route("admin.competitions.getAll"), {
                 params: {
-                    page: pageParam,
-                    limit: 10,
-                    ...(competitionStatus !== CompetitionFilterTable.ALL && {
-                        ...statusParams
-                    })
+                    page,
+                    limit: 4,
+                    ...(competitionStatus !== CompetitionFilterTable.ALL &&
+                        statusParams)
                 }
             });
             return res.data;
-        },
-        getNextPageParam: (lastPage) => {
-            if (
-                lastPage.pagination.current_page < lastPage.pagination.last_page
-            ) {
-                return lastPage.pagination.current_page + 1;
-            }
-            return undefined;
         }
     });
 
-    const competitionData = useMemo(
-        () => competitions.data?.pages.flatMap((page) => page.data),
-        [competitions.data?.pages]
-    );
+    const setFilter = (status: CompetitionFilterTable) => {
+        setCompetitionStatus(status);
+        setPage(1);
+    };
 
     const columns = useCallback(() => {
         return competitionColumns(setOpenDeleteModal, setCompetitionId);
@@ -165,9 +154,7 @@ export default function Competitions({
                 </div>
                 <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
                     <Button
-                        onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.ALL)
-                        }
+                        onClick={() => setFilter(CompetitionFilterTable.ALL)}
                         size="sm"
                         className={cn("rounded", {
                             "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
@@ -181,7 +168,7 @@ export default function Competitions({
                     </Button>
                     <Button
                         onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.ONGOING)
+                            setFilter(CompetitionFilterTable.ONGOING)
                         }
                         size="sm"
                         className={cn("rounded", {
@@ -197,9 +184,7 @@ export default function Competitions({
                     </Button>
                     <Button
                         onClick={() =>
-                            setCompetitionStatus(
-                                CompetitionFilterTable.COMPLETED
-                            )
+                            setFilter(CompetitionFilterTable.COMPLETED)
                         }
                         size="sm"
                         className={cn("rounded", {
@@ -215,7 +200,7 @@ export default function Competitions({
                     </Button>
                     <Button
                         onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.PENDING)
+                            setFilter(CompetitionFilterTable.PENDING)
                         }
                         size="sm"
                         className={cn("rounded", {
@@ -237,9 +222,66 @@ export default function Competitions({
                         </div>
                     )}
 
-                    {competitions.isSuccess && competitionData && (
-                        <DataTable columns={columns()} data={competitionData} />
+                    {competitions.isSuccess && competitions.data.data && (
+                        <DataTable
+                            columns={columns()}
+                            data={competitions.data.data}
+                        />
                     )}
+
+                    {competitions.isError && (
+                        <div className="flex items-center justify-center w-full h-96">
+                            <p className="text-muted-foreground">
+                                Terjadi kesalahan saat memuat data kompetisi
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="w-full inline-flex justify-between items-center mt-4">
+                    <div>
+                        <p className="text-sm text-muted-foreground">
+                            Halaman {competitions.data?.pagination.current_page}{" "}
+                            dari {competitions.data?.pagination.last_page} |
+                            Total Data:{" "}
+                            {competitions.data?.pagination.total}{" "}
+                        </p>
+                    </div>
+
+                    <div className="inline-flex gap-2">
+                        <Button
+                            disabled={
+                                +competitions.data?.pagination.current_page ===
+                                1
+                            }
+                            onClick={() => {
+                                setPage(
+                                    +competitions.data?.pagination
+                                        .current_page - 1
+                                );
+                            }}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Sebelumnya
+                        </Button>
+                        <Button
+                            disabled={
+                                +competitions.data?.pagination.current_page ===
+                                +competitions.data?.pagination.last_page
+                            }
+                            onClick={() => {
+                                setPage(
+                                    +competitions.data?.pagination
+                                        .current_page + 1
+                                );
+                            }}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Selanjutnya
+                        </Button>
+                    </div>
                 </div>
             </div>
             {openDeleteModal && (

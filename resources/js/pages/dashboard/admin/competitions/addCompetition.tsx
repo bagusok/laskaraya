@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useForm } from "@inertiajs/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
-import { CalendarIcon, ImageIcon, Plus, Upload, X } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ImageIcon, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import toast from "react-hot-toast";
@@ -136,12 +136,14 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
             <div className="container mx-auto py-4">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
-                        <Plus className="h-8 w-8 text-purple-600" />
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight">
-                                Tambah Kompetisi
-                            </h1>
-                        </div>
+                        <Button
+                            variant="outline"
+                            className="bg-white"
+                            onClick={() => window.history.back()}
+                        >
+                            <ChevronLeft className="mr-2 h-4 w-4" />
+                            Kembali
+                        </Button>
                     </div>
                 </div>
                 <div className="mt-8">
