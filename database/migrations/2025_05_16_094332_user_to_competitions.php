@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_to_competitions', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->foreignId('registrant_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('dosen_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('competition_id')->constrained('competitions')->onDelete('cascade');

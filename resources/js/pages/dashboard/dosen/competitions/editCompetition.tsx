@@ -1,4 +1,4 @@
-import AdminLayout from "@/components/layouts/adminLayout";
+import DosenLayout from "@/components/layouts/dosenLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -55,7 +55,6 @@ type FormData = {
     period_id: string;
     level: string;
     status: string;
-    verified_status: string;
     description: string;
     start_date: string;
     end_date: string;
@@ -79,7 +78,6 @@ export default function EditCompetition({
         period_id: competition.period_id.toString(),
         level: competition.level.toString(),
         status: competition.status.toString(),
-        verified_status: competition.verified_status.toString(),
         description: competition.description,
         start_date: competition.start_date,
         end_date: competition.end_date,
@@ -149,7 +147,7 @@ export default function EditCompetition({
             setData("end_date", format(date.to, "yyyy-MM-dd"));
         }
 
-        post(route("admin.competitions.edit.post", competition.id), {
+        post(route("dosen.competitions.edit.post", competition.id), {
             onSuccess: (data) => {
                 toast.success(data.props.success);
                 query.invalidateQueries({
@@ -163,7 +161,7 @@ export default function EditCompetition({
     };
 
     return (
-        <AdminLayout title="Edit Lomba">
+        <DosenLayout title="Edit Lomba">
             <div className="container mx-auto py-4">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
@@ -499,44 +497,6 @@ export default function EditCompetition({
                                 )}
                             </div>
                         </div>
-                        <div className="w-full flex flex-col md:flex-row gap-5">
-                            <div className="w-full">
-                                <Label className="uppercase text-purple-900">
-                                    Status Verifikasi
-                                </Label>
-                                <Select
-                                    value={data.verified_status}
-                                    onValueChange={(value) =>
-                                        setData(
-                                            "verified_status",
-                                            value.toString()
-                                        )
-                                    }
-                                    required
-                                >
-                                    <SelectTrigger className="w-full mt-2">
-                                        <SelectValue placeholder="Verified Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="pending">
-                                            Pending
-                                        </SelectItem>
-                                        <SelectItem value="accepted">
-                                            Accepted
-                                        </SelectItem>
-                                        <SelectItem value="rejected">
-                                            Rejected
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.verified_status && (
-                                    <small className="text-xs text-red-500">
-                                        * {errors.verified_status}
-                                    </small>
-                                )}
-                            </div>
-                            <div></div>
-                        </div>
 
                         <div className="w-full">
                             <Label className="uppercase text-purple-900">
@@ -567,6 +527,6 @@ export default function EditCompetition({
                     </form>
                 </div>
             </div>
-        </AdminLayout>
+        </DosenLayout>
     );
 }

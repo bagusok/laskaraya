@@ -25,7 +25,7 @@ export default function DeleteCompetitionModal({
     refetch: () => void;
 }) {
     const handleDelete = () => {
-        router.delete(route("mahasiswa.competitions.destroy", competitionId), {
+        router.delete(route("dosen.competitions.destroy", competitionId), {
             onSuccess: (data) => {
                 toast.success(data.props.success);
                 refetch();

@@ -55,6 +55,7 @@ type FormData = {
     description: string;
     start_date: string;
     end_date: string;
+    verified_status: string;
     skills: number[];
 };
 
@@ -69,6 +70,7 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
         period_id: "",
         level: "",
         status: "",
+        verified_status: "pending",
         description: "",
         start_date: "",
         end_date: "",
@@ -467,6 +469,44 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
                                     </small>
                                 )}
                             </div>
+                        </div>
+                        <div className="w-full flex flex-col md:flex-row gap-5">
+                            <div className="w-full">
+                                <Label className="uppercase text-purple-900">
+                                    Status Verifikasi
+                                </Label>
+                                <Select
+                                    value={data.verified_status}
+                                    onValueChange={(value) =>
+                                        setData(
+                                            "verified_status",
+                                            value.toString()
+                                        )
+                                    }
+                                    required
+                                >
+                                    <SelectTrigger className="w-full mt-2">
+                                        <SelectValue placeholder="Verified Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="pending">
+                                            Pending
+                                        </SelectItem>
+                                        <SelectItem value="accepted">
+                                            Accepted
+                                        </SelectItem>
+                                        <SelectItem value="rejected">
+                                            Rejected
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {errors.verified_status && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.verified_status}
+                                    </small>
+                                )}
+                            </div>
+                            <div></div>
                         </div>
 
                         <div className="w-full">

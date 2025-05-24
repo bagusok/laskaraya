@@ -1,4 +1,4 @@
-import AdminLayout from "@/components/layouts/adminLayout";
+import DosenLayout from "@/components/layouts/dosenLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -26,11 +26,9 @@ import { CalendarIcon, ChevronLeft, ImageIcon, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import toast from "react-hot-toast";
-import { Competition } from "./competition-table/columns";
 import ReactSelect from "react-select";
 
 type Props = {
-    competition: Competition;
     categories: {
         id: number;
         name: string;
@@ -44,46 +42,37 @@ type Props = {
         id: number;
         name: string;
     }[];
-    selectedSkills: number[];
 };
 
 type FormData = {
     name: string;
     author: string;
-    image: File | string;
+    image: File | null;
     category_id: string;
     period_id: string;
     level: string;
     status: string;
-    verified_status: string;
     description: string;
     start_date: string;
     end_date: string;
     skills: number[];
 };
 
-export default function EditCompetition({
-    categories,
-    periods,
-    competition,
-    skills,
-    selectedSkills
-}: Props) {
+export default function AddCompetition({ categories, periods, skills }: Props) {
     const query = useQueryClient();
 
     const { data, setData, errors, post, processing } = useForm<FormData>({
-        name: competition.name,
-        author: competition.author,
-        image: competition.image,
-        category_id: competition.category_id.toString(),
-        period_id: competition.period_id.toString(),
-        level: competition.level.toString(),
-        status: competition.status.toString(),
-        verified_status: competition.verified_status.toString(),
-        description: competition.description,
-        start_date: competition.start_date,
-        end_date: competition.end_date,
-        skills: selectedSkills
+        name: "",
+        author: "",
+        image: null,
+        category_id: "",
+        period_id: "",
+        level: "",
+        status: "",
+        description: "",
+        start_date: "",
+        end_date: "",
+        skills: []
     });
 
     const [date, setDate] = useState<DateRange | undefined>({
@@ -92,9 +81,7 @@ export default function EditCompetition({
     });
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [posterPreview, setPosterPreview] = useState<string | null>(
-        competition.image
-    );
+    const [posterPreview, setPosterPreview] = useState<string | null>(null);
 
     const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -116,40 +103,22 @@ export default function EditCompetition({
         }, {});
     }, [periods]);
 
-    const urlToFile = async (
-        url: string,
-        filename: string,
-        mimeType: string
-    ): Promise<File> => {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        return new File([blob], filename, { type: mimeType });
-    };
-
     useEffect(() => {
-        if (competition?.image) {
-            urlToFile(competition.image, "poster.png", "image/jpeg").then(
-                (file) => {
-                    setData("image", file);
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setPosterPreview(reader.result as string);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            );
-        }
-    }, [competition]);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
         if (date?.from && date?.to) {
             setData("start_date", format(date.from, "yyyy-MM-dd"));
             setData("end_date", format(date.to, "yyyy-MM-dd"));
         }
+    }, [date]);
 
-        post(route("admin.competitions.edit.post", competition.id), {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!data.start_date || !data.end_date) {
+            toast.error("Silakan pilih tanggal mulai dan akhir.");
+            return;
+        }
+
+        post(route("dosen.competitions.create.post"), {
             onSuccess: (data) => {
                 toast.success(data.props.success);
                 query.invalidateQueries({
@@ -163,7 +132,7 @@ export default function EditCompetition({
     };
 
     return (
-        <AdminLayout title="Edit Lomba">
+        <DosenLayout title="Tambah Lomba">
             <div className="container mx-auto py-4">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
@@ -499,44 +468,6 @@ export default function EditCompetition({
                                 )}
                             </div>
                         </div>
-                        <div className="w-full flex flex-col md:flex-row gap-5">
-                            <div className="w-full">
-                                <Label className="uppercase text-purple-900">
-                                    Status Verifikasi
-                                </Label>
-                                <Select
-                                    value={data.verified_status}
-                                    onValueChange={(value) =>
-                                        setData(
-                                            "verified_status",
-                                            value.toString()
-                                        )
-                                    }
-                                    required
-                                >
-                                    <SelectTrigger className="w-full mt-2">
-                                        <SelectValue placeholder="Verified Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="pending">
-                                            Pending
-                                        </SelectItem>
-                                        <SelectItem value="accepted">
-                                            Accepted
-                                        </SelectItem>
-                                        <SelectItem value="rejected">
-                                            Rejected
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {errors.verified_status && (
-                                    <small className="text-xs text-red-500">
-                                        * {errors.verified_status}
-                                    </small>
-                                )}
-                            </div>
-                            <div></div>
-                        </div>
 
                         <div className="w-full">
                             <Label className="uppercase text-purple-900">
@@ -567,6 +498,6 @@ export default function EditCompetition({
                     </form>
                 </div>
             </div>
-        </AdminLayout>
+        </DosenLayout>
     );
 }

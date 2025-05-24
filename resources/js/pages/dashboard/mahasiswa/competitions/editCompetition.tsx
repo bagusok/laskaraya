@@ -1,4 +1,4 @@
-import AdminLayout from "@/components/layouts/adminLayout";
+import DosenLayout from "@/components/layouts/mahasiswaLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -22,11 +22,12 @@ import { cn } from "@/lib/utils";
 import { useForm } from "@inertiajs/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
-import { CalendarIcon, ImageIcon, Plus, Upload, X } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ImageIcon, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DateRange } from "react-day-picker";
 import toast from "react-hot-toast";
 import { Competition } from "./competition-table/columns";
+import ReactSelect from "react-select";
 
 type Props = {
     competition: Competition;
@@ -39,6 +40,11 @@ type Props = {
         name: string;
         year: string;
     }[];
+    skills: {
+        id: number;
+        name: string;
+    }[];
+    selectedSkills: number[];
 };
 
 type FormData = {
@@ -52,12 +58,15 @@ type FormData = {
     description: string;
     start_date: string;
     end_date: string;
+    skills: number[];
 };
 
 export default function EditCompetition({
     categories,
     periods,
-    competition
+    competition,
+    skills,
+    selectedSkills
 }: Props) {
     const query = useQueryClient();
 
@@ -71,7 +80,8 @@ export default function EditCompetition({
         status: competition.status.toString(),
         description: competition.description,
         start_date: competition.start_date,
-        end_date: competition.end_date
+        end_date: competition.end_date,
+        skills: selectedSkills
     });
 
     const [date, setDate] = useState<DateRange | undefined>({
@@ -137,7 +147,7 @@ export default function EditCompetition({
             setData("end_date", format(date.to, "yyyy-MM-dd"));
         }
 
-        post(route("competitions.edit.post", competition.id), {
+        post(route("mahasiswa.competitions.edit.post", competition.id), {
             onSuccess: (data) => {
                 toast.success(data.props.success);
                 query.invalidateQueries({
@@ -151,16 +161,18 @@ export default function EditCompetition({
     };
 
     return (
-        <AdminLayout title="Tambah Lomba">
+        <DosenLayout title="Edit Lomba">
             <div className="container mx-auto py-4">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
-                        <Plus className="h-8 w-8 text-purple-600" />
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight">
-                                Tambah Kompetisi
-                            </h1>
-                        </div>
+                        <Button
+                            variant="outline"
+                            className="bg-white"
+                            onClick={() => window.history.back()}
+                        >
+                            <ChevronLeft className="mr-2 h-4 w-4" />
+                            Kembali
+                        </Button>
                     </div>
                 </div>
                 <div className="mt-8">
@@ -382,72 +394,110 @@ export default function EditCompetition({
                                 )}
                             </div>
                         </div>
-                        <div className="w-full">
-                            <Label className="uppercase text-purple-900">
-                                Tanggal Mulai - Selesai
-                            </Label>
-                            <div className="grid-gap-2 mt-2">
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            id="date"
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-[300px] justify-start text-left font-normal",
-                                                !date && "text-muted-foreground"
-                                            )}
-                                        >
-                                            <CalendarIcon />
-                                            {date?.from ? (
-                                                date.to ? (
-                                                    <>
-                                                        {format(
+                        <div className="w-full flex flex-col md:flex-row gap-5">
+                            <div className="w-full">
+                                <Label className="uppercase text-purple-900">
+                                    Tanggal Mulai - Selesai
+                                </Label>
+                                <div className="grid-gap-2 mt-2">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                id="date"
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-[300px] justify-start text-left font-normal",
+                                                    !date &&
+                                                        "text-muted-foreground"
+                                                )}
+                                            >
+                                                <CalendarIcon />
+                                                {date?.from ? (
+                                                    date.to ? (
+                                                        <>
+                                                            {format(
+                                                                date.from,
+                                                                "LLL dd, y"
+                                                            )}{" "}
+                                                            -{" "}
+                                                            {format(
+                                                                date.to,
+                                                                "LLL dd, y"
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        format(
                                                             date.from,
                                                             "LLL dd, y"
-                                                        )}{" "}
-                                                        -{" "}
-                                                        {format(
-                                                            date.to,
-                                                            "LLL dd, y"
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    format(
-                                                        date.from,
-                                                        "LLL dd, y"
+                                                        )
                                                     )
-                                                )
-                                            ) : (
-                                                <span>Pick a date</span>
-                                            )}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                        className="w-auto p-0"
-                                        align="start"
-                                    >
-                                        <Calendar
-                                            initialFocus
-                                            mode="range"
-                                            defaultMonth={date?.from}
-                                            selected={date}
-                                            onSelect={setDate}
-                                            numberOfMonths={2}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                            className="w-auto p-0"
+                                            align="start"
+                                        >
+                                            <Calendar
+                                                initialFocus
+                                                mode="range"
+                                                defaultMonth={date?.from}
+                                                selected={date}
+                                                onSelect={setDate}
+                                                numberOfMonths={2}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                {errors.start_date && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.start_date}
+                                    </small>
+                                )}
+                                {errors.end_date && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.end_date}
+                                    </small>
+                                )}
                             </div>
-                            {errors.start_date && (
-                                <small className="text-xs text-red-500">
-                                    * {errors.start_date}
-                                </small>
-                            )}
-                            {errors.end_date && (
-                                <small className="text-xs text-red-500">
-                                    * {errors.end_date}
-                                </small>
-                            )}
+                            <div className="w-full">
+                                <Label className="uppercase text-purple-900">
+                                    Skill yang dibutuhkan
+                                </Label>
+                                <ReactSelect
+                                    isMulti
+                                    options={skills.map((skill) => ({
+                                        value: skill.id,
+                                        label: skill.name
+                                    }))}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={(selectedOptions) => {
+                                        const selectedSkillIds = (
+                                            selectedOptions || []
+                                        ).map((option) => option.value);
+                                        setData("skills", selectedSkillIds); // Hanya kirim ID ke backend
+                                    }}
+                                    value={skills
+                                        .filter((skill) =>
+                                            data.skills.includes(skill.id)
+                                        )
+                                        .map((skill) => ({
+                                            value: skill.id,
+                                            label: skill.name
+                                        }))}
+                                />
+
+                                {errors.skills && (
+                                    <small className="text-xs text-red-500">
+                                        * {errors.skills}
+                                    </small>
+                                )}
+                            </div>
                         </div>
+
                         <div className="w-full">
                             <Label className="uppercase text-purple-900">
                                 Deskripsi
@@ -477,6 +527,6 @@ export default function EditCompetition({
                     </form>
                 </div>
             </div>
-        </AdminLayout>
+        </DosenLayout>
     );
 }

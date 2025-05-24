@@ -26,6 +26,7 @@ class CompetitionModel extends Model
         'end_date',
         'notes',
         'status',
+        'uploader_id',
     ];
 
     public function category()
@@ -41,6 +42,16 @@ class CompetitionModel extends Model
     public function skills()
     {
         return $this->belongsToMany(SkillModel::class, 'skill_to_competitions', 'competition_id', 'skill_id');
+    }
+
+    public function userToCompetition()
+    {
+        return $this->hasMany(UserToCompetition::class, 'competition_id');
+    }
+
+    public function uploader()
+    {
+        return $this->belongsTo(UserModel::class, 'uploader_id');
     }
 
     public function getImageAttribute($value)

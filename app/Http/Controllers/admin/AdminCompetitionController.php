@@ -19,11 +19,11 @@ class AdminCompetitionController extends Controller
         $pending = CompetitionModel::where('verified_status', 'pending')->count();
         $ongoing = CompetitionModel::where([
             'status' => 'ongoing',
-            'verified_status' => 'verified'
+            'verified_status' => 'accepted'
         ])->count();
         $completed = CompetitionModel::where([
             'status' => 'completed',
-            'verified_status' => 'verified'
+            'verified_status' => 'accepted'
         ])->count();
 
         $total = CompetitionModel::count();
@@ -102,6 +102,7 @@ class AdminCompetitionController extends Controller
             'author' => 'required|string|min:3|max:255',
             'level' => 'required|in:1,2,3,4,5',
             'status' => 'required|in:ongoing,completed,canceled',
+            'verified_status' => 'in:pending,accepted,rejected',
             'category_id' => 'required',
             'period_id' => 'required',
             'description' => 'required',
@@ -123,12 +124,13 @@ class AdminCompetitionController extends Controller
             'author' => $request->author,
             'level' => $request->level,
             'status' => $request->status,
-            'verified_status' => 'pending',
+            'verified_status' => $request->verified_status ?? 'pending',
             'category_id' => $request->category_id,
             'period_id' => $request->period_id,
             'description' => $request->description,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'uploader_id' => $user->id,
         ]);
 
         if ($request->has('skills')) {
@@ -176,6 +178,7 @@ class AdminCompetitionController extends Controller
             'author' => 'required|string|min:3|max:255',
             'level' => 'required|in:1,2,3,4,5',
             'status' => 'required|in:ongoing,completed,canceled',
+            'verified_status' => 'nullable|in:pending,accepted,rejected',
             'category_id' => 'required',
             'period_id' => 'required',
             'description' => 'required',
@@ -212,6 +215,7 @@ class AdminCompetitionController extends Controller
         $competition->description = $request->description;
         $competition->start_date = $request->start_date;
         $competition->end_date = $request->end_date;
+        $competition->verified_status = $request->verified_status ?? $competition->verified_status;
 
         // Update skills
         if ($request->has('skills')) {

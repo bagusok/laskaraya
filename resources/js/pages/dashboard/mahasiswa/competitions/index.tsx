@@ -1,21 +1,23 @@
-import AdminLayout from "@/components/layouts/adminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataTable from "@/components/ui/shared/dataTable";
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Award, Calendar, CheckCircle, Clock, Trophy } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { competitionColumns } from "./competition-table/columns";
 import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
+import MahasiswaLayout from "@/components/layouts/mahasiswaLayout";
+import useAuth from "@/hooks/use-auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 enum CompetitionFilterTable {
-    ALL = "all",
-    ONGOING = "ongoing",
-    COMPLETED = "completed",
-    PENDING = "pending"
+    AVAILABLE = "available",
+    JOINED_ONGOING = "joined",
+    JOINED_COMPLETED = "joined_completed",
+    PENDING_VERIFICATION = "pending_verification"
 }
 
 type Props = {
@@ -32,55 +34,78 @@ export default function Competitions({
     total
 }: Props) {
     const [competitionStatus, setCompetitionStatus] =
-        useState<CompetitionFilterTable>(CompetitionFilterTable.ALL);
+        useState<CompetitionFilterTable>(CompetitionFilterTable.AVAILABLE);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [competitionId, setCompetitionId] = useState(0);
 
-    const competitions = useInfiniteQuery({
-        queryKey: ["competitions", competitionStatus],
-        initialPageParam: 1,
-        queryFn: async ({ pageParam }) => {
-            const statusParams =
-                competitionStatus == CompetitionFilterTable.PENDING
-                    ? {
-                          verif_status: "pending"
-                      }
-                    : {
-                          status: competitionStatus
-                      };
+    const [page, setPage] = useState(1);
+    const { user } = useAuth();
 
-            const res = await axios.get("/competitions/get-all", {
-                params: {
-                    page: pageParam,
-                    limit: 10,
-                    ...(competitionStatus !== CompetitionFilterTable.ALL && {
-                        ...statusParams
-                    })
-                }
-            });
-            return res.data;
-        },
-        getNextPageParam: (lastPage) => {
-            if (
-                lastPage.pagination.current_page < lastPage.pagination.last_page
-            ) {
-                return lastPage.pagination.current_page + 1;
+    const competitions = useQuery({
+        queryKey: ["competitions", competitionStatus, page],
+
+        queryFn: async () => {
+            let statusParams = {};
+
+            switch (competitionStatus) {
+                case CompetitionFilterTable.AVAILABLE:
+                    statusParams = {
+                        verif_status: "accepted",
+                        status: "ongoing",
+                        type: "competitions"
+                    };
+                    break;
+                case CompetitionFilterTable.JOINED_ONGOING:
+                    statusParams = {
+                        verif_status: "accepted",
+                        type: "mahasiswa_competitions",
+                        status: "ongoing"
+                    };
+                    break;
+                case CompetitionFilterTable.JOINED_COMPLETED:
+                    statusParams = {
+                        verif_status: "accepted",
+                        type: "mahasiswa_competitions",
+                        status: "completed"
+                    };
+                    break;
+                case CompetitionFilterTable.PENDING_VERIFICATION:
+                    statusParams = {
+                        verif_status: "pending",
+                        type: "competitions",
+                        uploader_id: user?.id
+                    };
+                    break;
+                default:
+                    statusParams = {};
+                    break;
             }
-            return undefined;
+
+            const res = await axios.get(
+                route("mahasiswa.competitions.getAll"),
+                {
+                    params: {
+                        page,
+                        limit: 4,
+                        ...statusParams
+                    }
+                }
+            );
+            return res.data;
         }
     });
 
-    const competitionData = useMemo(
-        () => competitions.data?.pages.flatMap((page) => page.data),
-        [competitions.data?.pages]
-    );
+    const setFilter = (status: CompetitionFilterTable) => {
+        setCompetitionStatus(status);
+        setPage(1);
+    };
 
     const columns = useCallback(() => {
         return competitionColumns(setOpenDeleteModal, setCompetitionId);
     }, []);
 
     return (
-        <AdminLayout>
+        <MahasiswaLayout>
             <div className="container mx-auto py-8">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
@@ -98,7 +123,7 @@ export default function Competitions({
                         asChild
                         className="bg-purple-600 hover:bg-purple-700 rounded"
                     >
-                        <Link href={route("competitions.create")}>
+                        <Link href={route("mahasiswa.competitions.create")}>
                             Tambah Lomba
                         </Link>
                     </Button>
@@ -114,21 +139,21 @@ export default function Competitions({
                         <CardContent>
                             <div className="text-2xl font-bold">{total}</div>
                             <p className="text-xs text-muted-foreground">
-                                Kompetisi terdaftar dalam sistem
+                                Kompetisi yang diikuti
                             </p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">
-                                Sedang Berlangsung
+                                Sedang Diikuti (ONGOING)
                             </CardTitle>
                             <Clock className="h-4 w-4 text-green-500" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{ongoing}</div>
                             <p className="text-xs text-muted-foreground">
-                                Kompetisi yang sedang aktif
+                                Kompetisi yang sedang diikuti
                             </p>
                         </CardContent>
                     </Card>
@@ -144,7 +169,7 @@ export default function Competitions({
                                 {completed}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                Kompetisi yang telah selesai
+                                Kompetisi yang telah selesai diikuti
                             </p>
                         </CardContent>
                     </Card>
@@ -158,89 +183,185 @@ export default function Competitions({
                         <CardContent>
                             <div className="text-2xl font-bold">{pending}</div>
                             <p className="text-xs text-muted-foreground">
-                                Kompetisi yang perlu diverifikasi
+                                Kompetisi yang diajukan untuk diverifikasi
                             </p>
                         </CardContent>
                     </Card>
                 </div>
-                <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
-                    <Button
-                        onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.ALL)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ALL,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !== CompetitionFilterTable.ALL
-                        })}
-                    >
-                        Semua
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.ONGOING)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ONGOING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.ONGOING
-                        })}
-                    >
-                        Sedang Berlangsung
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setCompetitionStatus(
-                                CompetitionFilterTable.COMPLETED
-                            )
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.COMPLETED,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.COMPLETED
-                        })}
-                    >
-                        Selesai
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setCompetitionStatus(CompetitionFilterTable.PENDING)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.PENDING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.PENDING
-                        })}
-                    >
-                        Menunggu Verifikasi
-                    </Button>
-                </div>
-                <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border">
-                    {competitions.isLoading && (
-                        <div className="flex items-center justify-center w-full h-96">
-                            <p className="text-muted-foreground">Loading...</p>
-                        </div>
-                    )}
+                <Tabs defaultValue="competitions" className="w-full mt-6">
+                    <TabsList>
+                        <TabsTrigger value="competitions">
+                            Kompetisi
+                        </TabsTrigger>
+                        <TabsTrigger value="teams">Tim</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="competitions">
+                        <>
+                            <div className="overflow-x-auto">
+                                <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
+                                    <Button
+                                        onClick={() =>
+                                            setFilter(
+                                                CompetitionFilterTable.AVAILABLE
+                                            )
+                                        }
+                                        size="sm"
+                                        className={cn("rounded", {
+                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                                competitionStatus ===
+                                                CompetitionFilterTable.AVAILABLE,
+                                            "bg-muted text-black/50 hover:bg-muted":
+                                                competitionStatus !==
+                                                CompetitionFilterTable.AVAILABLE
+                                        })}
+                                    >
+                                        Kompetisi Tersedia
+                                    </Button>
+                                    <Button
+                                        onClick={() =>
+                                            setFilter(
+                                                CompetitionFilterTable.JOINED_ONGOING
+                                            )
+                                        }
+                                        size="sm"
+                                        className={cn("rounded", {
+                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                                competitionStatus ===
+                                                CompetitionFilterTable.JOINED_ONGOING,
+                                            "bg-muted text-black/50 hover:bg-muted":
+                                                competitionStatus !==
+                                                CompetitionFilterTable.JOINED_ONGOING
+                                        })}
+                                    >
+                                        Sedang Diikuti
+                                    </Button>
+                                    <Button
+                                        onClick={() =>
+                                            setFilter(
+                                                CompetitionFilterTable.JOINED_COMPLETED
+                                            )
+                                        }
+                                        size="sm"
+                                        className={cn("rounded", {
+                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                                competitionStatus ===
+                                                CompetitionFilterTable.JOINED_COMPLETED,
+                                            "bg-muted text-black/50 hover:bg-muted":
+                                                competitionStatus !==
+                                                CompetitionFilterTable.JOINED_COMPLETED
+                                        })}
+                                    >
+                                        Selesai Diikuti
+                                    </Button>
+                                    <Button
+                                        onClick={() =>
+                                            setFilter(
+                                                CompetitionFilterTable.PENDING_VERIFICATION
+                                            )
+                                        }
+                                        size="sm"
+                                        className={cn("rounded", {
+                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                                competitionStatus ===
+                                                CompetitionFilterTable.PENDING_VERIFICATION,
+                                            "bg-muted text-black/50 hover:bg-muted":
+                                                competitionStatus !==
+                                                CompetitionFilterTable.PENDING_VERIFICATION
+                                        })}
+                                    >
+                                        Pengajuan Kompetisi Menunggu Verifikasi
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border overflow-x-auto">
+                                {competitions.isLoading && (
+                                    <div className="flex items-center justify-center w-full h-96">
+                                        <p className="text-muted-foreground">
+                                            Loading...
+                                        </p>
+                                    </div>
+                                )}
 
-                    {competitions.isSuccess && competitionData && (
-                        <DataTable columns={columns()} data={competitionData} />
-                    )}
-                </div>
+                                {competitions.isSuccess &&
+                                    competitions.data.data && (
+                                        <DataTable
+                                            columns={columns()}
+                                            data={competitions.data.data}
+                                        />
+                                    )}
+
+                                {competitions.isError && (
+                                    <div className="flex items-center justify-center w-full h-96">
+                                        <p className="text-muted-foreground">
+                                            Terjadi kesalahan saat memuat data
+                                            kompetisi
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="w-full inline-flex justify-between items-center mt-4">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Halaman{" "}
+                                        {
+                                            competitions.data?.pagination
+                                                .current_page
+                                        }{" "}
+                                        dari{" "}
+                                        {
+                                            competitions.data?.pagination
+                                                .last_page
+                                        }{" "}
+                                        | Total Data:{" "}
+                                        {
+                                            competitions.data?.pagination.total
+                                        }{" "}
+                                    </p>
+                                </div>
+
+                                <div className="inline-flex gap-2">
+                                    <Button
+                                        disabled={
+                                            +competitions.data?.pagination
+                                                .current_page === 1
+                                        }
+                                        onClick={() => {
+                                            setPage(
+                                                +competitions.data?.pagination
+                                                    .current_page - 1
+                                            );
+                                        }}
+                                        variant="outline"
+                                        size="sm"
+                                    >
+                                        Sebelumnya
+                                    </Button>
+                                    <Button
+                                        disabled={
+                                            +competitions.data?.pagination
+                                                .current_page ===
+                                            +competitions.data?.pagination
+                                                .last_page
+                                        }
+                                        onClick={() => {
+                                            setPage(
+                                                +competitions.data?.pagination
+                                                    .current_page + 1
+                                            );
+                                        }}
+                                        variant="outline"
+                                        size="sm"
+                                    >
+                                        Selanjutnya
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    </TabsContent>
+                    <TabsContent value="teams">
+                        Change your password here.
+                    </TabsContent>
+                </Tabs>
             </div>
             {openDeleteModal && (
                 <DeleteCompetitionModal
@@ -250,6 +371,6 @@ export default function Competitions({
                     refetch={competitions.refetch}
                 />
             )}
-        </AdminLayout>
+        </MahasiswaLayout>
     );
 }

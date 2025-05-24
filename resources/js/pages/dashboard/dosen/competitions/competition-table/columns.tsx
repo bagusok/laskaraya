@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, Forward, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
 export const competitionColumns = (
@@ -158,19 +158,6 @@ export const competitionColumns = (
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        {row.getValue("status") == "ongoing" && (
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={route(
-                                        "mahasiswa.competitions.join",
-                                        row.original.id
-                                    )}
-                                >
-                                    <Forward className="mr-2 h-4 w-4" />
-                                    <span>Ikuti</span>
-                                </Link>
-                            </DropdownMenuItem>
-                        )}
                         <DropdownMenuItem>
                             <Eye className="mr-2 h-4 w-4" />
                             <span>Detail</span>
@@ -179,7 +166,7 @@ export const competitionColumns = (
                             <DropdownMenuItem asChild>
                                 <Link
                                     href={route(
-                                        "mahasiswa.competitions.edit",
+                                        "dosen.competitions.edit",
                                         row.original.id
                                     )}
                                 >

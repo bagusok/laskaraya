@@ -86,11 +86,33 @@ export const navItemsDosen = [
         subItems: [
             {
                 label: "Daftar Lomba",
-                href: "/dashboard/dosen/lomba"
+                href: route("dosen.competitions.index")
             },
             {
                 label: "Tambah Lomba",
                 href: "/dashboard/dosen/lomba/tambah"
+            },
+            {
+                label: "Manajemen Ketrampilan",
+                href: "/dashboard/dosen/skills"
+            }
+        ]
+    }
+];
+
+export const navItemsMahasiswa = [
+    {
+        label: "Beranda",
+        icon: <Home />,
+        href: "/dashboard"
+    },
+    {
+        label: "Data Lomba/Kompetisi",
+        icon: <Trophy />,
+        subItems: [
+            {
+                label: "Daftar Lomba",
+                href: route("mahasiswa.competitions.index")
             },
             {
                 label: "Manajemen Ketrampilan",
