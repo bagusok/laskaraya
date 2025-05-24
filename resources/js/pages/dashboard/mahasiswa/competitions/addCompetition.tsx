@@ -68,7 +68,7 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
         category_id: "",
         period_id: "",
         level: "",
-        status: "",
+        status: "ongoing",
         description: "",
         start_date: "",
         end_date: "",
@@ -347,14 +347,11 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
                                         <SelectValue placeholder="Pilih Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="ongoing">
+                                        <SelectItem
+                                            value="ongoing"
+                                            defaultChecked
+                                        >
                                             Sedang Berlangsung
-                                        </SelectItem>
-                                        <SelectItem value="completed">
-                                            Selesai
-                                        </SelectItem>
-                                        <SelectItem value="canceled">
-                                            Dibatalkan
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>

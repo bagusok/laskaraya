@@ -36,7 +36,7 @@ export default function MahasiswaLayout({ children, title }: DosenLayoutProps) {
             <div className="lg:ml-72">
                 <div className="sticky top-0 z-30 bg-white lg:shadow-none lg:static mt-2">
                     <Header
-                        user={user}
+                        user={user ?? { name: "Mahasiswa" }}
                         onToggleSidebar={toggleSidebar}
                         title={title}
                     />

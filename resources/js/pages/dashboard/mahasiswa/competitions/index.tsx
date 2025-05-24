@@ -12,6 +12,7 @@ import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
 import MahasiswaLayout from "@/components/layouts/mahasiswaLayout";
 import useAuth from "@/hooks/use-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TeamTable from "./team-table";
 
 enum CompetitionFilterTable {
     AVAILABLE = "available",
@@ -359,7 +360,7 @@ export default function Competitions({
                         </>
                     </TabsContent>
                     <TabsContent value="teams">
-                        Change your password here.
+                        <TeamTable />
                     </TabsContent>
                 </Tabs>
             </div>

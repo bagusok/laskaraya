@@ -1,10 +1,10 @@
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { usePage } from "@inertiajs/react";
-import { ChevronRight, LogOut, X, BookOpen } from "lucide-react";
-import { SidebarProps, NavItem } from "../../../types/sidebar";
+import { ChevronRight, LogOut, X } from "lucide-react";
+import { SidebarProps } from "../../../types/sidebar";
 import { getPath, normalizePath } from "../../../lib/sidebar.utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Sidebar({
     navItems = [],
@@ -12,10 +12,11 @@ export default function Sidebar({
     onClose,
     currentUrl
 }: SidebarProps) {
-    const { url } = usePage();
     const [isHovered, setIsHovered] = useState(false);
-    const [selectedItem, setSelectedItem] = useState("");
+    const [, setSelectedItem] = useState("");
     const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         setSelectedItem(currentUrl);
@@ -57,6 +58,11 @@ export default function Sidebar({
 
     const toggleSubmenu = (index: number) => {
         setOpenMenus((prev) => ({ ...prev, [index]: !prev[index] }));
+    };
+
+    const handleLogout = () => {
+        queryClient.clear();
+        router.visit(route("logout"));
     };
 
     return (
@@ -165,19 +171,14 @@ export default function Sidebar({
                         <div className="absolute inset-x-0 -top-6 h-12 bg-gradient-to-b from-transparent to-white/80 pointer-events-none" />
                         <div className="mx-2 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent mb-6" />
                         <Button
-                            asChild
+                            onClick={() => handleLogout()}
                             className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl py-5 shadow-sm transition-all duration-300 hover:shadow group"
                         >
-                            <Link
-                                href={route("logout")}
-                                className="flex items-center justify-center gap-2"
-                            >
-                                <LogOut
-                                    size={18}
-                                    className="group-hover:translate-x-1 transition-transform duration-300"
-                                />
-                                <span>Logout</span>
-                            </Link>
+                            <LogOut
+                                size={18}
+                                className="group-hover:translate-x-1 transition-transform duration-300"
+                            />
+                            <span>Logout</span>
                         </Button>
                     </div>
                 </nav>

@@ -17,7 +17,7 @@ class CompetitionMember extends Model
 
     public function userToCompetition()
     {
-        return $this->belongsTo(UserToCompetition::class, 'user_to_competition_id');
+        return $this->hasOne(UserToCompetition::class, 'id', 'user_to_competition_id');
     }
 
     public function user()

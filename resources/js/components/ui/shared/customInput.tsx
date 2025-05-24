@@ -30,7 +30,9 @@ export default function CustomInput({
                 onChange={onChange}
                 required={required}
             />
-            <small className="text-red-400 italic text-xs">* {error}</small>
+            {error && (
+                <span className="text-red-500 text-sm mt-1">* {error}</span>
+            )}
         </div>
     );
 }

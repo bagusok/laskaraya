@@ -379,12 +379,6 @@ export default function EditCompetition({
                                         <SelectItem value="ongoing">
                                             Sedang Berlangsung
                                         </SelectItem>
-                                        <SelectItem value="completed">
-                                            Selesai
-                                        </SelectItem>
-                                        <SelectItem value="canceled">
-                                            Dibatalkan
-                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.status && (
