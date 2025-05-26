@@ -135,12 +135,15 @@ class MahasiswaTeamController extends Controller
             'search' => 'string|nullable',
         ]);
 
-        $teams = UserToCompetition::with(['competitionMembers', 'competition', 'dosen', 'registrant'])->when($searchQuery, function ($query) use ($searchQuery) {
-            $query->where('name', 'like', '%' . $searchQuery . '%');
-        })
+        $teams = UserToCompetition::with(['competitionMembers', 'competition', 'dosen', 'registrant'])
+            ->when($searchQuery, function ($query) use ($searchQuery) {
+                $query->where('name', 'like', '%' . $searchQuery . '%');
+            })
             ->whereHas('competitionMembers', function ($query) {
                 $query->where('user_id', auth()->user()->id);
-            })->orderBy('created_at', 'desc')->paginate($perPage);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         return response()->json([
             'status' => 'success',

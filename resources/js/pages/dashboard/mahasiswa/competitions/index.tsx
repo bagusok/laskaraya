@@ -108,7 +108,7 @@ export default function Competitions({
     }, []);
 
     return (
-        <MahasiswaLayout>
+        <MahasiswaLayout title="Kompetisi Dashboard">
             <div className="container mx-auto py-8">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function Competitions({
                     </div>
                     <Button
                         asChild
-                        className="bg-purple-600 hover:bg-purple-700 rounded"
+                        className="bg-purple-600 hover:bg-purple-700 rounded-md"
                     >
                         <Link href={route("mahasiswa.competitions.create")}>
                             Tambah Lomba
@@ -153,17 +153,17 @@ export default function Competitions({
                         icon={<Calendar className="h-6 w-6 text-yellow-500" />}
                     />
                 </div>
-                <Tabs defaultValue="competitions" className="w-full mt-6">
-                    <TabsList>
+                <Tabs defaultValue="competitions" className="w-full mt-6 ">
+                    <TabsList className="rounded-lg border-1 border-purple-400">
                         <TabsTrigger value="competitions">
                             Kompetisi
                         </TabsTrigger>
-                        <TabsTrigger value="teams">Tim</TabsTrigger>
+                        <TabsTrigger value="teams" >Tim</TabsTrigger>
                     </TabsList>
                     <TabsContent value="competitions">
                         <>
                             <div className="overflow-x-auto">
-                                <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
+                                <div className="mt-6 p-1 rounded inline-flex gap-2">
                                     <Button
                                         onClick={() =>
                                             setFilter(
@@ -171,14 +171,13 @@ export default function Competitions({
                                             )
                                         }
                                         size="sm"
-                                        className={cn("rounded", {
-                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                                competitionStatus ===
-                                                CompetitionFilterTable.AVAILABLE,
-                                            "bg-muted text-black/50 hover:bg-muted":
-                                                competitionStatus !==
+                                        className={cn(
+                                            "rounded-lg border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                                            competitionStatus ===
                                                 CompetitionFilterTable.AVAILABLE
-                                        })}
+                                                ? "bg-white text-purple-700 border-purple-400 shadow-md ring-2 ring-purple-100 hover:scale-105"
+                                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                                        )}
                                     >
                                         Kompetisi Tersedia
                                     </Button>
@@ -189,14 +188,13 @@ export default function Competitions({
                                             )
                                         }
                                         size="sm"
-                                        className={cn("rounded", {
-                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                                competitionStatus ===
-                                                CompetitionFilterTable.JOINED_ONGOING,
-                                            "bg-muted text-black/50 hover:bg-muted":
-                                                competitionStatus !==
+                                        className={cn(
+                                            "rounded-lg border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                                            competitionStatus ===
                                                 CompetitionFilterTable.JOINED_ONGOING
-                                        })}
+                                                ? "bg-white text-purple-700 border-purple-400 shadow-md ring-2 ring-purple-100 hover:scale-105"
+                                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                                        )}
                                     >
                                         Sedang Diikuti
                                     </Button>
@@ -207,14 +205,13 @@ export default function Competitions({
                                             )
                                         }
                                         size="sm"
-                                        className={cn("rounded", {
-                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                                competitionStatus ===
-                                                CompetitionFilterTable.JOINED_COMPLETED,
-                                            "bg-muted text-black/50 hover:bg-muted":
-                                                competitionStatus !==
+                                        className={cn(
+                                            "rounded-lg border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                                            competitionStatus ===
                                                 CompetitionFilterTable.JOINED_COMPLETED
-                                        })}
+                                                ? "bg-white text-purple-700 border-purple-400 shadow-md ring-2 ring-purple-100 hover:scale-105"
+                                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                                        )}
                                     >
                                         Selesai Diikuti
                                     </Button>
@@ -225,14 +222,13 @@ export default function Competitions({
                                             )
                                         }
                                         size="sm"
-                                        className={cn("rounded", {
-                                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                                competitionStatus ===
-                                                CompetitionFilterTable.PENDING_VERIFICATION,
-                                            "bg-muted text-black/50 hover:bg-muted":
-                                                competitionStatus !==
+                                        className={cn(
+                                            "rounded-lg border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                                            competitionStatus ===
                                                 CompetitionFilterTable.PENDING_VERIFICATION
-                                        })}
+                                                ? "bg-white text-purple-700 border-purple-400 shadow-md ring-2 ring-purple-100 hover:scale-105"
+                                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                                        )}
                                     >
                                         Pengajuan Kompetisi Menunggu Verifikasi
                                     </Button>

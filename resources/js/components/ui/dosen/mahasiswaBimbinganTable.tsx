@@ -20,9 +20,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import AddBimbinganModal from "./addBimbinganModal";
-import EditBimbinganModal from "./editBimbinganModal";
-import DelBimbinganModal from "./delBimbinganModal";
+import CompleteBimbinganModal from "./completeBimbinganModal";
 
 export default function MahasiswaBimbinganTable({
     mahasiswa,
@@ -34,6 +32,8 @@ export default function MahasiswaBimbinganTable({
     const [search, setSearch] = useState<"name" | "identifier">("name");
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [status, setStatus] = useState<string>("all");
+    const [selectedMahasiswa, setSelectedMahasiswa] = useState<any>(null);
+    const [showCompleteModal, setShowCompleteModal] = useState(false);
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
@@ -49,70 +49,56 @@ export default function MahasiswaBimbinganTable({
         });
     };
 
+    const handleCompleteClick = (mahasiswa: any) => {
+        setSelectedMahasiswa(mahasiswa);
+        setShowCompleteModal(true);
+    };
+
     const columns = useMemo(
         () => [
             { header: "Nama", accessorKey: "name" },
             { header: "NIM", accessorKey: "identifier" },
-            { header: "Prodi", accessorKey: "faculty" },
+            { header: "Email", accessorKey: "email" },
+            { header: "Nama Tim", accessorKey: "team_name" },
+            { header: "Nama Lomba", accessorKey: "competition_name" },
             {
                 header: "Status",
                 accessorKey: "status",
-                cell: (row: MahasiswaBimbingan) => (
-                    <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${row.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                        {row.status}
-                    </span>
-                )
+                cell: ({ row }: any) => {
+                    const status = row.original.status;
+                    return (
+                        <span
+                            className={`text-xs px-2 py-0.5 rounded-full ${
+                                status === "bimbingan"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-green-100 text-green-700"
+                            }`}
+                        >
+                            {status === "bimbingan" ? "Bimbingan" : "Selesai"}
+                        </span>
+                    );
+                }
             },
-            { header: "Nama Lomba", accessorKey: "kategori" },
             {
                 header: "Aksi",
-                accessorKey: "action",
-                cell: ({ row }: any) => (
-                    <div className="flex items-center gap-2">
-                        {row.original.status === "Aktif" && (
-                            <Button
-                                size="sm"
-                                className="bg-green-500 text-white"
-                                onClick={() =>
-                                    router.put(
-                                        route(
-                                            "dosen.bimbingan.update",
-                                            row.original.id
-                                        ),
-                                        { status: "Selesai" },
-                                        {
-                                            onSuccess: () =>
-                                                router.reload({
-                                                    only: ["mahasiswa"]
-                                                })
-                                        }
-                                    )
-                                }
-                            >
-                                Selesai
-                            </Button>
-                        )}
-                        <EditBimbinganModal
-                            bimbingan={row.original}
-                            onSuccess={() =>
-                                router.reload({ only: ["mahasiswa"] })
-                            }
-                        />
-                        <DelBimbinganModal
-                            bimbinganId={row.original.id}
-                            bimbinganName={row.original.name}
-                            onSuccess={() =>
-                                router.reload({ only: ["mahasiswa"] })
-                            }
-                        />
-                    </div>
-                )
+                accessorKey: "id",
+                cell: ({ row }: any) =>
+                    row.original.status === "bimbingan" && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs bg-green-50 text-green-600 hover:bg-green-100 border-green-200"
+                            onClick={() => handleCompleteClick(row.original)}
+                        >
+                            Selesai
+                        </Button>
+                    )
             }
         ],
-        [router]
+        []
     );
+
+    console.log(mahasiswa.data);
 
     return (
         <div className="w-full space-y-4">
@@ -147,18 +133,14 @@ export default function MahasiswaBimbinganTable({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Status</SelectItem>
-                            <SelectItem value="Aktif">Aktif</SelectItem>
-                            <SelectItem value="Selesai">Selesai</SelectItem>
+                            <SelectItem value="bimbingan">Bimbingan</SelectItem>
+                            <SelectItem value="selesai">Selesai</SelectItem>
                         </SelectContent>
                     </Select>
                     <Button type="submit" className="bg-purple-500 text-white">
                         Cari
                     </Button>
                 </form>
-                <AddBimbinganModal
-                    mahasiswaList={mahasiswaList}
-                    onSuccess={() => router.reload({ only: ["mahasiswa"] })}
-                />
             </div>
             <div className="rounded-md border border-purple-200 overflow-x-auto">
                 <DataTable columns={columns as any} data={mahasiswa.data} />
@@ -225,6 +207,12 @@ export default function MahasiswaBimbinganTable({
                     </PaginationContent>
                 </Pagination>
             </div>
+
+            <CompleteBimbinganModal
+                open={showCompleteModal}
+                onClose={() => setShowCompleteModal(false)}
+                mahasiswa={selectedMahasiswa}
+            />
         </div>
     );
 }

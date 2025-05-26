@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Pencil } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface Mahasiswa {
     nama: string;
@@ -47,7 +47,6 @@ export default function MahasiswaBimbinganList({
                                         <th className="py-2 px-2">Kategori</th>
                                         <th className="py-2 px-2">Tahun</th>
                                         <th className="py-2 px-2">Status</th>
-                                        <th className="py-2 px-2">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,22 +69,17 @@ export default function MahasiswaBimbinganList({
                                             </td>
                                             <td className="py-2 px-2">
                                                 <span
-                                                    className={`text-xs px-2 py-0.5 rounded-full ${mhs.status === "Aktif" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+                                                    className={`text-xs px-2 py-0.5 rounded-full ${
+                                                        mhs.status ===
+                                                        "bimbingan"
+                                                            ? "bg-blue-100 text-blue-700"
+                                                            : "bg-green-100 text-green-700"
+                                                    }`}
                                                 >
-                                                    {mhs.status}
+                                                    {mhs.status === "bimbingan"
+                                                        ? "Bimbingan"
+                                                        : "Selesai"}
                                                 </span>
-                                            </td>
-                                            <td className="py-2 px-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-purple-50"
-                                                >
-                                                    <Pencil
-                                                        size={14}
-                                                        className="text-gray-400 hover:text-purple-600 transition-colors duration-200"
-                                                    />
-                                                </Button>
                                             </td>
                                         </tr>
                                     ))}

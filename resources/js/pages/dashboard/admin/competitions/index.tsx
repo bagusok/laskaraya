@@ -71,7 +71,7 @@ export default function Competitions({
     }, []);
 
     return (
-        <AdminLayout>
+        <AdminLayout title="Manajemen Kompetisi">
             <div className="container mx-auto py-8">
                 <div className="inline-flex w-full justify-between items-end">
                     <div className="flex items-center gap-2">
