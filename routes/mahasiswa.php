@@ -11,6 +11,7 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
         Route::get('/get-all', [MahasiswaCompetitionController::class, 'getAllCompetitions'])->name('mahasiswa.competitions.getAll');
         Route::get('/create', [MahasiswaCompetitionController::class, 'create'])->name('mahasiswa.competitions.create');
         Route::post('/create', [MahasiswaCompetitionController::class, 'postCreate'])->name('mahasiswa.competitions.create.post');
+        Route::get('/detail/{id}', [MahasiswaCompetitionController::class, 'detail'])->name('mahasiswa.competitions.detail');
         Route::get('/edit/{id}', [MahasiswaCompetitionController::class, 'edit'])->name('mahasiswa.competitions.edit');
         Route::post('/edit/{id}', [MahasiswaCompetitionController::class, 'update'])->name('mahasiswa.competitions.edit.post');
         Route::delete('/{id}', [MahasiswaCompetitionController::class, 'destroy'])->name('mahasiswa.competitions.destroy');
@@ -23,6 +24,7 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
         // Route::get('/', [MahasiswaTeamController::class, 'index'])->name('mahasiswa.teams.index');
         Route::get('/edit/{id}', [MahasiswaTeamController::class, 'edit'])->name('mahasiswa.teams.edit');
         Route::post('/edit', [MahasiswaTeamController::class, 'postEdit'])->name('mahasiswa.teams.edit.post');
+        Route::get('/detail/{id}', [MahasiswaTeamController::class, 'detail'])->name('mahasiswa.teams.detail');
         Route::delete('/{id}', [MahasiswaTeamController::class, 'destroy'])->name('mahasiswa.teams.destroy');
         Route::get('/get-all', [MahasiswaTeamController::class, 'getAllTeams'])->name('mahasiswa.teams.getAll');
 

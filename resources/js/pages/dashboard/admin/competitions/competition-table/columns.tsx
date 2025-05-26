@@ -205,6 +205,7 @@ export type Competition = {
     status: "ongoing" | "completed" | "canceled";
     verified_status: "accepted" | "pending" | "rejected";
     notes?: string;
+    uploader_id: number;
     created_at: string;
     updated_at: string;
 };

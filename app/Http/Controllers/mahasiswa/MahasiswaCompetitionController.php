@@ -85,6 +85,29 @@ class MahasiswaCompetitionController extends Controller
         ]);
     }
 
+    public function detail($id)
+    {
+        $competition = CompetitionModel::with(['category', 'period', 'skills'])->findOrFail($id);
+
+        if (!$competition) {
+            return back()->with('error', 'Competition not found.');
+        }
+
+        $member = CompetitionMember::with('userToCompetition')->where('user_id', auth()->user()->id)
+            ->whereHas('userToCompetition', function ($query) use ($competition) {
+                $query->where('competition_id', $competition->id);
+            })->first();
+
+        return Inertia::render('dashboard/mahasiswa/competitions/detail')->with([
+            'competition' => $competition,
+            'category' => $competition->category,
+            'period' => $competition->period,
+            'skills' => $competition->skills,
+            'isJoined' => $member !== null,
+            'joinedTeamId' => $member?->userToCompetition?->id,
+        ]);
+    }
+
     public function getAllCompetitions(Request $request)
     {
         $perPage = $request->query('limit', 10);
@@ -338,7 +361,7 @@ class MahasiswaCompetitionController extends Controller
     {
         $user = auth()->user();
 
-        $competition = CompetitionModel::where([
+        $competition = CompetitionModel::with('skills', 'category')->where([
             'id' => $id,
             'status' => 'ongoing',
             'verified_status' => 'accepted',
@@ -358,7 +381,6 @@ class MahasiswaCompetitionController extends Controller
             })->exists();
 
         if ($alreadyJoined) {
-
             $team = CompetitionMember::where('user_id', $user->id)
                 ->whereHas('userToCompetition', function ($query) use ($competition) {
                     $query->where('competition_id', $competition->id);
@@ -382,6 +404,8 @@ class MahasiswaCompetitionController extends Controller
             'competition' => $competition,
             'dosen' => $dosen,
             'mahasiswa' => $mahasiswa,
+            'category' => $competition->category,
+            'skills' => $competition->skills
         ]);
     }
 

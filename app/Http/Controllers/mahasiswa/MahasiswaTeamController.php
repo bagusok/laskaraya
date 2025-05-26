@@ -125,7 +125,6 @@ class MahasiswaTeamController extends Controller
         return back()->with('success', 'Team deleted successfully');
     }
 
-
     public function getAllTeams(Request $request)
     {
         $perPage = $request->query('limit', 10);
@@ -153,6 +152,24 @@ class MahasiswaTeamController extends Controller
                 'per_page' => $teams->perPage(),
                 'has_more_pages' => $teams->hasMorePages(),
             ],
+        ]);
+    }
+
+    public function detail($id)
+    {
+        $team = UserToCompetition::with(['competitionMembers', 'competition', 'competitionMembers.user', 'dosen'])
+            ->findOrFail($id);
+
+        $achievement = $team->achievement;
+
+        return Inertia::render('dashboard/mahasiswa/competitions/teams/detail', [
+            'team' => $team,
+            'competition' => $team->competition,
+            'members' => $team->competitionMembers->pluck('user')->toArray(),
+            'dosen' => $team->dosen,
+            'registrant' => $team->registrant,
+            'achievement' => $achievement,
+            'certificates' => $achievement ? $achievement->certificates : [],
         ]);
     }
 }

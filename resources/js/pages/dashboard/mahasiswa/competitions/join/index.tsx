@@ -22,11 +22,20 @@ import useAuth from "@/hooks/use-auth";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 import CustomInput from "@/components/ui/shared/customInput";
+import { cn } from "@/lib/utils";
 
 type Props = {
     competition: Competition;
     dosen: IUser[];
     mahasiswa: IUser[];
+    category: {
+        id: number;
+        name: string;
+    };
+    skills: {
+        id: number;
+        name: string;
+    }[];
 };
 
 type FormData = {
@@ -51,7 +60,9 @@ type TeamMember = IUser;
 export default function JoinCompetition({
     competition,
     dosen,
-    mahasiswa
+    mahasiswa,
+    category,
+    skills
 }: Props) {
     const { data, setData, post, processing, errors } = useForm<FormData>({
         competition_id: competition.id,
@@ -183,6 +194,24 @@ export default function JoinCompetition({
                                             <Badge className="bg-purple-100 text-purple-800">
                                                 Level {competition.level}
                                             </Badge>
+                                            <Badge className="bg-blue-100 text-blue-800">
+                                                {category.name}
+                                            </Badge>
+                                            <Badge
+                                                className={cn({
+                                                    "bg-yellow-100 text-yellow-800 font-semibold":
+                                                        competition.status ==
+                                                        "ongoing",
+                                                    "bg-green-100 text-green-800 font-semibold":
+                                                        competition.status ==
+                                                        "completed",
+                                                    "bg-red-100 text-red-800 font-semibold":
+                                                        competition.status ==
+                                                        "canceled"
+                                                })}
+                                            >
+                                                {competition.status}
+                                            </Badge>
                                             <Badge className="bg-green-100 text-green-800">
                                                 <Calendar className="h-3 w-3 mr-1" />
                                                 {new Date(
@@ -202,13 +231,15 @@ export default function JoinCompetition({
                                             </span>
                                         </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-medium mb-2">
-                                            Deskripsi
-                                        </h3>
-                                        <p className="text-muted-foreground leading-relaxed line-clamp-6">
-                                            {competition.description}
-                                        </p>
+                                    <div className="flex items-center gap-1 flex-wrap">
+                                        {skills?.map((skill) => (
+                                            <Badge
+                                                key={skill.id}
+                                                className="bg-purple-100 text-purple-800 mr-2 mb-2"
+                                            >
+                                                {skill.name}
+                                            </Badge>
+                                        ))}
                                     </div>
                                 </div>
                             </div>

@@ -171,9 +171,16 @@ export const competitionColumns = (
                                 </Link>
                             </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span>Detail</span>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={route(
+                                    "mahasiswa.competitions.detail",
+                                    row.original.id
+                                )}
+                            >
+                                <Eye className="mr-2 h-4 w-4" />
+                                <span>Detail</span>
+                            </Link>
                         </DropdownMenuItem>
                         {row.getValue("verified_status") == "pending" && (
                             <DropdownMenuItem asChild>

@@ -182,9 +182,16 @@ export const teamColumns = (
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span>Detail</span>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={route(
+                                    "mahasiswa.teams.detail",
+                                    row.original.id
+                                )}
+                            >
+                                <Eye className="mr-2 h-4 w-4" />
+                                <span>Detail</span>
+                            </Link>
                         </DropdownMenuItem>
                         {row.getValue("status") == "pending" && (
                             <DropdownMenuItem asChild>

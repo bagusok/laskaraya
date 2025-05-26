@@ -94,8 +94,8 @@ class MahasiswaAchievementController extends Controller
 
                     // Proses gambar ke .webp
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                        $webp = Image::read($file)->toWebp(80); // 90 adalah kualitas kompresi
                         $filename = $hash . '.webp';
-                        $webp = Image::make($file)->encode('webp');
                         Storage::disk('public')->put('certificates/' . $filename, $webp);
                     } else {
                         $filename = $hash . '.' . $extension;

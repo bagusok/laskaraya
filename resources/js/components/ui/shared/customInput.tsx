@@ -7,7 +7,8 @@ export default function CustomInput({
     value,
     onChange,
     error,
-    required
+    required,
+    disabled = false
 }: {
     label: string;
     type: string;
@@ -16,6 +17,7 @@ export default function CustomInput({
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     error?: string;
     required?: boolean;
+    disabled?: boolean;
 }) {
     return (
         <div className="w-full flex flex-col">
@@ -29,6 +31,7 @@ export default function CustomInput({
                 value={value}
                 onChange={onChange}
                 required={required}
+                disabled={disabled}
             />
             {error && (
                 <span className="text-red-500 text-sm mt-1">* {error}</span>
