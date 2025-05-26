@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AdminLayout from "@/components/layouts/adminLayout";
+import MahasiswaLayout from "@/components/layouts/mahasiswaLayout";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import AddSkillModal from "@/components/ui/admin/skill/addSkillModal";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 
-export default function SkillsManagementAdmin() {
+export default function SkillsManagementMahasiswa() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editData, setEditData] = useState<Skill | null>(null);
     const [deleteSkill, setDeleteSkill] = useState<Skill | null>(null);
@@ -37,7 +37,7 @@ export default function SkillsManagementAdmin() {
 
     const handleDelete = (id: number) => {
         setDeleting(true);
-        router.delete(`/dashboard/skills/${id}`, {
+        router.delete(`/dashboard/mahasiswa/skills/${id}`, {
             onSuccess: () => {
                 toast.success("Ketrampilan berhasil dihapus.");
                 setDeleteSkill(null);
@@ -49,7 +49,7 @@ export default function SkillsManagementAdmin() {
 
     const handleSubmit = (data: Skill) => {
         if (data.id) {
-            router.put(`/dashboard/skills/${data.id}`, data, {
+            router.put(`/dashboard/mahasiswa/skills/${data.id}`, data, {
                 onSuccess: () => {
                     toast.success("Ketrampilan berhasil diperbarui!");
                     setModalOpen(false);
@@ -57,7 +57,7 @@ export default function SkillsManagementAdmin() {
                 onError: () => toast.error("Gagal memperbarui ketrampilan."),
             });
         } else {
-            router.post("/dashboard/skills", data, {
+            router.post("/dashboard/mahasiswa/skills", data, {
                 onSuccess: () => {
                     toast.success("Ketrampilan berhasil ditambahkan!");
                     setModalOpen(false);
@@ -68,7 +68,7 @@ export default function SkillsManagementAdmin() {
     };
 
     return (
-        <AdminLayout title="Manajemen Ketrampilan">
+        <MahasiswaLayout title="Manajemen Ketrampilan">
             <Card className="border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all">
                 <CardHeader className="pb-3">
                     <div className="flex justify-between items-center">
@@ -152,6 +152,6 @@ export default function SkillsManagementAdmin() {
                 onSubmit={handleSubmit}
                 initialData={editData}
             />
-        </AdminLayout>
+        </MahasiswaLayout>
     );
 }

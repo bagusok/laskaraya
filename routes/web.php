@@ -96,6 +96,13 @@ Route::prefix('period')->group(function () {
     Route::get('/{id}', [PeriodController::class, 'show'])->name('period.show');
 });
 
+//CRUD untuk skill mahasiswa
+Route::middleware(['auth', 'role:mahasiswa'])->prefix('dashboard/mahasiswa/skills')->group(function () {
+    Route::get('/', [SkillController::class, 'indexMahasiswa'])->name('mahasiswa.skills.index');
+    Route::post('/', [SkillController::class, 'storeMahasiswa'])->name('mahasiswa.skills.store');
+    Route::put('/{id}', [SkillController::class, 'updateMahasiswa'])->name('mahasiswa.skills.update');
+    Route::delete('/{id}', [SkillController::class, 'destroyMahasiswa'])->name('mahasiswa.skills.destroy');
+});
 
 include __DIR__ . '/admin.php';
 include __DIR__ . '/mahasiswa.php';

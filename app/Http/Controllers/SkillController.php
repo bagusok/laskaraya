@@ -76,4 +76,39 @@ class SkillController extends Controller
         $skill->delete();
         return redirect()->back()->with('success', 'Skill berhasil dihapus');
     }
+
+    //CRUD untuk mahasiswa
+    public function indexMahasiswa()
+    {
+        $skills = SkillModel::orderBy('created_at', 'desc')->get();
+        return Inertia::render('dashboard/mahasiswa/skills/index', [
+            'skills' => $skills
+        ]);
+    }
+
+    public function storeMahasiswa(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        SkillModel::create($request->only('name'));
+        return redirect()->back()->with('success', 'Skill berhasil ditambahkan');
+    }
+
+    public function updateMahasiswa(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        $skill = SkillModel::findOrFail($id);
+        $skill->update($request->only('name'));
+        return redirect()->back()->with('success', 'Skill berhasil diperbarui');
+    }
+
+    public function destroyMahasiswa($id)
+    {
+        $skill = SkillModel::findOrFail($id);
+        $skill->delete();
+        return redirect()->back()->with('success', 'Skill berhasil dihapus');
+    }
 }

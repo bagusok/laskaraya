@@ -5,12 +5,12 @@ import Header from "@/components/ui/admin/dashboard/header";
 import useAuth from "@/hooks/use-auth";
 import { navItemsMahasiswa } from "@/lib/layoutData";
 
-interface DosenLayoutProps {
+interface MahasiswaLayoutProps {
     children: React.ReactNode;
     title?: string;
 }
 
-export default function MahasiswaLayout({ children, title }: DosenLayoutProps) {
+export default function MahasiswaLayout({ children, title }: MahasiswaLayoutProps) {
     const { user } = useAuth();
     const { url } = usePage();
     const [sidebarOpen, setSidebarOpen] = useState(false);
