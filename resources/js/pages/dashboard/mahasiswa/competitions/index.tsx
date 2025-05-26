@@ -13,6 +13,8 @@ import MahasiswaLayout from "@/components/layouts/mahasiswaLayout";
 import useAuth from "@/hooks/use-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeamTable from "./team-table";
+import StatCard from "@/components/ui/admin/dashboard/statCard";
+import "@/../css/dashboard-admin.css";
 
 enum CompetitionFilterTable {
     AVAILABLE = "available",
@@ -129,65 +131,27 @@ export default function Competitions({
                         </Link>
                     </Button>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Kompetisi
-                            </CardTitle>
-                            <Award className="h-4 w-4 text-purple-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{total}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang diikuti
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Sedang Diikuti (ONGOING)
-                            </CardTitle>
-                            <Clock className="h-4 w-4 text-green-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{ongoing}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang sedang diikuti
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Selesai
-                            </CardTitle>
-                            <CheckCircle className="h-4 w-4 text-blue-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {completed}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang telah selesai diikuti
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Menunggu Verifikasi
-                            </CardTitle>
-                            <Calendar className="h-4 w-4 text-yellow-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{pending}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang diajukan untuk diverifikasi
-                            </p>
-                        </CardContent>
-                    </Card>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
+                    <StatCard
+                        label="Total Kompetisi"
+                        value={total}
+                        icon={<Award className="h-6 w-6 text-purple-600" />}
+                    />
+                    <StatCard
+                        label="Sedang Diikuti"
+                        value={ongoing}
+                        icon={<Clock className="h-6 w-6 text-green-500" />}
+                    />
+                    <StatCard
+                        label="Selesai"
+                        value={completed}
+                        icon={<CheckCircle className="h-6 w-6 text-blue-500" />}
+                    />
+                    <StatCard
+                        label="Menunggu Verifikasi"
+                        value={pending}
+                        icon={<Calendar className="h-6 w-6 text-yellow-500" />}
+                    />
                 </div>
                 <Tabs defaultValue="competitions" className="w-full mt-6">
                     <TabsList>

@@ -10,6 +10,8 @@ import { Award, Calendar, CheckCircle, Clock, Trophy } from "lucide-react";
 import { useCallback, useState } from "react";
 import { competitionColumns } from "./competition-table/columns";
 import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
+import StatCard from "@/components/ui/admin/dashboard/statCard";
+import "@/../css/dashboard-admin.css";
 
 enum CompetitionFilterTable {
     ALL = "all",
@@ -85,84 +87,45 @@ export default function Competitions({
                     </div>
                     <Button
                         asChild
-                        className="bg-purple-600 hover:bg-purple-700 rounded"
+                        className="bg-purple-600 hover:bg-purple-700 rounded-md"
                     >
                         <Link href={route("admin.competitions.create")}>
                             Tambah Lomba
                         </Link>
                     </Button>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Kompetisi
-                            </CardTitle>
-                            <Award className="h-4 w-4 text-purple-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{total}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi terdaftar dalam sistem
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Sedang Berlangsung
-                            </CardTitle>
-                            <Clock className="h-4 w-4 text-green-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{ongoing}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang sedang aktif
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Selesai
-                            </CardTitle>
-                            <CheckCircle className="h-4 w-4 text-blue-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {completed}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang telah selesai
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Menunggu Verifikasi
-                            </CardTitle>
-                            <Calendar className="h-4 w-4 text-yellow-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{pending}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Kompetisi yang perlu diverifikasi
-                            </p>
-                        </CardContent>
-                    </Card>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
+                    <StatCard
+                        label="Total Kompetisi"
+                        value={total}
+                        icon={<Award className="h-6 w-6 text-purple-600" />}
+                    />
+                    <StatCard
+                        label="Sedang Berlangsung"
+                        value={ongoing}
+                        icon={<Clock className="h-6 w-6 text-green-500" />}
+                    />
+                    <StatCard
+                        label="Selesai"
+                        value={completed}
+                        icon={<CheckCircle className="h-6 w-6 text-blue-500" />}
+                    />
+                    <StatCard
+                        label="Menunggu Verifikasi"
+                        value={pending}
+                        icon={<Calendar className="h-6 w-6 text-yellow-500" />}
+                    />
                 </div>
-                <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
+                <div className="mt-6 p-1 rounded inline-flex gap-2">
                     <Button
                         onClick={() => setFilter(CompetitionFilterTable.ALL)}
                         size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ALL,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !== CompetitionFilterTable.ALL
-                        })}
+                        className={cn(
+                            "rounded-lg border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                            competitionStatus === CompetitionFilterTable.ALL
+                                ? "bg-white text-purple-700 border-purple-400 ring-2 ring-purple-100 hover:scale-105"
+                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                        )}
                     >
                         Semua
                     </Button>
@@ -171,14 +134,12 @@ export default function Competitions({
                             setFilter(CompetitionFilterTable.ONGOING)
                         }
                         size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ONGOING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.ONGOING
-                        })}
+                        className={cn(
+                            "rounded-lg  border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                            competitionStatus === CompetitionFilterTable.ONGOING
+                                ? "bg-white text-purple-700 border-purple-400 ring-2 ring-purple-100 hover:scale-105 hover:shadow-lg"
+                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                        )}
                     >
                         Sedang Berlangsung
                     </Button>
@@ -187,14 +148,13 @@ export default function Competitions({
                             setFilter(CompetitionFilterTable.COMPLETED)
                         }
                         size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.COMPLETED,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
+                        className={cn(
+                            "rounded-lg  border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                            competitionStatus ===
                                 CompetitionFilterTable.COMPLETED
-                        })}
+                                ? "bg-white text-purple-700 border-purple-400 ring-2 ring-purple-100 hover:scale-105 hover:shadow-lg"
+                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                        )}
                     >
                         Selesai
                     </Button>
@@ -203,14 +163,12 @@ export default function Competitions({
                             setFilter(CompetitionFilterTable.PENDING)
                         }
                         size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.PENDING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.PENDING
-                        })}
+                        className={cn(
+                            "rounded-lg  border-2 px-5 py-2 font-semibold transition-all duration-200 focus:outline-none",
+                            competitionStatus === CompetitionFilterTable.PENDING
+                                ? "bg-white text-purple-700 border-purple-400 ring-2 ring-purple-100 hover:scale-105 hover:shadow-lg"
+                                : "bg-transparent text-gray-500 border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 hover:scale-105"
+                        )}
                     >
                         Menunggu Verifikasi
                     </Button>
