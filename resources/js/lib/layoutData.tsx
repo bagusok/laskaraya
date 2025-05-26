@@ -116,7 +116,7 @@ export const navItemsMahasiswa = [
             },
             {
                 label: "Manajemen Ketrampilan",
-                href: "/dashboard/dosen/skills"
+                href: "/dashboard/mahasiswa/skills"
             }
         ]
     }
