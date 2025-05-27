@@ -10,6 +10,8 @@ import { Award, Calendar, CheckCircle, Clock, Trophy } from "lucide-react";
 import { useCallback, useState } from "react";
 import { competitionColumns } from "./competition-table/columns";
 import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TeamTable from "./team-table";
 
 enum CompetitionFilterTable {
     ALL = "all",
@@ -152,137 +154,160 @@ export default function Competitions({
                         </CardContent>
                     </Card>
                 </div>
-                <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
-                    <Button
-                        onClick={() => setFilter(CompetitionFilterTable.ALL)}
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ALL,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !== CompetitionFilterTable.ALL
-                        })}
-                    >
-                        Semua
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setFilter(CompetitionFilterTable.ONGOING)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.ONGOING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.ONGOING
-                        })}
-                    >
-                        Sedang Berlangsung
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setFilter(CompetitionFilterTable.COMPLETED)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.COMPLETED,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.COMPLETED
-                        })}
-                    >
-                        Selesai
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            setFilter(CompetitionFilterTable.PENDING)
-                        }
-                        size="sm"
-                        className={cn("rounded", {
-                            "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
-                                competitionStatus ===
-                                CompetitionFilterTable.PENDING,
-                            "bg-muted text-black/50 hover:bg-muted":
-                                competitionStatus !==
-                                CompetitionFilterTable.PENDING
-                        })}
-                    >
-                        Menunggu Verifikasi
-                    </Button>
-                </div>
-                <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border overflow-x-auto">
-                    {competitions.isLoading && (
-                        <div className="flex items-center justify-center w-full h-96">
-                            <p className="text-muted-foreground">Loading...</p>
+                <Tabs defaultValue="competitions" className="mt-6">
+                    <TabsList className="grid grid-cols-2 w-fit">
+                        <TabsTrigger value="competitions">
+                            Kompetisi
+                        </TabsTrigger>
+                        <TabsTrigger value="teams">Tim</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="competitions">
+                        <div className="mt-6 p-1 rounded bg-muted inline-flex gap-2">
+                            <Button
+                                onClick={() =>
+                                    setFilter(CompetitionFilterTable.ALL)
+                                }
+                                size="sm"
+                                className={cn("rounded", {
+                                    "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                        competitionStatus ===
+                                        CompetitionFilterTable.ALL,
+                                    "bg-muted text-black/50 hover:bg-muted":
+                                        competitionStatus !==
+                                        CompetitionFilterTable.ALL
+                                })}
+                            >
+                                Semua
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    setFilter(CompetitionFilterTable.ONGOING)
+                                }
+                                size="sm"
+                                className={cn("rounded", {
+                                    "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                        competitionStatus ===
+                                        CompetitionFilterTable.ONGOING,
+                                    "bg-muted text-black/50 hover:bg-muted":
+                                        competitionStatus !==
+                                        CompetitionFilterTable.ONGOING
+                                })}
+                            >
+                                Sedang Berlangsung
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    setFilter(CompetitionFilterTable.COMPLETED)
+                                }
+                                size="sm"
+                                className={cn("rounded", {
+                                    "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                        competitionStatus ===
+                                        CompetitionFilterTable.COMPLETED,
+                                    "bg-muted text-black/50 hover:bg-muted":
+                                        competitionStatus !==
+                                        CompetitionFilterTable.COMPLETED
+                                })}
+                            >
+                                Selesai
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    setFilter(CompetitionFilterTable.PENDING)
+                                }
+                                size="sm"
+                                className={cn("rounded", {
+                                    "bg-white rounded text-black font-medium hover:text-black hover:bg-white":
+                                        competitionStatus ===
+                                        CompetitionFilterTable.PENDING,
+                                    "bg-muted text-black/50 hover:bg-muted":
+                                        competitionStatus !==
+                                        CompetitionFilterTable.PENDING
+                                })}
+                            >
+                                Menunggu Verifikasi
+                            </Button>
                         </div>
-                    )}
+                        <div className="w-full mt-6 p-1 bg-white inline-flex gap-2 rounded-xl overflow-hidden border overflow-x-auto">
+                            {competitions.isLoading && (
+                                <div className="flex items-center justify-center w-full h-96">
+                                    <p className="text-muted-foreground">
+                                        Loading...
+                                    </p>
+                                </div>
+                            )}
 
-                    {competitions.isSuccess && competitions.data.data && (
-                        <DataTable
-                            columns={columns()}
-                            data={competitions.data.data}
-                        />
-                    )}
+                            {competitions.isSuccess &&
+                                competitions.data.data && (
+                                    <DataTable
+                                        columns={columns()}
+                                        data={competitions.data.data}
+                                    />
+                                )}
 
-                    {competitions.isError && (
-                        <div className="flex items-center justify-center w-full h-96">
-                            <p className="text-muted-foreground">
-                                Terjadi kesalahan saat memuat data kompetisi
-                            </p>
+                            {competitions.isError && (
+                                <div className="flex items-center justify-center w-full h-96">
+                                    <p className="text-muted-foreground">
+                                        Terjadi kesalahan saat memuat data
+                                        kompetisi
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
 
-                <div className="w-full inline-flex justify-between items-center mt-4">
-                    <div>
-                        <p className="text-sm text-muted-foreground">
-                            Halaman {competitions.data?.pagination.current_page}{" "}
-                            dari {competitions.data?.pagination.last_page} |
-                            Total Data:{" "}
-                            {competitions.data?.pagination.total}{" "}
-                        </p>
-                    </div>
+                        <div className="w-full inline-flex justify-between items-center mt-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground">
+                                    Halaman{" "}
+                                    {competitions.data?.pagination.current_page}{" "}
+                                    dari{" "}
+                                    {competitions.data?.pagination.last_page} |
+                                    Total Data:{" "}
+                                    {competitions.data?.pagination.total}{" "}
+                                </p>
+                            </div>
 
-                    <div className="inline-flex gap-2">
-                        <Button
-                            disabled={
-                                +competitions.data?.pagination.current_page ===
-                                1
-                            }
-                            onClick={() => {
-                                setPage(
-                                    +competitions.data?.pagination
-                                        .current_page - 1
-                                );
-                            }}
-                            variant="outline"
-                            size="sm"
-                        >
-                            Sebelumnya
-                        </Button>
-                        <Button
-                            disabled={
-                                +competitions.data?.pagination.current_page ===
-                                +competitions.data?.pagination.last_page
-                            }
-                            onClick={() => {
-                                setPage(
-                                    +competitions.data?.pagination
-                                        .current_page + 1
-                                );
-                            }}
-                            variant="outline"
-                            size="sm"
-                        >
-                            Selanjutnya
-                        </Button>
-                    </div>
-                </div>
+                            <div className="inline-flex gap-2">
+                                <Button
+                                    disabled={
+                                        +competitions.data?.pagination
+                                            .current_page === 1
+                                    }
+                                    onClick={() => {
+                                        setPage(
+                                            +competitions.data?.pagination
+                                                .current_page - 1
+                                        );
+                                    }}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Sebelumnya
+                                </Button>
+                                <Button
+                                    disabled={
+                                        +competitions.data?.pagination
+                                            .current_page ===
+                                        +competitions.data?.pagination.last_page
+                                    }
+                                    onClick={() => {
+                                        setPage(
+                                            +competitions.data?.pagination
+                                                .current_page + 1
+                                        );
+                                    }}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Selanjutnya
+                                </Button>
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="teams">
+                        <TeamTable />
+                    </TabsContent>
+                </Tabs>
             </div>
             {openDeleteModal && (
                 <DeleteCompetitionModal

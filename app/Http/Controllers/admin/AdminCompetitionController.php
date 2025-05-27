@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CategoryModel;
+use App\Models\CompetitionMember;
 use App\Models\CompetitionModel;
 use App\Models\PeriodModel;
 use App\Models\SkillModel;
@@ -47,6 +48,22 @@ class AdminCompetitionController extends Controller
             'categories' => $categories,
             'periods' => $periods,
             'skills' => $skills,
+        ]);
+    }
+
+    public function detail($id)
+    {
+        $competition = CompetitionModel::with(['category', 'period', 'skills'])->findOrFail($id);
+
+        if (!$competition) {
+            return back()->with('error', 'Competition not found.');
+        }
+
+        return Inertia::render('dashboard/admin/competitions/detail')->with([
+            'competition' => $competition,
+            'category' => $competition->category,
+            'period' => $competition->period,
+            'skills' => $competition->skills,
         ]);
     }
 
@@ -228,7 +245,6 @@ class AdminCompetitionController extends Controller
 
         return redirect()->route('admin.competitions.index')->with('success', 'Competition updated successfully.');
     }
-
     public function destroy($id)
     {
         $user = auth()->user();
@@ -250,5 +266,39 @@ class AdminCompetitionController extends Controller
         $competition->delete();
 
         return redirect()->route('admin.competitions.index')->with('success', 'Competition deleted successfully.');
+    }
+
+    public function responseCompetition(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'admin') {
+            return redirect()->route('index')->with('error', 'Unauthorized access.');
+        }
+
+        $competition = CompetitionModel::find([
+            'id' => $id,
+            'verified_status' => 'pending'
+        ]);
+
+        if (!$competition) {
+            return back()->withErrors(['error' => 'Kompetisi tidak ditemukan atau sudah diverifikasi.']);
+        }
+
+        $request->validate([
+            'verified_status' => 'required|in:accepted,rejected',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $update = CompetitionModel::where('id', $id)->update([
+            'verified_status' => $request->verified_status,
+            'notes' => $request->reason,
+        ]);
+
+        if (!$update) {
+            return back()->withErrors(['error' => 'Failed to update competition response.']);
+        }
+
+        return back()->with('success', 'Competition response updated successfully.');
     }
 }

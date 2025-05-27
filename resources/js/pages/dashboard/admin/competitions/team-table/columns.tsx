@@ -9,97 +9,71 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import { Eye, MoreHorizontal, Trash } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { User } from "@/types";
+import { Competition } from "../competition-table/columns";
 
-export const competitionColumns = (
-    setOpenDeleteCompetitionModal: (open: boolean) => void,
-    setCompetitionId: (id: number) => void
-): ColumnDef<Competition>[] => [
-    {
-        accessorKey: "image",
-        header: "Poster",
-        cell: ({ row }) => (
-            <div className="w-12 h-12 relative rounded-md overflow-hidden">
-                <img
-                    src={
-                        row.getValue("image") ||
-                        "/placeholder.svg?height=48&width=48"
-                    }
-                    alt={`Poster for ${row.getValue("name")}`}
-                    className="object-cover"
-                />
-            </div>
-        )
-    },
+export const teamColumns = (
+    setOpenDeleteTeamModal: (open: boolean) => void,
+    setTeamId: (id: number) => void,
+    userId: number
+): ColumnDef<Team>[] => [
     {
         accessorKey: "name",
-
+        header: "Nama Tim",
         cell: ({ row }) => (
             <div className="font-medium">{row.getValue("name")}</div>
         )
     },
     {
-        accessorKey: "author",
-        cell: ({ row }) => <div>{row.getValue("author")}</div>
-    },
-    {
-        accessorKey: "level",
-        cell: ({ row }) => {
-            const level = row.getValue("level") as number;
-            const colors = {
-                1: "bg-gray-500 hover:bg-gray-600",
-                2: "bg-blue-500 hover:bg-blue-600",
-                3: "bg-green-500 hover:bg-green-600",
-                4: "bg-orange-500 hover:bg-orange-600",
-                5: "bg-purple-600 hover:bg-purple-700"
-            };
-
-            const levelNames = {
-                1: "Internasional",
-                2: "Nasional",
-                3: "Regional",
-                4: "Provinsi",
-                5: "Universitas"
-            };
-
-            return (
-                <Badge className={colors[level as keyof typeof colors]}>
-                    {levelNames[level as keyof typeof levelNames]}
-                </Badge>
-            );
-        }
-    },
-    {
-        accessorKey: "start_date",
+        accessorKey: "competition.name",
+        header: "Kompetisi",
         cell: ({ row }) => (
-            <div>
-                {new Date(row.getValue("start_date")).toLocaleDateString()}
+            <div className="text-sm text-muted-foreground">
+                {row.original.competition.name}
             </div>
         )
     },
     {
-        accessorKey: "end_date",
+        accessorKey: "competition.author",
+        header: "Penyelenggara",
         cell: ({ row }) => (
-            <div>{new Date(row.getValue("end_date")).toLocaleDateString()}</div>
+            <div className="text-sm text-muted-foreground">
+                {row.original.competition.author}
+            </div>
         )
     },
     {
-        accessorKey: "status",
+        accessorKey: "registrant.name",
+        header: "Ketua Tim",
+        cell: ({ row }) => <div>{row.original.registrant.name}</div>
+    },
+    {
+        accessorKey: "dosen.name",
+        header: "Dosen Pembimbing",
+        cell: ({ row }) => (
+            <div className="text-sm text-muted-foreground">
+                {row.original.dosen.name}
+            </div>
+        )
+    },
+    {
+        accessorKey: "competition.status",
         header: "Status",
         cell: ({ row }) => {
-            const status = row.getValue("status") as string;
+            const status = row.original.competition.status;
 
             switch (status) {
                 case "ongoing":
                     return (
-                        <Badge className="bg-green-500 hover:bg-green-600">
-                            Sedang Berlangsung
+                        <Badge className="bg-blue-500 hover:bg-blue-600">
+                            Berlangsung
                         </Badge>
                     );
                 case "completed":
                     return (
-                        <Badge className="bg-blue-500 hover:bg-blue-600">
+                        <Badge className="bg-green-500 hover:bg-green-600">
                             Selesai
                         </Badge>
                     );
@@ -114,10 +88,10 @@ export const competitionColumns = (
         }
     },
     {
-        accessorKey: "verified_status",
-        header: "Verifikasi",
+        accessorKey: "competition.verified_status",
+        header: "Verifikasi Lomba",
         cell: ({ row }) => {
-            const status = row.getValue("verified_status") as string;
+            const status = row.original.competition.verified_status;
 
             switch (status) {
                 case "accepted":
@@ -146,6 +120,56 @@ export const competitionColumns = (
         }
     },
     {
+        accessorKey: "status",
+        header: "Verifikasi Tim",
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string;
+
+            switch (status) {
+                case "accepted":
+                    return (
+                        <Badge className="bg-green-500 hover:bg-green-600">
+                            Diterima
+                        </Badge>
+                    );
+                case "pending":
+                    return (
+                        <Badge
+                            variant="outline"
+                            className="text-yellow-600 border-yellow-600"
+                        >
+                            Menunggu
+                        </Badge>
+                    );
+                case "rejected":
+                    return <Badge variant="destructive">Ditolak</Badge>;
+                default:
+                    return null;
+            }
+        },
+        filterFn: (row, id, value) => {
+            return value.includes(row.getValue(id));
+        }
+    },
+    {
+        accessorKey: "created_at",
+        header: "Tanggal Dibuat",
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("created_at"));
+            return (
+                <div className="text-sm text-muted-foreground">
+                    {date.toLocaleDateString("id-ID", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })}
+                </div>
+            );
+        }
+    },
+    {
         id: "actions",
         cell: ({ row }) => {
             return (
@@ -161,7 +185,7 @@ export const competitionColumns = (
                         <DropdownMenuItem asChild>
                             <Link
                                 href={route(
-                                    "admin.competitions.detail",
+                                    "admin.teams.detail",
                                     row.original.id
                                 )}
                             >
@@ -169,23 +193,12 @@ export const competitionColumns = (
                                 <span>Detail</span>
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link
-                                href={route(
-                                    "admin.competitions.edit",
-                                    row.original.id
-                                )}
-                            >
-                                <Edit className="mr-2 h-4 w-4" />
-                                <span>Edit</span>
-                            </Link>
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => {
-                                setCompetitionId(row.original.id);
-                                setOpenDeleteCompetitionModal(true);
+                                setTeamId(row.original.id);
+                                setOpenDeleteTeamModal(true);
                             }}
                         >
                             <Trash className="mr-2 h-4 w-4" />
@@ -198,21 +211,16 @@ export const competitionColumns = (
     }
 ];
 
-export type Competition = {
+export type Team = {
     id: number;
-    category_id: number;
-    period_id: number;
     name: string;
-    image: string;
-    author: string;
-    level: 1 | 2 | 3 | 4 | 5;
-    start_date: string;
-    end_date: string;
-    description: string;
-    status: "ongoing" | "completed" | "canceled";
-    verified_status: "accepted" | "pending" | "rejected";
-    notes?: string;
-    uploader_id: number;
+    dosen_id: number;
+    registrant_id: number;
+    status: "pending" | "accepted" | "rejected";
+    dosen: User;
+    registrant: User;
+    competition: Competition;
     created_at: string;
     updated_at: string;
+    members: User[];
 };
