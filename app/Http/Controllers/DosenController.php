@@ -43,4 +43,70 @@ class DosenController extends Controller
     {
         return back();
     }
+
+    public function mahasiswaBimbingan(Request $request)
+    {
+        $dosenId = auth()->user()->id;
+        $perPage = $request->query('limit', 10);
+        $search = $request->query('search', 'name');
+        $searchQuery = $request->query('search_query', '');
+        $status = $request->query('status', 'all');
+
+        $teams = \App\Models\UserToCompetition::with(['competition', 'competitionMembers.user'])
+            ->where('dosen_id', $dosenId)
+            ->when($searchQuery, function ($query) use ($search, $searchQuery) {
+                if ($search === 'name') {
+                    $query->whereHas('competitionMembers.user', function ($q) use ($searchQuery) {
+                        $q->where('name', 'like', '%' . $searchQuery . '%');
+                    });
+                } else if ($search === 'identifier') {
+                    $query->whereHas('competitionMembers.user', function ($q) use ($searchQuery) {
+                        $q->where('identifier', 'like', '%' . $searchQuery . '%');
+                    });
+                }
+            })
+            ->when($status !== 'all', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
+        $mahasiswa = [];
+        foreach ($teams as $team) {
+            foreach ($team->competitionMembers as $member) {
+                $mahasiswa[] = [
+                    'id' => $member->user->id,
+                    'team_id' => $team->id,
+                    'name' => $member->user->name,
+                    'identifier' => $member->user->identifier,
+                    'email' => $member->user->email,
+                    'team_name' => $team->name,
+                    'competition_name' => $team->competition->name,
+                    'status' => $team->bimbingan_status,
+                ];
+            }
+        }
+
+
+        return Inertia::render('dashboard/dosen/mahasiswaBimbingan', [
+            'mahasiswa' => [
+                'data' => $mahasiswa,
+                'current_page' => $teams->currentPage(),
+                'last_page' => $teams->lastPage(),
+                'per_page' => $teams->perPage(),
+                'total_page' => $teams->lastPage(),
+                'total_data' => $teams->total(),
+            ],
+            'mahasiswaList' => [],
+        ]);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $team = \App\Models\UserToCompetition::findOrFail($id);
+        $team->bimbingan_status = 'selesai';
+        $team->save();
+
+        return back();
+    }
 }

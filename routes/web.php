@@ -86,6 +86,7 @@ Route::group(['prefix' => 'bimbingan', 'middleware' => ['auth', 'role:dosen']], 
     Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.bimbingan.show');
     Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.bimbingan.update');
     Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.bimbingan.destroy');
+    Route::post('/{id}/status', [DosenController::class, 'updateStatus'])->name('dosen.bimbingan.status');
 });
 
 Route::prefix('period')->group(function () {

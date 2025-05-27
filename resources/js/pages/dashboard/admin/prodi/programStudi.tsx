@@ -90,7 +90,7 @@ export default function ProgramStudiIndex({
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout title="Manajemen Program Studi">
             <div className="container mx-auto py-8">
                 <Card className="border border-purple-200 rounded-xl shadow-sm bg-gradient-to-br from-white to-purple-50/30">
                     <CardHeader className="flex flex-row items-center gap-3 pb-4 border-b border-purple-100 justify-between">

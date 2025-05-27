@@ -18,7 +18,8 @@ class UserToCompetition extends Model
         'status',
         'notes',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'bimbingan_status',
     ];
 
     public function competition()

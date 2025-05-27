@@ -11,6 +11,77 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { Checkbox } from "@/components/ui/checkbox";
+
+export const createCompetitionTableColumns = (
+    columns: ColumnDef<Competition>[],
+    selectable: boolean,
+    setOpenDeleteCompetitionModal: (open: boolean) => void,
+    setCompetitionId: (id: number) => void
+): ColumnDef<Competition>[] => {
+    const columnsWithSelection: ColumnDef<Competition>[] = selectable
+        ? [
+              {
+                  id: "select",
+                  header: ({ table }) => (
+                      <Checkbox
+                          checked={table.getIsAllPageRowsSelected()}
+                          onCheckedChange={(value: boolean) =>
+                              table.toggleAllPageRowsSelected(!!value)
+                          }
+                          aria-label="Pilih semua"
+                          className="translate-y-[2px]"
+                      />
+                  ),
+                  cell: ({ row }) => (
+                      <Checkbox
+                          checked={row.getIsSelected()}
+                          onCheckedChange={(value: boolean) =>
+                              row.toggleSelected(!!value)
+                          }
+                          aria-label="Pilih baris"
+                          className="translate-y-[2px]"
+                      />
+                  ),
+                  enableSorting: false,
+                  enableHiding: false
+              }
+          ]
+        : [];
+    const actionColumn: ColumnDef<Competition> = {
+        id: "actions",
+        header: "Aksi",
+        cell: ({ row }) => {
+            const comp = row.original;
+            return (
+                <div className="flex gap-2">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        asChild
+                        className="rounded shadow-sm border border-purple-200 p-2 hover:bg-white hover:text-purple-700 transition-all duration-150"
+                    >
+                        <Link href={route("admin.competitions.edit", comp.id)}>
+                            <Edit className="h-5 w-5" />
+                        </Link>
+                    </Button>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                            setCompetitionId(comp.id);
+                            setOpenDeleteCompetitionModal(true);
+                        }}
+                        className="rounded shadow-sm border border-red-200 p-2 hover:bg-white hover:text-red-600 transition-all duration-150"
+                    >
+                        <Trash className="h-5 w-5" />
+                    </Button>
+                </div>
+            );
+        }
+    };
+    return [...columnsWithSelection, ...columns, actionColumn];
+};
 
 export const competitionColumns = (
     setOpenDeleteCompetitionModal: (open: boolean) => void,
