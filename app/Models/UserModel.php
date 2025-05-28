@@ -82,4 +82,9 @@ class UserModel extends Authenticatable
     {
         return $this->belongsTo(ProgramStudiModel::class, 'prodi_id');
     }
+
+    public function userToSkills()
+    {
+        return $this->hasMany(\App\Models\UserToSkill::class, 'user_id');
+    }
 }

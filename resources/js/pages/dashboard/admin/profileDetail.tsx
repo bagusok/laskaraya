@@ -1,7 +1,7 @@
 import AdminLayout from "@/components/layouts/adminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import {
     ArrowLeft,
     Pencil,
@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import type { User } from "@/types/profile";
 import Header from "@/components/ui/admin/dashboard/header";
 import { motion } from "framer-motion";
+import React from "react";
 
 interface ProfileDetailProps {
     user: User;
@@ -37,6 +38,14 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
 
     // Dummy handler for sidebar toggle (bisa dihubungkan ke state layout jika ada)
     const handleSidebar = () => {};
+
+    const userSkills = (usePage().props.userSkills ?? []) as {
+        id: number;
+        name: string;
+        level: number;
+    }[];
+
+    console.log("USER SKILLS:", userSkills);
 
     return (
         <AdminLayout>
@@ -209,7 +218,78 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
                                             {user.role}
                                         </p>
                                     </div>
+                                    {user.dosen && user.dosen.faculty && (
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                Jurusan
+                                            </h3>
+                                            <p className="text-base">
+                                                {user.dosen.faculty}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {user.mahasiswa && (
+                                        <>
+                                            {user.mahasiswa.faculty && (
+                                                <div>
+                                                    <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                        Fakultas
+                                                    </h3>
+                                                    <p className="text-base">
+                                                        {user.mahasiswa.faculty}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {user.mahasiswa.major && (
+                                                <div>
+                                                    <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                        Jurusan
+                                                    </h3>
+                                                    <p className="text-base">
+                                                        {user.mahasiswa.major}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    {user.mahasiswa && user.prodi && (
+                                        <div>
+                                            <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                Program Studi
+                                            </h3>
+                                            <p className="text-base">
+                                                {user.prodi.nama}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
+                                {/* Tampilkan skill user */}
+                                {userSkills && userSkills.length > 0 ? (
+                                    <div className="mt-6">
+                                        <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                            Skill Mahasiswa
+                                        </h3>
+                                        <ul className="list-disc pl-5">
+                                            {userSkills.map((s: any) => (
+                                                <li key={s.id} className="mb-1">
+                                                    <span className="font-semibold">
+                                                        {s.name}
+                                                    </span>{" "}
+                                                    <span className="text-xs text-gray-500">
+                                                        (Tingkat Keterampilan:{" "}
+                                                        {s.level})
+                                                    </span>
+                                                    {/* Debug */}
+                                                    {/* <span className="text-xs text-gray-400 ml-2">user_id: {s.user_id}, skill_id: {s.id}</span> */}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : (
+                                    <div className="mt-6 text-xs text-gray-400">
+                                        Belum ada skill yang diinputkan
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 

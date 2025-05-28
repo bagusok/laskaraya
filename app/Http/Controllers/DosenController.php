@@ -66,7 +66,9 @@ class DosenController extends Controller
                 }
             })
             ->when($status !== 'all', function ($query) use ($status) {
-                $query->where('status', $status);
+                $query->whereHas('competition', function ($q) use ($status) {
+                    $q->where('status', $status);
+                });
             })
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
@@ -82,11 +84,10 @@ class DosenController extends Controller
                     'email' => $member->user->email,
                     'team_name' => $team->name,
                     'competition_name' => $team->competition->name,
-                    'status' => $team->bimbingan_status,
+                    'status' => $team->competition->status,
                 ];
             }
         }
-
 
         return Inertia::render('dashboard/dosen/mahasiswaBimbingan', [
             'mahasiswa' => [
