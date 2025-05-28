@@ -2,24 +2,38 @@ import StatCard from "@/components/ui/admin/dashboard/statCard";
 import ProfileCard from "@/components/ui/admin/dashboard/profileCard";
 import EventList from "@/components/ui/admin/dashboard/eventList";
 import MahasiswaLayout from "@/components/layouts/mahasiswaLayout";
+import MahasiswaChart from "@/components/ui/mahasiswaChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useAuth from "@/hooks/use-auth";
 import { upcomingEvents } from "@/lib/adminData";
 import { stats } from "@/lib/mahasiswaData";
-import { Star } from "lucide-react";
 
 export default function MahasiswaDashboard() {
     const { user } = useAuth();
 
-    // Hitung winrate
+    // Get values from stats
     const wins = parseInt(stats.find(stat => stat.label === "Menang")?.value || "0");
-    const totalCompetitions = parseInt(stats.find(stat => stat.label === "Riwayat Lomba")?.value || "1");
-    const winRate = ((wins / totalCompetitions) * 100).toFixed(1);
+    const totalCompetitions = parseInt(stats.find(stat => stat.label === "Riwayat Lomba")?.value || "0");
+    const ongoingCompetitions = parseInt(stats.find(stat => stat.label === "Kompetisi Yang Diikuti")?.value || "0");
 
-    const winRateStat = {
-        label: "Ratio Menang",
-        value: `${winRate}%`,
-        icon: <Star className="text-yellow-500" />,
-    };
+    // Calculate losses
+    const losses = totalCompetitions - wins;
+
+    // Create chart data for win rate visualization
+    const chartData = [
+        {
+            label: "Menang",
+            value: wins
+        },
+        {
+            label: "Kalah",
+            value: losses
+        },
+        {
+            label: "Sedang Diikuti",
+            value: ongoingCompetitions
+        }
+    ];
 
     return (
         <MahasiswaLayout>
@@ -49,14 +63,29 @@ export default function MahasiswaDashboard() {
                 </div>
             </div>
 
-            <section className="mb-10 relative z-10">
-                <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                    <StatCard
-                        label={winRateStat.label}
-                        value={winRateStat.value}
-                        icon={winRateStat.icon}
-                        className="w-full max-w-md mx-auto shadow-sm"
-                    />
+            <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+                <div className="lg:col-span-8 space-y-6">
+                    <div className="admin-card">
+                        <div className="admin-card-header">Statistik Kompetisi</div>
+                        <div className="admin-card-content">
+                            <Card className="border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all bg-gradient-to-br from-white to-blue-50/20">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-xl font-bold text-gray-900 text-center">
+                                        Performa Kompetisi
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-0">
+                                    <MahasiswaChart data={chartData} />
+                                    <div className="mt-6 text-center p-3 bg-purple-100/30 rounded-md">
+                                        <span className="text-sm text-gray-500">Win Rate: </span>
+                                        <span className="text-lg font-bold text-purple-700">
+                                            {totalCompetitions > 0 ? ((wins / totalCompetitions) * 100).toFixed(1) : 0}%
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
                 </div>
             </section>
         </MahasiswaLayout>
