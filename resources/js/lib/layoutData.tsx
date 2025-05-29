@@ -5,7 +5,8 @@ import {
     CalendarDays,
     BookOpen,
     FileCheck,
-    Trophy
+    Trophy,
+    Medal
 } from "lucide-react";
 import { NavItem } from "../types/layout";
 
@@ -119,5 +120,10 @@ export const navItemsMahasiswa = [
                 href: "/dashboard/mahasiswa/skills"
             }
         ]
+    },
+    {
+        label: "Riwayat Prestasi",
+        icon: <Medal />,
+        href: route("mahasiswa.achievements.index")
     }
 ];

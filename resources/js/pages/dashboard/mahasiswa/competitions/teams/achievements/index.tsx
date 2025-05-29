@@ -112,7 +112,7 @@ export default function TeamAchievement({
             setData("certificates", updatedCertificates);
         }
     };
-    // Convert existing certificates URLs to File objects if they exist
+
     useEffect(() => {
         if (achievement?.certificates && achievement.certificates.length > 0) {
             getFileCertificates();

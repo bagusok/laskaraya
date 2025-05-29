@@ -10,7 +10,6 @@ import { Award, Calendar, CheckCircle, Clock, Trophy } from "lucide-react";
 import { useCallback, useState } from "react";
 import { competitionColumns } from "./competition-table/columns";
 import DeleteCompetitionModal from "./competition-table/deleteCompetitionModal";
-import StatCard from "@/components/ui/admin/dashboard/statCard";
 import "@/../css/dashboard-admin.css";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeamTable from "./team-table";
@@ -54,7 +53,7 @@ export default function Competitions({
             const res = await axios.get(route("admin.competitions.getAll"), {
                 params: {
                     page,
-                    limit: 4,
+                    limit: 10,
                     ...(competitionStatus !== CompetitionFilterTable.ALL &&
                         statusParams)
                 }

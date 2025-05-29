@@ -10,11 +10,10 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { router, usePage } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Camera, ArrowLeft } from "lucide-react";
 
 export default function EditProfile() {

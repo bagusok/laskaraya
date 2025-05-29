@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataTable from "@/components/ui/shared/dataTable";
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
@@ -158,7 +157,7 @@ export default function Competitions({
                         <TabsTrigger value="competitions">
                             Kompetisi
                         </TabsTrigger>
-                        <TabsTrigger value="teams" >Tim</TabsTrigger>
+                        <TabsTrigger value="teams">Tim</TabsTrigger>
                     </TabsList>
                     <TabsContent value="competitions">
                         <>

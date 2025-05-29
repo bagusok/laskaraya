@@ -185,14 +185,14 @@ export default function EditCompetition({
                     </div>
                 </div>
                 <div className="mt-8">
-                    <Card className="max-w-2xl mx-auto border-purple-200 shadow-md">
+                    <Card className="border-purple-200 shadow-md">
                         <CardHeader>
                             <CardTitle className="text-xl font-bold text-gray-900">
                                 Edit Kompetisi
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form className="space-y-4" onSubmit={handleSubmit}>
+                            <form className="space-y-4">
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center">
                                     {posterPreview ? (
                                         <div className="relative w-full max-w-md">
@@ -599,9 +599,9 @@ export default function EditCompetition({
                         </CardContent>
                         <CardFooter className="flex justify-end">
                             <Button
-                                type="submit"
                                 className="bg-purple-600 hover:bg-purple-700"
                                 disabled={processing}
+                                onClick={(e) => handleSubmit(e)}
                             >
                                 Simpan
                             </Button>
