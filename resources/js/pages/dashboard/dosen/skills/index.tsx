@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DosenLayout from "@/components/layouts/dosenLayout";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Search } from "lucide-react";
 import AddSkillModal from "@/components/ui/admin/skill/addSkillModal";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { router, usePage } from "@inertiajs/react";
 import type { Skill } from "@/types/skill";
 import {
@@ -22,8 +22,19 @@ export default function SkillsManagementDosen() {
     const [editData, setEditData] = useState<Skill | null>(null);
     const [deleteSkill, setDeleteSkill] = useState<Skill | null>(null);
     const [deleting, setDeleting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const skills = usePage<{ skills: Skill[] }>().props.skills;
+
+    // Filter skills based on search query
+    const filteredSkills = useMemo(() => {
+        if (!searchQuery.trim()) {
+            return skills;
+        }
+        return skills.filter(skill =>
+            skill.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [skills, searchQuery]);
 
     const handleAdd = () => {
         setEditData(null);
@@ -79,6 +90,25 @@ export default function SkillsManagementDosen() {
                             <Plus className="mr-2" size={16}/>Tambah Ketrampilan
                         </Button>
                     </div>
+
+                    {/* Search Bar */}
+                    <div className="mt-4 relative">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                            <input
+                                type="text"
+                                placeholder="Cari ketrampilan..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                        </div>
+                        {searchQuery && (
+                            <div className="mt-2 text-sm text-gray-600">
+                                Ditemukan {filteredSkills.length} dari {skills.length} ketrampilan
+                            </div>
+                        )}
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="rounded-md border border-purple-200 overflow-x-auto">
@@ -91,11 +121,20 @@ export default function SkillsManagementDosen() {
                             </tr>
                             </thead>
                             <tbody>
-                            {skills.map((skill, idx) => (
+                            {filteredSkills.map((skill, idx) => (
                                 <tr key={skill.id} className="border-b hover:bg-purple-100/30 hover:scale-[1.01] transition-all duration-200">
                                     <td className="p-4 text-center text-gray-700">{idx + 1}</td>
                                     <td className="p-4 text-gray-700">
-                                        <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">{skill.name}</span>
+                                            <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                                                {/* Highlight search matches */}
+                                                {searchQuery ? (
+                                                    skill.name.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, i) =>
+                                                        part.toLowerCase() === searchQuery.toLowerCase() ? (
+                                                            <mark key={i} className="bg-yellow-200 rounded px-1">{part}</mark>
+                                                        ) : part
+                                                    )
+                                                ) : skill.name}
+                                            </span>
                                     </td>
                                     <td className="p-4 text-center text-gray-700">
                                         <div className="flex justify-center items-center gap-2">
@@ -111,7 +150,6 @@ export default function SkillsManagementDosen() {
                                                     >
                                                         <Trash2 className="h-4 w-4 text-red-600" />
                                                     </Button>
-
                                                 </DialogTrigger>
                                                 <DialogContent>
                                                     <DialogHeader>
@@ -136,7 +174,14 @@ export default function SkillsManagementDosen() {
                                     </td>
                                 </tr>
                             ))}
-                            {skills.length === 0 && (
+                            {filteredSkills.length === 0 && searchQuery && (
+                                <tr>
+                                    <td colSpan={3} className="text-center p-4 text-gray-500">
+                                        Tidak ada ketrampilan yang cocok dengan pencarian "{searchQuery}"
+                                    </td>
+                                </tr>
+                            )}
+                            {skills.length === 0 && !searchQuery && (
                                 <tr>
                                     <td colSpan={3} className="text-center p-4 text-gray-500">Belum ada data ketrampilan.</td>
                                 </tr>

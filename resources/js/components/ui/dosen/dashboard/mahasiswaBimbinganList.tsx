@@ -70,15 +70,20 @@ export default function MahasiswaBimbinganList({
                                             <td className="py-2 px-2">
                                                 <span
                                                     className={`text-xs px-2 py-0.5 rounded-full ${
-                                                        mhs.status ===
-                                                        "bimbingan"
+                                                        mhs.status === "ongoing"
                                                             ? "bg-blue-100 text-blue-700"
-                                                            : "bg-green-100 text-green-700"
+                                                            : mhs.status ===
+                                                                "completed"
+                                                              ? "bg-green-100 text-green-700"
+                                                              : "bg-red-100 text-red-700"
                                                     }`}
                                                 >
-                                                    {mhs.status === "bimbingan"
-                                                        ? "Bimbingan"
-                                                        : "Selesai"}
+                                                    {mhs.status === "ongoing"
+                                                        ? "Sedang Berlangsung"
+                                                        : mhs.status ===
+                                                            "completed"
+                                                          ? "Selesai"
+                                                          : "Dibatalkan"}
                                                 </span>
                                             </td>
                                         </tr>

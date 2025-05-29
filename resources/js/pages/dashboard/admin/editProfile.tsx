@@ -14,7 +14,14 @@ import { router, usePage } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
 import { useState } from "react";
-import { Camera, ArrowLeft } from "lucide-react";
+import { Camera, ArrowLeft, X } from "lucide-react";
+import React from "react";
+
+// Tambahkan tipe untuk skills di form
+interface SkillForm {
+    id: number;
+    level: number;
+}
 
 export default function EditProfile() {
     const {
@@ -25,10 +32,28 @@ export default function EditProfile() {
         onSubmit,
         isLoading,
         user
-    } = useProfileForm();
+    } = useProfileForm() as any; // abaikan type error, atau update useProfileForm agar support 'skills'
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const prodiList = (usePage().props.prodiList ?? []) as any[];
+    const skills = (usePage().props.skills ?? []) as {
+        id: number;
+        name: string;
+    }[];
+    const userSkills = (usePage().props.userSkills ?? []) as {
+        id: number;
+        name: string;
+        level: number;
+    }[];
+    const [selectedSkills, setSelectedSkills] =
+        useState<{ id: number; name: string; level: number }[]>(userSkills);
+
+    useEffect(() => {
+        setValue(
+            "skills",
+            selectedSkills.map((s) => ({ id: s.id, level: s.level }))
+        );
+    }, [selectedSkills, setValue]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -39,6 +64,31 @@ export default function EditProfile() {
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    const handleSkillChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedOptions = Array.from(e.target.selectedOptions).map(
+            (opt) => Number(opt.value)
+        );
+        // Tambahkan skill baru yang dipilih, default level 1
+        const newSkills = selectedOptions.map((id) => {
+            const existing = selectedSkills.find((s) => s.id === id);
+            if (existing) return existing;
+            const skill = skills.find((s) => s.id === id);
+            return { id, name: skill?.name || "", level: 1 };
+        });
+        setSelectedSkills(newSkills);
+    };
+
+    const handleLevelChange = (id: number, level: number) => {
+        setSelectedSkills(
+            selectedSkills.map((s) => (s.id === id ? { ...s, level } : s))
+        );
+    };
+
+    const handleSubmitWithLog = (data: any) => {
+        console.log("DATA YANG DIKIRIM:", data.skills);
+        onSubmit(data);
     };
 
     return (
@@ -63,7 +113,7 @@ export default function EditProfile() {
                     </CardHeader>
                     <CardContent>
                         <form
-                            onSubmit={handleSubmit(onSubmit as any)}
+                            onSubmit={handleSubmit(handleSubmitWithLog as any)}
                             className="space-y-6"
                             encType="multipart/form-data"
                         >
@@ -422,26 +472,33 @@ export default function EditProfile() {
                                         >
                                             Prodi
                                         </Label>
-                                        <select
-                                            id="prodi_id"
-                                            {...register("prodi_id")}
-                                            defaultValue={
-                                                user?.mahasiswa?.prodi_id || ""
+                                        <Select
+                                            onValueChange={(value) =>
+                                                setValue("prodi_id", value)
                                             }
-                                            className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            defaultValue={
+                                                user?.mahasiswa?.prodi_id
+                                                    ? String(
+                                                          user?.mahasiswa
+                                                              ?.prodi_id
+                                                      )
+                                                    : ""
+                                            }
                                         >
-                                            <option value="">
-                                                Pilih Program Studi
-                                            </option>
-                                            {prodiList.map((prodi: any) => (
-                                                <option
-                                                    key={prodi.id}
-                                                    value={prodi.id}
-                                                >
-                                                    {prodi.nama}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+                                                <SelectValue placeholder="Pilih Program Studi" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {prodiList.map((prodi: any) => (
+                                                    <SelectItem
+                                                        key={prodi.id}
+                                                        value={String(prodi.id)}
+                                                    >
+                                                        {prodi.nama}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         {errors.prodi_id && (
                                             <p className="text-sm text-red-500">
                                                 {errors.prodi_id.message}
@@ -449,6 +506,117 @@ export default function EditProfile() {
                                         )}
                                     </div>
                                 )}
+
+                                {/* Field Skill tanpa Card */}
+                                <div className="space-y-2 mb-6">
+                                    <Label className="text-gray-700">
+                                        Skill
+                                    </Label>
+                                    <Select
+                                        onValueChange={(value) => {
+                                            const id = Number(value);
+                                            if (
+                                                !selectedSkills.some(
+                                                    (s) => s.id === id
+                                                )
+                                            ) {
+                                                const skill = skills.find(
+                                                    (s) => s.id === id
+                                                );
+                                                if (skill)
+                                                    setSelectedSkills([
+                                                        ...selectedSkills,
+                                                        {
+                                                            id,
+                                                            name: skill.name,
+                                                            level: 1
+                                                        }
+                                                    ]);
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+                                            <SelectValue placeholder="Pilih Skill" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {skills
+                                                .filter(
+                                                    (skill) =>
+                                                        !selectedSkills.some(
+                                                            (s) =>
+                                                                s.id ===
+                                                                skill.id
+                                                        )
+                                                )
+                                                .map((skill) => (
+                                                    <SelectItem
+                                                        key={skill.id}
+                                                        value={String(skill.id)}
+                                                    >
+                                                        {skill.name}
+                                                    </SelectItem>
+                                                ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {selectedSkills.length === 0 && (
+                                            <div className="text-xs text-gray-400">
+                                                Belum ada skill yang dipilih
+                                            </div>
+                                        )}
+                                        {selectedSkills.map((skill) => (
+                                            <div
+                                                key={skill.id}
+                                                className="flex items-center gap-2 border border-purple-200 rounded px-2 py-1 bg-white shadow-sm"
+                                            >
+                                                <span className="text-sm text-gray-800 w-28">
+                                                    {skill.name}
+                                                </span>
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map(
+                                                        (num) => (
+                                                            <button
+                                                                key={num}
+                                                                type="button"
+                                                                className={`w-6 h-6 rounded border text-xs font-bold transition-colors
+                                                                ${skill.level === num ? "bg-purple-500 text-white border-purple-500" : "bg-white text-purple-700 border-purple-200 hover:bg-purple-100"}`}
+                                                                onClick={() =>
+                                                                    handleLevelChange(
+                                                                        skill.id,
+                                                                        num
+                                                                    )
+                                                                }
+                                                            >
+                                                                {num}
+                                                            </button>
+                                                        )
+                                                    )}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    className="text-red-400 hover:text-red-600"
+                                                    onClick={() =>
+                                                        setSelectedSkills(
+                                                            selectedSkills.filter(
+                                                                (s) =>
+                                                                    s.id !==
+                                                                    skill.id
+                                                            )
+                                                        )
+                                                    }
+                                                    title="Hapus"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {errors?.skills && (
+                                        <p className="text-sm text-red-500">
+                                            {errors.skills.message}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="flex justify-end">

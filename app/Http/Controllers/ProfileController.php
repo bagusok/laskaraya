@@ -18,19 +18,37 @@ class ProfileController extends Controller
 {
     public function show()
     {
-        $user = Auth::user()->load(['dosen', 'mahasiswa']);
+        $user = Auth::user()->load(['dosen', 'mahasiswa', 'userToSkills.skill', 'prodi']);
+        $userSkills = $user->userToSkills->map(function ($item) {
+            return [
+                'id' => $item->skill_id,
+                'name' => $item->skill->name,
+                'level' => $item->level,
+            ];
+        });
         return Inertia::render('dashboard/admin/profileDetail', [
-            'user' => $user
+            'user' => $user,
+            'userSkills' => $userSkills,
         ]);
     }
 
     public function edit()
     {
-        $user = Auth::user()->load(['dosen', 'mahasiswa']);
+        $user = Auth::user()->load(['dosen', 'mahasiswa', 'userToSkills.skill', 'prodi']);
         $prodiList = ProgramStudiModel::all(['id', 'nama']);
+        $skills = \App\Models\SkillModel::all(['id', 'name']);
+        $userSkills = $user->userToSkills->map(function ($item) {
+            return [
+                'id' => $item->skill_id,
+                'name' => $item->skill->name,
+                'level' => $item->level,
+            ];
+        });
         return Inertia::render('dashboard/admin/editProfile', [
             'user' => $user,
             'prodiList' => $prodiList,
+            'skills' => $skills,
+            'userSkills' => $userSkills,
         ]);
     }
 
@@ -49,6 +67,11 @@ class ProfileController extends Controller
             unset($data['password']);
         }
 
+        // Decode skills JSON if exists
+        if (isset($data['skills'])) {
+            $data['skills'] = json_decode($data['skills'], true);
+        }
+
         $validated = Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -65,7 +88,10 @@ class ProfileController extends Controller
             'gender' => 'nullable|in:L,P',
             'birth_place' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
-            'prodi_id' => 'nullable|exists:program_studi,id'
+            'prodi_id' => 'nullable|exists:program_studi,id',
+            'skills' => 'nullable|array',
+            'skills.*.id' => 'required|exists:skills,id',
+            'skills.*.level' => 'required|integer|min:1|max:5',
         ])->validate();
 
         try {
@@ -121,6 +147,20 @@ class ProfileController extends Controller
                     $user->mahasiswa->update($mahasiswaData);
                 } else {
                     $user->mahasiswa()->create($mahasiswaData);
+                }
+            }
+
+            // Update user skills
+            if (isset($validated['skills'])) {
+                // Hapus semua skill lama
+                \App\Models\UserToSkill::where('user_id', $user->id)->delete();
+                // Tambahkan skill baru
+                foreach ($validated['skills'] as $skill) {
+                    \App\Models\UserToSkill::create([
+                        'user_id' => $user->id,
+                        'skill_id' => $skill['id'],
+                        'level' => $skill['level'],
+                    ]);
                 }
             }
 

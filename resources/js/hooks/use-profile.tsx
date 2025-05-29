@@ -100,6 +100,11 @@ export function useProfileForm() {
                 formData.append("prodi_id", data.prodi_id.toString());
             }
 
+            // Append skills data
+            if (data.skills) {
+                formData.append("skills", JSON.stringify(data.skills));
+            }
+
             await router.post(route("profile.update"), formData, {
                 preserveScroll: true,
                 onSuccess: (page) => {
