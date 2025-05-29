@@ -13,7 +13,7 @@ import {
 import { router, usePage } from "@inertiajs/react";
 import { useProfileForm } from "@/hooks/use-profile";
 import type { UserRole } from "@/types/profile.d";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Camera, ArrowLeft, X } from "lucide-react";
 import React from "react";
 
