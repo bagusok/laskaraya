@@ -101,10 +101,6 @@ export const navItemsDosen = [
             {
                 label: "Manajemen Ketrampilan",
                 href: "/dashboard/dosen/skills"
-            },
-            {
-                label: "Manajemen Kategori",
-                href: "/dashboard/dosen/categories"
             }
 
         ]
@@ -128,10 +124,6 @@ export const navItemsMahasiswa = [
             {
                 label: "Manajemen Ketrampilan",
                 href: "/dashboard/mahasiswa/skills"
-            },
-            {
-                label: "Manajemen Kategori",
-                href: "/dashboard/mahasiswa/categories"
             }
         ]
     },

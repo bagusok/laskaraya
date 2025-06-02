@@ -114,22 +114,6 @@ Route::prefix('dashboard/admin/categories')->middleware(['auth'])->group(functio
     Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 });
 
-// Routes untuk Dosen
-Route::prefix('dashboard/dosen/categories')->middleware(['auth'])->group(function () {
-    Route::get('/', [CategoryController::class, 'indexDosen'])->name('dosen.categories.index');
-    Route::post('/', [CategoryController::class, 'storeDosen'])->name('dosen.categories.store');
-    Route::put('/{id}', [CategoryController::class, 'updateDosen'])->name('dosen.categories.update');
-    Route::delete('/{id}', [CategoryController::class, 'destroyDosen'])->name('dosen.categories.destroy');
-});
-
-// Routes untuk Mahasiswa
-Route::prefix('dashboard/mahasiswa/categories')->middleware(['auth'])->group(function () {
-    Route::get('/', [CategoryController::class, 'indexMahasiswa'])->name('mahasiswa.categories.index');
-    Route::post('/', [CategoryController::class, 'storeMahasiswa'])->name('mahasiswa.categories.store');
-    Route::put('/{id}', [CategoryController::class, 'updateMahasiswa'])->name('mahasiswa.categories.update');
-    Route::delete('/{id}', [CategoryController::class, 'destroyMahasiswa'])->name('mahasiswa.categories.destroy');
-});
-
 include __DIR__ . '/admin.php';
 include __DIR__ . '/mahasiswa.php';
 include __DIR__ . '/dosen.php';
