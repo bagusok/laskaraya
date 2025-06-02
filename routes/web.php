@@ -9,6 +9,7 @@ use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -103,6 +104,30 @@ Route::middleware(['auth', 'role:mahasiswa'])->prefix('dashboard/mahasiswa/skill
     Route::post('/', [SkillController::class, 'storeMahasiswa'])->name('mahasiswa.skills.store');
     Route::put('/{id}', [SkillController::class, 'updateMahasiswa'])->name('mahasiswa.skills.update');
     Route::delete('/{id}', [SkillController::class, 'destroyMahasiswa'])->name('mahasiswa.skills.destroy');
+});
+
+// Routes untuk Admin
+Route::prefix('dashboard/admin/categories')->middleware(['auth'])->group(function () {
+    Route::get('/', [CategoryController::class, 'index'])->name('admin.categories.index');
+    Route::post('/', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+});
+
+// Routes untuk Dosen
+Route::prefix('dashboard/dosen/categories')->middleware(['auth'])->group(function () {
+    Route::get('/', [CategoryController::class, 'indexDosen'])->name('dosen.categories.index');
+    Route::post('/', [CategoryController::class, 'storeDosen'])->name('dosen.categories.store');
+    Route::put('/{id}', [CategoryController::class, 'updateDosen'])->name('dosen.categories.update');
+    Route::delete('/{id}', [CategoryController::class, 'destroyDosen'])->name('dosen.categories.destroy');
+});
+
+// Routes untuk Mahasiswa
+Route::prefix('dashboard/mahasiswa/categories')->middleware(['auth'])->group(function () {
+    Route::get('/', [CategoryController::class, 'indexMahasiswa'])->name('mahasiswa.categories.index');
+    Route::post('/', [CategoryController::class, 'storeMahasiswa'])->name('mahasiswa.categories.store');
+    Route::put('/{id}', [CategoryController::class, 'updateMahasiswa'])->name('mahasiswa.categories.update');
+    Route::delete('/{id}', [CategoryController::class, 'destroyMahasiswa'])->name('mahasiswa.categories.destroy');
 });
 
 include __DIR__ . '/admin.php';
