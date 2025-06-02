@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AdminAchievementController;
 use App\Http\Controllers\admin\AdminCompetitionController;
 use App\Http\Controllers\admin\AdminTeamController;
 use Illuminate\Support\Facades\Route;
@@ -29,5 +30,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
         Route::delete('/{id}', [AdminTeamController::class, 'destroy'])->name('admin.teams.destroy');
         Route::get('/get-all', [AdminTeamController::class, 'getAllTeams'])->name('admin.teams.getAll');
+    });
+
+    Route::group(['prefix' => 'achievements', 'middleware' => ['role:admin']], function () {
+        Route::get('/', [AdminAchievementController::class, 'index'])->name('admin.achievements.index');
+        Route::get('/get-all', [AdminAchievementController::class, 'getAllAchievements'])->name('admin.achievements.getAll');
+        Route::get('/create', [AdminAchievementController::class, 'createWithCompletedCompetition'])->name('admin.achievements.create');
+        Route::post('/create', [AdminAchievementController::class, 'postCreateWithCompletedCompetition'])->name('admin.achievements.create.post');
+        Route::delete('/delete/{id}', [AdminAchievementController::class, 'destroy'])->name('admin.achievements.destroy');
+
+        Route::get('/detail/{id}', [AdminAchievementController::class, 'detail'])->name('admin.achievements.detail');
+        Route::post('/response/{id}', [AdminAchievementController::class, 'responseAchievement'])->name('admin.achievements.response');
     });
 });

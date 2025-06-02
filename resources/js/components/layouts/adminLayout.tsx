@@ -36,7 +36,9 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
             <div className="lg:ml-72">
                 <div className="sticky top-0 z-30 bg-white lg:shadow-none lg:static mt-2">
                     <Header
-                        user={user}
+                        user={{
+                            name: user?.name ?? "Pengguna"
+                        }}
                         onToggleSidebar={toggleSidebar}
                         title={title}
                     />

@@ -58,6 +58,11 @@ export const navItems: NavItem[] = [
             },
             { label: "Laporan & Analisis", href: "/dashboard/reports" }
         ]
+    },
+    {
+        label: "Prestasi Mahasiswa",
+        icon: <Medal />,
+        href: route("admin.achievements.index")
     }
 ];
 
