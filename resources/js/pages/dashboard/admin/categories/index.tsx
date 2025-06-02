@@ -2,10 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminLayout from "@/components/layouts/adminLayout";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";
-import AddSkillModal from "@/components/ui/admin/skill/addSkillModal";
+import AddCategoryModal from "@/components/ui/admin/category/addCategoryModal";
 import React, { useState, useMemo } from "react";
 import { router, usePage } from "@inertiajs/react";
-import type { Skill } from "@/types/skill";
+import type { Category } from "@/types/category";
 import {
     Dialog,
     DialogClose,
@@ -17,77 +17,77 @@ import {
 } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 
-export default function SkillsManagementAdmin() {
+export default function CategoriesManagementAdmin() {
     const [modalOpen, setModalOpen] = useState(false);
-    const [editData, setEditData] = useState<Skill | null>(null);
-    const [deleteSkill, setDeleteSkill] = useState<Skill | null>(null);
+    const [editData, setEditData] = useState<Category | null>(null);
+    const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
     const [deleting, setDeleting] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const skills = usePage<{ skills: Skill[] }>().props.skills;
+    const categories = usePage<{ categories: Category[] }>().props.categories;
 
-    // Filter skills based on search query
-    const filteredSkills = useMemo(() => {
+    // Filter categories based on search query
+    const filteredCategories = useMemo(() => {
         if (!searchQuery.trim()) {
-            return skills;
+            return categories;
         }
-        return skills.filter(skill =>
-            skill.name.toLowerCase().includes(searchQuery.toLowerCase())
+        return categories.filter(category =>
+            category.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
-    }, [skills, searchQuery]);
+    }, [categories, searchQuery]);
 
     const handleAdd = () => {
         setEditData(null);
         setModalOpen(true);
     };
 
-    const handleEdit = (skill: Skill) => {
-        setEditData(skill);
+    const handleEdit = (category: Category) => {
+        setEditData(category);
         setModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
         setDeleting(true);
-        router.delete(`/dashboard/skills/${id}`, {
+        router.delete(`/dashboard/admin/categories/${id}`, {
             onSuccess: () => {
-                toast.success("Ketrampilan berhasil dihapus.");
-                setDeleteSkill(null);
+                toast.success("Kategori berhasil dihapus.");
+                setDeleteCategory(null);
             },
-            onError: () => toast.error("Gagal menghapus ketrampilan."),
+            onError: () => toast.error("Gagal menghapus kategori."),
             onFinish: () => setDeleting(false),
         });
     };
 
-    const handleSubmit = (data: Skill) => {
+    const handleSubmit = (data: Category) => {
         if (data.id) {
-            router.put(`/dashboard/skills/${data.id}`, data, {
+            router.put(`/dashboard/admin/categories/${data.id}`, data, {
                 onSuccess: () => {
-                    toast.success("Ketrampilan berhasil diperbarui!");
+                    toast.success("Kategori berhasil diperbarui!");
                     setModalOpen(false);
                 },
-                onError: () => toast.error("Gagal memperbarui ketrampilan."),
+                onError: () => toast.error("Gagal memperbarui kategori."),
             });
         } else {
-            router.post("/dashboard/skills", data, {
+            router.post("/dashboard/admin/categories", data, {
                 onSuccess: () => {
-                    toast.success("Ketrampilan berhasil ditambahkan!");
+                    toast.success("Kategori berhasil ditambahkan!");
                     setModalOpen(false);
                 },
-                onError: () => toast.error("Gagal menambahkan ketrampilan."),
+                onError: () => toast.error("Gagal menambahkan kategori."),
             });
         }
     };
 
     return (
-        <AdminLayout title="Manajemen Ketrampilan">
+        <AdminLayout title="Manajemen Kategori">
             <Card className="border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all">
                 <CardHeader className="pb-3">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-xl font-bold text-gray-900">
-                            Manajemen Ketrampilan
+                            Manajemen Kategori
                         </CardTitle>
                         <Button onClick={handleAdd} className="bg-purple-600 hover:bg-purple-700 text-white" type="button">
-                            <Plus className="mr-2" size={16}/>Tambah Ketrampilan
+                            <Plus className="mr-2" size={16}/>Tambah Kategori
                         </Button>
                     </div>
 
@@ -97,7 +97,7 @@ export default function SkillsManagementAdmin() {
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <input
                                 type="text"
-                                placeholder="Cari ketrampilan..."
+                                placeholder="Cari kategori..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -105,7 +105,7 @@ export default function SkillsManagementAdmin() {
                         </div>
                         {searchQuery && (
                             <div className="mt-2 text-sm text-gray-600">
-                                Ditemukan {filteredSkills.length} dari {skills.length} ketrampilan
+                                Ditemukan {filteredCategories.length} dari {categories.length} kategori
                             </div>
                         )}
                     </div>
@@ -121,27 +121,27 @@ export default function SkillsManagementAdmin() {
                             </tr>
                             </thead>
                             <tbody>
-                            {filteredSkills.map((skill, idx) => (
-                                <tr key={skill.id} className="border-b hover:bg-purple-100/30 hover:scale-[1.01] transition-all duration-200">
+                            {filteredCategories.map((category, idx) => (
+                                <tr key={category.id} className="border-b hover:bg-purple-100/30 hover:scale-[1.01] transition-all duration-200">
                                     <td className="p-4 text-center text-gray-700">{idx + 1}</td>
                                     <td className="p-4 text-gray-700">
-                                            <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                                            <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
                                                 {/* Highlight search matches */}
                                                 {searchQuery ? (
-                                                    skill.name.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, i) =>
+                                                    category.name.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, i) =>
                                                         part.toLowerCase() === searchQuery.toLowerCase() ? (
                                                             <mark key={i} className="bg-yellow-200 rounded px-1">{part}</mark>
                                                         ) : part
                                                     )
-                                                ) : skill.name}
+                                                ) : category.name}
                                             </span>
                                     </td>
                                     <td className="p-4 text-center text-gray-700">
                                         <div className="flex justify-center items-center gap-2">
-                                            <Button size="icon" variant="ghost" onClick={() => handleEdit(skill)}>
+                                            <Button size="icon" variant="ghost" onClick={() => handleEdit(category)}>
                                                 <Pencil className="h-4 w-4 text-purple-600" />
                                             </Button>
-                                            <Dialog open={deleteSkill?.id === skill.id} onOpenChange={open => setDeleteSkill(open ? skill : null)}>
+                                            <Dialog open={deleteCategory?.id === category.id} onOpenChange={open => setDeleteCategory(open ? category : null)}>
                                                 <DialogTrigger asChild>
                                                     <Button
                                                         size="icon"
@@ -153,19 +153,19 @@ export default function SkillsManagementAdmin() {
                                                 </DialogTrigger>
                                                 <DialogContent>
                                                     <DialogHeader>
-                                                        <DialogTitle>Hapus Ketrampilan</DialogTitle>
+                                                        <DialogTitle>Hapus Kategori</DialogTitle>
                                                     </DialogHeader>
-                                                    <p>Yakin ingin menghapus <strong>{skill.name}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+                                                    <p>Yakin ingin menghapus <strong>{category.name}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
                                                     <DialogFooter>
                                                         <DialogClose asChild>
                                                             <button className="px-4 py-2 border rounded">Batal</button>
                                                         </DialogClose>
                                                         <button
-                                                            onClick={() => handleDelete(skill.id)}
+                                                            onClick={() => handleDelete(category.id)}
                                                             disabled={deleting}
                                                             className="px-6 py-2 bg-red-800 text-white rounded"
                                                         >
-                                                            {deleting && deleteSkill?.id === skill.id ? "Menghapus..." : "Hapus"}
+                                                            {deleting && deleteCategory?.id === category.id ? "Menghapus..." : "Hapus"}
                                                         </button>
                                                     </DialogFooter>
                                                 </DialogContent>
@@ -174,24 +174,24 @@ export default function SkillsManagementAdmin() {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredSkills.length === 0 && searchQuery && (
+                            {filteredCategories.length === 0 && searchQuery && (
                                 <tr>
                                     <td colSpan={3} className="text-center p-4 text-gray-500">
-                                        Tidak ada ketrampilan yang cocok dengan pencarian "{searchQuery}"
+                                        Tidak ada kategori yang cocok dengan pencarian "{searchQuery}"
                                     </td>
                                 </tr>
                             )}
-                            {skills.length === 0 && !searchQuery && (
+                            {categories.length === 0 && !searchQuery && (
                                 <tr>
-                                    <td colSpan={3} className="text-center p-4 text-gray-500">Belum ada data ketrampilan.</td>
+                                    <td colSpan={3} className="text-center p-4 text-gray-500">Belum ada data kategori.</td>
                                 </tr>
                             )}
                             </tbody>
                         </table>
                     </div>
                 </CardContent>
-            </Card>``
-            <AddSkillModal
+            </Card>
+            <AddCategoryModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onSubmit={handleSubmit}
