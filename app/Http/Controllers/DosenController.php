@@ -14,10 +14,14 @@ class DosenController extends Controller
     {
         $dosenId = auth()->user()->id;
 
-        // Ambil data dari dosen_profiles
-        $dosenProfile = DosenModel::where('user_id', $dosenId)->first();
-        $totalCompetitions = $dosenProfile ? $dosenProfile->total_competitions : 0;
-        $totalWins = $dosenProfile ? $dosenProfile->total_wins : 0;
+        // Cek dan buat data jika belum ada
+        $dosenProfile = \App\Models\DosenModel::firstOrCreate(
+            ['user_id' => $dosenId],
+            ['total_competitions' => 0, 'total_wins' => 0]
+        );
+
+        $totalCompetitions = $dosenProfile->total_competitions;
+        $totalWins = $dosenProfile->total_wins;
         $winRate = $totalCompetitions > 0 ? round(($totalWins / $totalCompetitions) * 100) : 0;
 
         // Hitung total mahasiswa yang dibimbing

@@ -71,6 +71,13 @@ interface Dosen extends IUser {
     competitions: number;
 }
 
+function getRekomendasiLabel(score: number) {
+    if (score >= 0.8) return "Sangat Direkomendasikan";
+    if (score >= 0.6) return "Direkomendasikan";
+    if (score >= 0.4) return "Cukup";
+    return "Kurang";
+}
+
 export default function JoinCompetition({
     competition,
     dosen,
@@ -296,7 +303,7 @@ export default function JoinCompetition({
                                                         )
                                                         .map((d) => ({
                                                             value: d.id,
-                                                            label: `${d.name} (Score: ${(d.score * 100).toFixed(2)}%) - Skills: ${(d.skills * 100).toFixed(0)}% - Wins: ${d.wins} - Competitions: ${d.competitions}`,
+                                                            label: `${d.name} (${Math.round(d.score * 100)} - ${getRekomendasiLabel(d.score)})`,
                                                             email: d.email,
                                                             identifier:
                                                                 d.identifier ||
@@ -313,7 +320,7 @@ export default function JoinCompetition({
                                                 }}
                                                 options={dosen.map((d) => ({
                                                     value: d.id,
-                                                    label: `${d.name} (Score: ${(d.score * 100).toFixed(2)}%) - Skills: ${(d.skills * 100).toFixed(0)}% - Wins: ${d.wins} - Competitions: ${d.competitions}`,
+                                                    label: `${d.name} (${Math.round(d.score * 100)} - ${getRekomendasiLabel(d.score)})`,
                                                     email: d.email,
                                                     identifier:
                                                         d.identifier || ""
