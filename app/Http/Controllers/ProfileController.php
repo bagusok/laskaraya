@@ -54,6 +54,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        Log::info('RAW REQUEST:', $request->all());
         /** @var UserModel $user */
         $user = Auth::user();
 
@@ -92,6 +93,8 @@ class ProfileController extends Controller
             'skills' => 'nullable|array',
             'skills.*.id' => 'required|exists:skills,id',
             'skills.*.level' => 'required|integer|min:1|max:5',
+            'total_competitions' => 'nullable|numeric',
+            'total_wins' => 'nullable|numeric',
         ])->validate();
 
         try {
@@ -128,6 +131,12 @@ class ProfileController extends Controller
                     'gender' => $validated['gender'] ?? null,
                     'birth_place' => $validated['birth_place'] ?? null,
                     'birth_date' => $validated['birth_date'] ?? null,
+                    'total_competitions' => isset($validated['total_competitions'])
+                        ? (int)$validated['total_competitions']
+                        : ($user->dosen ? $user->dosen->total_competitions : 0),
+                    'total_wins' => isset($validated['total_wins'])
+                        ? (int)$validated['total_wins']
+                        : ($user->dosen ? $user->dosen->total_wins : 0),
                 ];
 
                 if ($user->dosen) {
@@ -169,6 +178,9 @@ class ProfileController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating profile: ' . $e->getMessage());
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                Log::error('VALIDATION ERRORS: ' . json_encode($e->errors()));
+            }
             return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui profil: ' . $e->getMessage()]);
         }
     }

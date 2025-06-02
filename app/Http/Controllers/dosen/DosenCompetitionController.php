@@ -90,7 +90,7 @@ class DosenCompetitionController extends Controller
         ]);
 
         if ($request->query('type') == 'dosen_competitions') {
-            $competitions = UserToCompetition::with(['competition', 'competition.category', 'competition.period'])
+            $competitions = UserToCompetition::with(['competition', 'competition.category', 'competition.period', 'competitionMembers.user'])
                 ->where('dosen_id', auth()->user()->id)
                 ->where('status', 'accepted')
                 ->whereHas('competition', function ($query) use ($status, $verif_status, $searchQuery) {
@@ -108,10 +108,39 @@ class DosenCompetitionController extends Controller
                 ->paginate($perPage);
 
             $competitions->getCollection()->transform(function ($item) {
-                return $item->competition;
+                return [
+                    'id' => $item->competition->id,
+                    'name' => $item->competition->name,
+                    'category' => $item->competition->category,
+                    'start_date' => $item->competition->start_date,
+                    'end_date' => $item->competition->end_date,
+                    'status' => $item->competition->status,
+                    'members' => $item->competitionMembers->map(function ($member) {
+                        return [
+                            'id' => $member->id,
+                            'user_id' => $member->user_id,
+                            'user_to_competition_id' => $member->user_to_competition_id,
+                            'user' => $member->user,
+                            'userToCompetition' => [
+                                'id' => $member->userToCompetition->id,
+                                'name' => $member->userToCompetition->name,
+                                'competition_id' => $member->userToCompetition->competition_id,
+                                'status' => $member->userToCompetition->status,
+                                'competition' => [
+                                    'id' => $member->userToCompetition->competition->id,
+                                    'name' => $member->userToCompetition->competition->name,
+                                    'category' => $member->userToCompetition->competition->category,
+                                    'start_date' => $member->userToCompetition->competition->start_date,
+                                    'end_date' => $member->userToCompetition->competition->end_date,
+                                    'status' => $member->userToCompetition->competition->status,
+                                ]
+                            ]
+                        ];
+                    })
+                ];
             })->unique('id');
         } else {
-            $competitions = CompetitionModel::with(['category', 'period'])
+            $competitions = CompetitionModel::with(['category', 'period', 'userToCompetition.competitionMembers.user'])
                 ->where(function ($query) use ($status, $verif_status, $searchQuery, $uploader_id) {
                     if ($status) {
                         $query->where('status', $status);
@@ -129,6 +158,41 @@ class DosenCompetitionController extends Controller
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
+
+            $competitions->getCollection()->transform(function ($competition) {
+                return [
+                    'id' => $competition->id,
+                    'name' => $competition->name,
+                    'category' => $competition->category,
+                    'start_date' => $competition->start_date,
+                    'end_date' => $competition->end_date,
+                    'status' => $competition->status,
+                    'members' => $competition->userToCompetition->flatMap(function ($userToCompetition) use ($competition) {
+                        return $userToCompetition->competitionMembers->map(function ($member) use ($competition, $userToCompetition) {
+                            return [
+                                'id' => $member->id,
+                                'user_id' => $member->user_id,
+                                'user_to_competition_id' => $member->user_to_competition_id,
+                                'user' => $member->user,
+                                'userToCompetition' => [
+                                    'id' => $userToCompetition->id,
+                                    'name' => $userToCompetition->name,
+                                    'competition_id' => $userToCompetition->competition_id,
+                                    'status' => $userToCompetition->status,
+                                    'competition' => [
+                                        'id' => $competition->id,
+                                        'name' => $competition->name,
+                                        'category' => $competition->category,
+                                        'start_date' => $competition->start_date,
+                                        'end_date' => $competition->end_date,
+                                        'status' => $competition->status,
+                                    ]
+                                ]
+                            ];
+                        });
+                    })
+                ];
+            });
         }
 
         return response()->json([

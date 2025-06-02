@@ -26,7 +26,14 @@ import { cn } from "@/lib/utils";
 
 type Props = {
     competition: Competition;
-    dosen: IUser[];
+    dosen: Array<
+        IUser & {
+            score: number;
+            skills: number;
+            wins: number;
+            competitions: number;
+        }
+    >;
     mahasiswa: IUser[];
     category: {
         id: number;
@@ -56,6 +63,13 @@ type DosenOption = {
 };
 
 type TeamMember = IUser;
+
+interface Dosen extends IUser {
+    score: number;
+    skills: number;
+    wins: number;
+    competitions: number;
+}
 
 export default function JoinCompetition({
     competition,
@@ -270,81 +284,92 @@ export default function JoinCompetition({
                                         <Label htmlFor="dosen">
                                             Dosen Pembimbing *
                                         </Label>
-                                        <Select<DosenOption>
-                                            id="dosen"
-                                            value={
-                                                dosen
-                                                    .filter(
-                                                        (d) =>
-                                                            d.id ===
-                                                            data.dosen_id
-                                                    )
-                                                    .map((d) => ({
-                                                        value: d.id,
-                                                        label: `${d.name} (${d.identifier || ""})`,
-                                                        email: d.email,
-                                                        identifier:
-                                                            d.identifier || ""
-                                                    }))[0]
-                                            }
-                                            onChange={(selectedOption) => {
-                                                setData(
-                                                    "dosen_id",
-                                                    selectedOption
-                                                        ? selectedOption.value
-                                                        : 0
-                                                );
-                                            }}
-                                            options={dosen.map((d) => ({
-                                                value: d.id,
-                                                label: `${d.name} (${d.identifier || ""})`,
-                                                email: d.email,
-                                                identifier: d.identifier || ""
-                                            }))}
-                                            placeholder="Pilih dosen pembimbing"
-                                            isSearchable
-                                            isClearable
-                                            formatOptionLabel={(option) => (
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium">
-                                                        {option.label}
-                                                    </span>
-                                                    <span className="text-xs text-gray-500">
-                                                        {option.email}
-                                                    </span>
-                                                </div>
+                                        <div className="mb-4">
+                                            <Select<DosenOption>
+                                                id="dosen"
+                                                value={
+                                                    dosen
+                                                        .filter(
+                                                            (d) =>
+                                                                d.id ===
+                                                                data.dosen_id
+                                                        )
+                                                        .map((d) => ({
+                                                            value: d.id,
+                                                            label: `${d.name} (Score: ${(d.score * 100).toFixed(2)}%) - Skills: ${(d.skills * 100).toFixed(0)}% - Wins: ${d.wins} - Competitions: ${d.competitions}`,
+                                                            email: d.email,
+                                                            identifier:
+                                                                d.identifier ||
+                                                                ""
+                                                        }))[0]
+                                                }
+                                                onChange={(selectedOption) => {
+                                                    setData(
+                                                        "dosen_id",
+                                                        selectedOption
+                                                            ? selectedOption.value
+                                                            : 0
+                                                    );
+                                                }}
+                                                options={dosen.map((d) => ({
+                                                    value: d.id,
+                                                    label: `${d.name} (Score: ${(d.score * 100).toFixed(2)}%) - Skills: ${(d.skills * 100).toFixed(0)}% - Wins: ${d.wins} - Competitions: ${d.competitions}`,
+                                                    email: d.email,
+                                                    identifier:
+                                                        d.identifier || ""
+                                                }))}
+                                                placeholder="Pilih dosen pembimbing"
+                                                isSearchable
+                                                isClearable
+                                                formatOptionLabel={(option) => (
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium">
+                                                            {option.label}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500">
+                                                            {option.email}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                filterOption={(
+                                                    option,
+                                                    inputValue
+                                                ) => {
+                                                    const searchValue =
+                                                        inputValue.toLowerCase();
+                                                    return (
+                                                        option.label
+                                                            .toLowerCase()
+                                                            .includes(
+                                                                searchValue
+                                                            ) ||
+                                                        option.data.email
+                                                            .toLowerCase()
+                                                            .includes(
+                                                                searchValue
+                                                            ) ||
+                                                        option.data.identifier
+                                                            .toLowerCase()
+                                                            .includes(
+                                                                searchValue
+                                                            )
+                                                    );
+                                                }}
+                                                noOptionsMessage={() =>
+                                                    "Tidak ada dosen ditemukan"
+                                                }
+                                            />
+                                            <p className="mt-1 text-sm text-gray-500">
+                                                Dosen diurutkan berdasarkan
+                                                rekomendasi sistem menggunakan
+                                                metode TOPSIS
+                                            </p>
+                                            {errors.dosen_id && (
+                                                <small className="text-red-600 text-xs">
+                                                    * {errors.dosen_id}
+                                                </small>
                                             )}
-                                            filterOption={(
-                                                option,
-                                                inputValue
-                                            ) => {
-                                                const searchValue =
-                                                    inputValue.toLowerCase();
-                                                return (
-                                                    option.label
-                                                        .toLowerCase()
-                                                        .includes(
-                                                            searchValue
-                                                        ) ||
-                                                    option.data.email
-                                                        .toLowerCase()
-                                                        .includes(
-                                                            searchValue
-                                                        ) ||
-                                                    option.data.identifier
-                                                        .toLowerCase()
-                                                        .includes(searchValue)
-                                                );
-                                            }}
-                                            noOptionsMessage={() =>
-                                                "Tidak ada dosen ditemukan"
-                                            }
-                                        />
-                                        {errors.dosen_id && (
-                                            <small className="text-red-600 text-xs">
-                                                * {errors.dosen_id}
-                                            </small>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
 

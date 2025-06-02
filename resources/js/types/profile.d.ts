@@ -11,6 +11,8 @@ export interface DosenProfile {
     gender: "L" | "P" | null;
     birth_place: string | null;
     birth_date: string | null;
+    total_competitions?: number;
+    total_wins?: number;
     created_at: string;
     updated_at: string;
 }

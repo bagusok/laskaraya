@@ -5,22 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use App\Models\DosenModel;
 
 class DosenController extends Controller
 {
 
     public function index(Request $request)
     {
-        return Inertia::render('dashboard/dosen/mahasiswaBimbingan', [
-            'mahasiswa' => [
-                'data' => [],
-                'current_page' => 1,
-                'last_page' => 1,
-                'per_page' => 10,
-                'total_page' => 1,
-                'total_data' => 0,
+        $dosenId = auth()->user()->id;
+
+        // Ambil data dari dosen_profiles
+        $dosenProfile = DosenModel::where('user_id', $dosenId)->first();
+        $totalCompetitions = $dosenProfile ? $dosenProfile->total_competitions : 0;
+        $totalWins = $dosenProfile ? $dosenProfile->total_wins : 0;
+        $winRate = $totalCompetitions > 0 ? round(($totalWins / $totalCompetitions) * 100) : 0;
+
+        // Hitung total mahasiswa yang dibimbing
+        $totalStudents = \App\Models\UserToCompetition::where('dosen_id', $dosenId)
+            ->with('competitionMembers')
+            ->get()
+            ->pluck('competitionMembers')
+            ->flatten()
+            ->pluck('user_id')
+            ->unique()
+            ->count();
+
+        // Ambil data mahasiswa bimbingan
+        $mahasiswaBimbingan = \App\Models\CompetitionMember::with(['user', 'userToCompetition.competition.category'])
+            ->whereHas('userToCompetition', function ($query) use ($dosenId) {
+                $query->where('dosen_id', $dosenId)
+                    ->where('status', 'accepted');
+            })
+            ->get();
+
+        return Inertia::render('dashboard/dosen/index', [
+            'stats' => [
+                'total_competitions' => $totalCompetitions,
+                'total_wins' => $totalWins,
+                'total_students' => $totalStudents,
+                'win_rate' => $winRate,
             ],
-            'mahasiswaList' => [],
+            'mahasiswaBimbingan' => $mahasiswaBimbingan,
         ]);
     }
 

@@ -1,21 +1,38 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { User } from "@/types/profile";
 
-interface Mahasiswa {
-    nama: string;
-    prestasi: string;
-    kategori: string;
-    tahun: number;
-    status: string;
+interface CompetitionMember {
+    id: number;
+    user_id: number;
+    user_to_competition_id: number;
+    user: User;
+    userToCompetition: {
+        id: number;
+        name: string;
+        competition_id: number;
+        status: "pending" | "accepted" | "rejected";
+        competition: {
+            id: number;
+            name: string;
+            category: {
+                id: number;
+                name: string;
+            };
+            start_date: string;
+            end_date: string;
+            status: string;
+        };
+    };
 }
 
 interface MahasiswaBimbinganListProps {
-    data: Mahasiswa[];
+    data: CompetitionMember[];
 }
 
 export default function MahasiswaBimbinganList({
-    data
+    data = []
 }: MahasiswaBimbinganListProps) {
     return (
         <div className="admin-card">
@@ -43,44 +60,60 @@ export default function MahasiswaBimbinganList({
                                 <thead>
                                     <tr className="text-gray-700 border-b">
                                         <th className="py-2 px-2">Nama</th>
-                                        <th className="py-2 px-2">Prestasi</th>
-                                        <th className="py-2 px-2">Kategori</th>
-                                        <th className="py-2 px-2">Tahun</th>
+                                        <th className="py-2 px-2">NIM</th>
+                                        <th className="py-2 px-2">Nama Tim</th>
+                                        <th className="py-2 px-2">
+                                            Nama Lomba
+                                        </th>
                                         <th className="py-2 px-2">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data.map((mhs, idx) => (
+                                    {(data ?? []).map((member) => (
                                         <tr
-                                            key={idx}
+                                            key={member.id}
                                             className="border-b last:border-0 group hover:bg-purple-100/30 hover:scale-[1.01] hover:shadow-sm transition-all duration-200 rounded-lg"
                                         >
                                             <td className="py-2 px-2 font-medium text-purple-800">
-                                                {mhs.nama}
+                                                {member.user.name}
                                             </td>
                                             <td className="py-2 px-2">
-                                                {mhs.prestasi}
+                                                {member.user.identifier}
                                             </td>
                                             <td className="py-2 px-2">
-                                                {mhs.kategori}
+                                                {member.userToCompetition.name}
                                             </td>
                                             <td className="py-2 px-2">
-                                                {mhs.tahun}
+                                                {
+                                                    member.userToCompetition
+                                                        .competition.name
+                                                }
                                             </td>
                                             <td className="py-2 px-2">
                                                 <span
                                                     className={`text-xs px-2 py-0.5 rounded-full ${
-                                                        mhs.status === "ongoing"
+                                                        member.userToCompetition
+                                                            .competition
+                                                            .status ===
+                                                        "ongoing"
                                                             ? "bg-blue-100 text-blue-700"
-                                                            : mhs.status ===
+                                                            : member
+                                                                    .userToCompetition
+                                                                    .competition
+                                                                    .status ===
                                                                 "completed"
                                                               ? "bg-green-100 text-green-700"
                                                               : "bg-red-100 text-red-700"
                                                     }`}
                                                 >
-                                                    {mhs.status === "ongoing"
+                                                    {member.userToCompetition
+                                                        .competition.status ===
+                                                    "ongoing"
                                                         ? "Sedang Berlangsung"
-                                                        : mhs.status ===
+                                                        : member
+                                                                .userToCompetition
+                                                                .competition
+                                                                .status ===
                                                             "completed"
                                                           ? "Selesai"
                                                           : "Dibatalkan"}

@@ -87,4 +87,9 @@ class UserModel extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserToSkill::class, 'user_id');
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(SkillModel::class, 'user_to_skills', 'user_id', 'skill_id')->withPivot('level');
+    }
 }
