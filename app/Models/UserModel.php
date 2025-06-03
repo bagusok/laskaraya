@@ -102,4 +102,9 @@ class UserModel extends Authenticatable
             'competition_id'
         )->withPivot('status', 'notes');
     }
+
+    public function competitionMember()
+    {
+        return $this->hasMany(CompetitionMember::class, 'user_id');
+    }
 }

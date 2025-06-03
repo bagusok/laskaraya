@@ -353,188 +353,206 @@ export default function TeamDetail({
                     </Card>
 
                     {/* Formulir Prestasi */}
-                    {team.status == "accepted" && (
-                        <>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Prestasi</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        <CustomInput
-                                            label="Nama Prestasi"
-                                            placeholder="Juara 1 KMIPN"
-                                            onChange={(e) =>
-                                                setData("name", e.target.value)
-                                            }
-                                            value={data.name}
-                                            error={errors.name}
-                                            required
-                                            type="text"
-                                            disabled
-                                        />
-                                        <div>
-                                            <Label className="text-purple-900 mb-1">
-                                                Peringkat
-                                            </Label>
-                                            <Select
-                                                onValueChange={(value) =>
-                                                    setData(
-                                                        "champion",
-                                                        Number(value) as
-                                                            | 1
-                                                            | 2
-                                                            | 3
-                                                            | 4
-                                                            | 5
-                                                    )
-                                                }
-                                                value={data.champion.toString()}
-                                                disabled
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Pilih Peringkat" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="1">
-                                                        Peringkat 1
-                                                    </SelectItem>
-                                                    <SelectItem value="2">
-                                                        Peringkat 2
-                                                    </SelectItem>
-                                                    <SelectItem value="3">
-                                                        Peringkat 3
-                                                    </SelectItem>
-                                                    <SelectItem value="4">
-                                                        Peringkat 4
-                                                    </SelectItem>
-                                                    <SelectItem value="5">
-                                                        Peringkat 5
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <CustomInput
-                                            label="Skor (Skala 100, Jika Koma dibulatkan)"
-                                            placeholder="Masukkan skor"
-                                            onChange={(e) =>
-                                                setData(
-                                                    "score",
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                            value={data.score.toString()}
-                                            error={errors.score}
-                                            required
-                                            type="number"
-                                            disabled
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card className="rounded-2xl shadow-lg">
-                                <CardHeader>
-                                    <CardTitle className="text-xl font-semibold">
-                                        Sertifikat (Jika Ada)
-                                    </CardTitle>
-                                    <p className="text-sm text-muted-foreground">
-                                        File dapat berupa PDF, JPG, JPEG, atau
-                                        PNG.
-                                    </p>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {members.map((member) => {
-                                            const uploaded =
-                                                data.certificates.find(
-                                                    (c) =>
-                                                        c.user_id === member.id
-                                                )?.file;
-
-                                            const fileUrl =
-                                                achievement?.certificates.find(
-                                                    (cert) =>
-                                                        cert.user_id ===
-                                                        member.id
-                                                );
-
-                                            return (
-                                                <div key={member.id}>
-                                                    <Label className="mb-2 block text-sm font-medium text-gray-700">
-                                                        Sertifikat untuk{" "}
-                                                        {member.name}
+                    {(team.status == "accepted" &&
+                        competition.status !== "completed") ||
+                        (competition.status == "completed" &&
+                            team.status == "pending" && (
+                                <>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Prestasi</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-4">
+                                                <CustomInput
+                                                    label="Nama Prestasi"
+                                                    placeholder="Juara 1 KMIPN"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "name",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    value={data.name}
+                                                    error={errors.name}
+                                                    required
+                                                    type="text"
+                                                    disabled
+                                                />
+                                                <div>
+                                                    <Label className="text-purple-900 mb-1">
+                                                        Peringkat
                                                     </Label>
-
-                                                    <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 hover:border-primary transition overflow-hidden">
-                                                        <div className="text-sm text-gray-600 group-hover:text-primary overflow-hidden text-ellipsis whitespace-nowrap">
-                                                            {uploaded
-                                                                ? uploaded.name
-                                                                : "Pilih file sertifikat"}
-                                                        </div>
-
-                                                        <input
-                                                            type="file"
-                                                            accept=".pdf,.jpg,.jpeg,.png"
-                                                            onChange={(e) => {
-                                                                const file =
-                                                                    e.target
-                                                                        .files?.[0] ||
-                                                                    null;
-                                                                setData(
-                                                                    "certificates",
-                                                                    data.certificates.map(
-                                                                        (
-                                                                            cert
-                                                                        ) =>
-                                                                            cert.user_id ===
-                                                                            member.id
-                                                                                ? {
-                                                                                      ...cert,
-                                                                                      file
-                                                                                  }
-                                                                                : cert
-                                                                    )
-                                                                );
-                                                            }}
-                                                            className="hidden"
-                                                            disabled
-                                                        />
-                                                    </label>
-
-                                                    {fileUrl?.file_url && (
-                                                        <a
-                                                            className="mt-2 text-blue-400 hover:underline text-xs"
-                                                            href={
-                                                                fileUrl.file_url
-                                                            }
-                                                            target="_blank"
-                                                        >
-                                                            Lihat Sertifikat
-                                                        </a>
-                                                    )}
-
-                                                    {errors.certificates &&
-                                                        errors.certificates[
-                                                            member.id
-                                                        ] && (
-                                                            <p className="text-red-500 text-xs mt-1">
-                                                                {
-                                                                    errors
-                                                                        .certificates[
-                                                                        member
-                                                                            .id
-                                                                    ]
-                                                                }
-                                                            </p>
-                                                        )}
+                                                    <Select
+                                                        onValueChange={(
+                                                            value
+                                                        ) =>
+                                                            setData(
+                                                                "champion",
+                                                                Number(
+                                                                    value
+                                                                ) as
+                                                                    | 1
+                                                                    | 2
+                                                                    | 3
+                                                                    | 4
+                                                                    | 5
+                                                            )
+                                                        }
+                                                        value={data.champion.toString()}
+                                                        disabled
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Pilih Peringkat" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="1">
+                                                                Peringkat 1
+                                                            </SelectItem>
+                                                            <SelectItem value="2">
+                                                                Peringkat 2
+                                                            </SelectItem>
+                                                            <SelectItem value="3">
+                                                                Peringkat 3
+                                                            </SelectItem>
+                                                            <SelectItem value="4">
+                                                                Peringkat 4
+                                                            </SelectItem>
+                                                            <SelectItem value="5">
+                                                                Peringkat 5
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </>
-                    )}
+                                                <CustomInput
+                                                    label="Skor (Skala 100, Jika Koma dibulatkan)"
+                                                    placeholder="Masukkan skor"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "score",
+                                                            Number(
+                                                                e.target.value
+                                                            )
+                                                        )
+                                                    }
+                                                    value={data.score.toString()}
+                                                    error={errors.score}
+                                                    required
+                                                    type="number"
+                                                    disabled
+                                                />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="rounded-2xl shadow-lg">
+                                        <CardHeader>
+                                            <CardTitle className="text-xl font-semibold">
+                                                Sertifikat (Jika Ada)
+                                            </CardTitle>
+                                            <p className="text-sm text-muted-foreground">
+                                                File dapat berupa PDF, JPG,
+                                                JPEG, atau PNG.
+                                            </p>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                {members.map((member) => {
+                                                    const uploaded =
+                                                        data.certificates.find(
+                                                            (c) =>
+                                                                c.user_id ===
+                                                                member.id
+                                                        )?.file;
+
+                                                    const fileUrl =
+                                                        achievement?.certificates.find(
+                                                            (cert) =>
+                                                                cert.user_id ===
+                                                                member.id
+                                                        );
+
+                                                    return (
+                                                        <div key={member.id}>
+                                                            <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                                Sertifikat untuk{" "}
+                                                                {member.name}
+                                                            </Label>
+
+                                                            <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 hover:border-primary transition overflow-hidden">
+                                                                <div className="text-sm text-gray-600 group-hover:text-primary overflow-hidden text-ellipsis whitespace-nowrap">
+                                                                    {uploaded
+                                                                        ? uploaded.name
+                                                                        : "Pilih file sertifikat"}
+                                                                </div>
+
+                                                                <input
+                                                                    type="file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png"
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        const file =
+                                                                            e
+                                                                                .target
+                                                                                .files?.[0] ||
+                                                                            null;
+                                                                        setData(
+                                                                            "certificates",
+                                                                            data.certificates.map(
+                                                                                (
+                                                                                    cert
+                                                                                ) =>
+                                                                                    cert.user_id ===
+                                                                                    member.id
+                                                                                        ? {
+                                                                                              ...cert,
+                                                                                              file
+                                                                                          }
+                                                                                        : cert
+                                                                            )
+                                                                        );
+                                                                    }}
+                                                                    className="hidden"
+                                                                    disabled
+                                                                />
+                                                            </label>
+
+                                                            {fileUrl?.file_url && (
+                                                                <a
+                                                                    className="mt-2 text-blue-400 hover:underline text-xs"
+                                                                    href={
+                                                                        fileUrl.file_url
+                                                                    }
+                                                                    target="_blank"
+                                                                >
+                                                                    Lihat
+                                                                    Sertifikat
+                                                                </a>
+                                                            )}
+
+                                                            {errors.certificates &&
+                                                                errors
+                                                                    .certificates[
+                                                                    member.id
+                                                                ] && (
+                                                                    <p className="text-red-500 text-xs mt-1">
+                                                                        {
+                                                                            errors
+                                                                                .certificates[
+                                                                                member
+                                                                                    .id
+                                                                            ]
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </>
+                            ))}
                 </div>
             </div>
         </MahasiswaLayout>
