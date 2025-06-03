@@ -87,4 +87,9 @@ class UserModel extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserToSkill::class, 'user_id');
     }
+
+    public function competitionMember()
+    {
+        return $this->hasMany(CompetitionMember::class, 'user_id');
+    }
 }

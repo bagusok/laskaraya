@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminAchievementController extends Controller
 {
@@ -23,7 +24,13 @@ class AdminAchievementController extends Controller
     public function index(Request $request)
     {
 
-        return Inertia::render('dashboard/admin/achievements/index');
+        $periods = PeriodModel::all();
+
+        return Inertia::render('dashboard/admin/achievements/index')->with(
+            [
+                'periods' => $periods,
+            ]
+        );
     }
 
     public function create(Request $request, $id)
@@ -468,5 +475,108 @@ class AdminAchievementController extends Controller
             DB::rollBack();
             return back()->withErrors(['error' => 'Gagal menghapus prestasi: ' . $e->getMessage()]);
         }
+    }
+
+    public function testSPK()
+    {
+
+        $user = UserModel::with('competitionMember', 'competitionMember.userToCompetition', 'competitionMember.userToCompetition.competition', 'competitionMember.userToCompetition.achievement')->where('role', 'mahasiswa')->get();
+
+
+        return response()->json($user);
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'status' => 'nullable|string|in:all,win,lose,unknown,verify_pending,verify_rejected',
+            'period_id' => 'nullable|exists:periods,id',
+        ]);
+
+        $members = CompetitionMember::with([
+            'user',
+            'userToCompetition.achievement',
+            'userToCompetition.competition.category',
+            'userToCompetition.competition.period',
+            'userToCompetition.dosen',
+            'userToCompetition.registrant',
+        ])
+            ->join('user_to_competitions', 'competition_members.user_to_competition_id', '=', 'user_to_competitions.id')
+            ->join('competitions', 'user_to_competitions.competition_id', '=', 'competitions.id')
+            ->when($request->status !== null, function ($query) use ($request) {
+                switch ($request->status) {
+                    case 'win':
+                        $query->where('user_to_competitions.status', 'accepted')
+                            ->where('competitions.verified_status', 'accepted')
+                            ->whereHas('userToCompetition.achievement');
+                        break;
+
+                    case 'lose':
+                        $query->where('user_to_competitions.status', 'accepted')
+                            ->where('competitions.status', 'completed')
+                            ->where('competitions.verified_status', 'accepted')
+                            ->whereDoesntHave('userToCompetition.achievement');
+                        break;
+
+                    case 'unknown':
+                        $query->where('user_to_competitions.status', 'accepted')
+                            ->where('competitions.status', 'ongoing')
+                            ->where('competitions.verified_status', 'accepted')
+                            ->whereDoesntHave('userToCompetition.achievement');
+                        break;
+
+                    case 'verify_pending':
+                        $query->where('user_to_competitions.status', 'pending')
+                            ->where('competitions.status', 'completed')
+                            ->where('competitions.verified_status', 'pending');
+                        break;
+
+                    case 'verify_rejected':
+                        $query->where('user_to_competitions.status', 'rejected')
+                            ->where('competitions.status', 'completed')
+                            ->where('competitions.verified_status', 'rejected');
+                        break;
+                }
+            })
+            ->when($request->period_id, function ($query) use ($request) {
+                return $query->whereHas('userToCompetition.competition.period', function ($q) use ($request) {
+                    $q->where('id', $request->period_id);
+                });
+            })
+            ->orderBy('user_to_competitions.created_at', 'desc')
+            ->select('competition_members.*')
+            ->get();
+
+        if ($members->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada data yang ditemukan.'], 404);
+        }
+
+        $exportData = $members->map(function ($item) {
+            return [
+                'Nama' => $item->user->name,
+                'NIM' => $item->user->identifier,
+                'Kompetisi' => $item->userToCompetition->competition->name ?? '-',
+                'Nama TIM' => $item->userToCompetition->name,
+                'Dosen Pembimbing' => optional($item->userToCompetition->dosen)->name,
+                'Prestasi' => optional($item->userToCompetition->achievement)->name,
+                'Skor' => optional($item->userToCompetition->achievement)->score,
+                'Juara' => optional($item->userToCompetition->achievement)->champion,
+                'Kategori' => optional($item->userToCompetition->competition->category)->name,
+                'Periode' => optional($item->userToCompetition->competition->period)->name,
+                'Status Lomba' => $item->userToCompetition->competition->status,
+                'Status Verifikasi Lomba' => $item->userToCompetition->competition->verified_status,
+                'Status Verifikasi Tim' => $item->userToCompetition->status,
+                'Tanggal Bergabung' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null,
+            ];
+        });
+
+        $filename = 'achievements_' . date('Ymd_His') . '.xlsx';
+
+        return Excel::download(
+            new \App\Exports\AchievementsExport($exportData),
+            $filename,
+            \Maatwebsite\Excel\Excel::XLSX,
+            ['Content-Disposition' => 'attachment; filename="' . $filename . '"']
+        );
     }
 }

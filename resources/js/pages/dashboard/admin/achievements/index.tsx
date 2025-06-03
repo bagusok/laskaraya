@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "@inertiajs/react";
 import { useCallback, useState } from "react";
 import { mahasiswaAchievementColumns } from "./columns";
 import useAuth from "@/hooks/use-auth";
@@ -10,6 +9,23 @@ import DataTable from "@/components/ui/shared/dataTable";
 import { cn } from "@/lib/utils";
 import AdminLayout from "@/components/layouts/adminLayout";
 import DeleteAchievementModal from "./deleteAchievementModal";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
+import { FileDown } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 enum MahasiswaAchievementStatus {
     ALL = "all",
@@ -20,11 +36,21 @@ enum MahasiswaAchievementStatus {
     VERIFY_REJECTED = "verify_rejected"
 }
 
-export default function AchievementsPage() {
+type Props = {
+    periods: {
+        id: number;
+        name: string;
+    }[];
+};
+
+export default function AchievementsPage({ periods }: Props) {
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [id, setId] = useState<number | null>(null);
     const [achievementStatus, setAchievementStatus] =
         useState<MahasiswaAchievementStatus>(MahasiswaAchievementStatus.ALL);
+
+    const [period, setPeriod] = useState<string | null>(null);
+    const [status, setStatus] = useState<string>("all");
 
     const { user } = useAuth();
 
@@ -68,8 +94,96 @@ export default function AchievementsPage() {
     return (
         <AdminLayout title="Riwayat Prestasi">
             <Card className="mt-4">
-                <CardHeader>
+                <CardHeader className="flex flex-row justify-between items-center">
                     <CardTitle>List Prestasi</CardTitle>
+                    <div className="inline-flex">
+                        <Dialog>
+                            <DialogTrigger>
+                                <FileDown
+                                    size="20"
+                                    className="hover:opacity-70"
+                                />
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Ekspor ke Excell</DialogTitle>
+                                </DialogHeader>
+                                <div>
+                                    <Label>Periode</Label>
+                                    <Select
+                                        onValueChange={(value) =>
+                                            setPeriod(value)
+                                        }
+                                        value={period ?? "all"}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Periode" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {periods.map((period) => (
+                                                <SelectItem
+                                                    key={period.id}
+                                                    value={String(period.id)}
+                                                >
+                                                    {period.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label>Status</Label>
+                                    <Select
+                                        onValueChange={(value) =>
+                                            setStatus(value)
+                                        }
+                                        value={status}
+                                    >
+                                        <SelectTrigger
+                                            className="w-full"
+                                            defaultValue="all"
+                                        >
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">
+                                                Semua
+                                            </SelectItem>
+                                            <SelectItem value="win">
+                                                Menang
+                                            </SelectItem>
+                                            <SelectItem value="lose">
+                                                Kalah
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <DialogFooter>
+                                    <Button
+                                        variant="default"
+                                        className="w-full"
+                                        onClick={() => {
+                                            window.open(
+                                                route(
+                                                    "admin.achievements.exportExcel",
+                                                    {
+                                                        period_id:
+                                                            period == "all"
+                                                                ? null
+                                                                : period,
+                                                        status: status
+                                                    }
+                                                ),
+                                                "_blank"
+                                            );
+                                        }}
+                                    >
+                                        Ekspor
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">

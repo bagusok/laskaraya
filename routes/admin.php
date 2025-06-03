@@ -41,5 +41,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
         Route::get('/detail/{id}', [AdminAchievementController::class, 'detail'])->name('admin.achievements.detail');
         Route::post('/response/{id}', [AdminAchievementController::class, 'responseAchievement'])->name('admin.achievements.response');
+
+        Route::get('/export-excel', [AdminAchievementController::class, 'exportExcel'])->name('admin.achievements.exportExcel');
+        Route::get('test', [AdminAchievementController::class, 'testSPK'])->name('admin.achievements.test');
     });
 });
