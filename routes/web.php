@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -11,6 +10,7 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DosenAchievementController;
+use App\Http\Controllers\RecommendationController; // Add this import
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -63,7 +63,6 @@ Route::group(['prefix' => 'prodi', 'middleware' => ['auth', 'role:admin']], func
     Route::put('/edit/{id}', [ProgramStudiController::class, 'update'])->name('prodi.update');
     Route::delete('/{id}', [ProgramStudiController::class, 'destroy'])->name('prodi.destroy');
     Route::get('/{id}', [ProgramStudiController::class, 'show'])->name('prodi.detail');
-    // (opsional) Route::get('/edit/{id}', [ProgramStudiController::class, 'edit'])->name('prodi.edit');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -134,6 +133,29 @@ Route::prefix('dashboard/mahasiswa/categories')->middleware(['auth'])->group(fun
     Route::post('/', [CategoryController::class, 'storeMahasiswa'])->name('mahasiswa.categories.store');
     Route::put('/{id}', [CategoryController::class, 'updateMahasiswa'])->name('mahasiswa.categories.update');
     Route::delete('/{id}', [CategoryController::class, 'destroyMahasiswa'])->name('mahasiswa.categories.destroy');
+});
+
+// Recommendation Routes - Fixed and consolidated
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    // Route untuk halaman utama recommendations
+    Route::get('/admin/recommendations', [RecommendationController::class, 'index'])
+        ->name('admin.recommendations.index');
+
+    // Route untuk mendapatkan rekomendasi berdasarkan kompetisi (AJAX)
+    Route::get('/admin/recommendations/get', [RecommendationController::class, 'getRecommendations'])
+        ->name('admin.recommendations.get');
+
+    // Route untuk halaman analisis detail (GET request)
+    Route::get('/admin/recommendations/analysis', [RecommendationController::class, 'showAnalysis'])
+        ->name('admin.recommendations.analysis');
+
+    // Route untuk mendapatkan analisis detail mahasiswa (AJAX - if needed)
+    Route::get('/admin/recommendations/analysis/data', [RecommendationController::class, 'getDetailedAnalysis'])
+        ->name('admin.recommendations.analysis.data');
+
+    // Route untuk export CSV
+    Route::get('/admin/recommendations/export', [RecommendationController::class, 'exportRecommendations'])
+        ->name('admin.recommendations.export');
 });
 
 Route::get('/dashboard/dosen', [DosenController::class, 'index'])->name('dashboard.dosen');

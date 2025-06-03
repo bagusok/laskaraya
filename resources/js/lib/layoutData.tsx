@@ -59,7 +59,7 @@ export const navItems: NavItem[] = [
         subItems: [
             {
                 label: "Rekomendasi Peserta",
-                href: "/dashboard/recommendations"
+                href: route("admin.recommendations.index")
             },
             { label: "Laporan & Analisis", href: "/dashboard/reports" }
         ]

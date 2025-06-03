@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+            $table->float('level')->default(0); // Tambahkan kolom level
             $table->timestamps();
 
             $table->unique(['user_id', 'skill_id'], 'user_skill_unique');

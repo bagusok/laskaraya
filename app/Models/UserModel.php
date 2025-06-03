@@ -92,4 +92,14 @@ class UserModel extends Authenticatable
     {
         return $this->belongsToMany(SkillModel::class, 'user_to_skills', 'user_id', 'skill_id')->withPivot('level');
     }
+
+    public function competitions()
+    {
+        return $this->belongsToMany(
+            \App\Models\CompetitionModel::class,
+            'user_to_competitions',
+            'registrant_id',
+            'competition_id'
+        )->withPivot('status', 'notes');
+    }
 }
