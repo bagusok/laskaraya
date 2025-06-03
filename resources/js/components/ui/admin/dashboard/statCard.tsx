@@ -15,6 +15,7 @@ export default function StatCard({
     icon,
     className
 }: StatCardProps) {
+    console.log("StatCard:", label, value); // DEBUG
     const colorClass =
         className || "bg-gradient-to-br from-white to-blue-50/20";
 

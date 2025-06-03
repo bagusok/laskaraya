@@ -19,6 +19,8 @@ class DosenModel extends Model
         'gender',
         'birth_place',
         'birth_date',
+        'total_competitions',
+        'total_wins',
     ];
 
     public function user()

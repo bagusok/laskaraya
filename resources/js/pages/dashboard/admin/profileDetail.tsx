@@ -161,6 +161,28 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
                                         </div>
                                     </div>
                                 )}
+
+                                {user.dosen && (
+                                    <>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-gray-500 text-sm">
+                                                Total Kompetisi
+                                            </span>
+                                            <span className="font-bold text-purple-700">
+                                                {user.dosen
+                                                    .total_competitions ?? 0}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-gray-500 text-sm">
+                                                Total Kemenangan
+                                            </span>
+                                            <span className="font-bold text-purple-700">
+                                                {user.dosen.total_wins ?? 0}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

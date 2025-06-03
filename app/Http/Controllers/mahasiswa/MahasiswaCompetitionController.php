@@ -10,6 +10,7 @@ use App\Models\PeriodModel;
 use App\Models\SkillModel;
 use App\Models\UserModel;
 use App\Models\UserToCompetition;
+use App\Services\TopsisService;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\DB;
@@ -374,7 +375,6 @@ class MahasiswaCompetitionController extends Controller
         }
 
         // check if user already joined this competition
-
         $alreadyJoined = CompetitionMember::where('user_id', $user->id)
             ->whereHas('userToCompetition', function ($query) use ($competition) {
                 $query->where('competition_id', $competition->id);
@@ -392,9 +392,11 @@ class MahasiswaCompetitionController extends Controller
             ]);
         }
 
-        $dosen = UserModel::where([
-            'role' => 'dosen',
-        ])->get();
+        // Hitung rekomendasi dosen menggunakan TOPSIS
+        $topsisService = new TopsisService();
+        $recommendedDosen = $topsisService->calculateRecommendations(
+            $competition->skills->pluck('id')->toArray()
+        );
 
         $mahasiswa = UserModel::where([
             'role' => 'mahasiswa',
@@ -402,7 +404,7 @@ class MahasiswaCompetitionController extends Controller
 
         return Inertia::render('dashboard/mahasiswa/competitions/join/index')->with([
             'competition' => $competition,
-            'dosen' => $dosen,
+            'dosen' => $recommendedDosen,
             'mahasiswa' => $mahasiswa,
             'category' => $competition->category,
             'skills' => $competition->skills

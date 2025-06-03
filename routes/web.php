@@ -10,6 +10,7 @@ use App\Http\Controllers\SkillController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DosenAchievementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -80,6 +81,11 @@ Route::middleware(['auth', 'role:dosen'])->prefix('dashboard/dosen/skills')->gro
     Route::delete('/{id}', [SkillController::class, 'destroyDosen'])->name('dosen.skills.destroy');
 });
 
+Route::middleware(['auth', 'role:dosen'])->group(function () {
+    Route::get('/dashboard/dosen/achievements', [DosenAchievementController::class, 'index'])->name('dosen.achievements.index');
+    Route::get('/dashboard/dosen/achievements/{id}', [DosenAchievementController::class, 'show'])->name('dosen.achievements.show');
+    Route::post('/dashboard/dosen/achievements/{id}/status', [DosenAchievementController::class, 'updateStatus'])->name('dosen.achievements.updateStatus');
+});
 
 Route::group(['prefix' => 'bimbingan', 'middleware' => ['auth', 'role:dosen']], function () {
     Route::get('/', [DosenController::class, 'index'])->name('dosen.bimbingan');
@@ -129,6 +135,8 @@ Route::prefix('dashboard/mahasiswa/categories')->middleware(['auth'])->group(fun
     Route::put('/{id}', [CategoryController::class, 'updateMahasiswa'])->name('mahasiswa.categories.update');
     Route::delete('/{id}', [CategoryController::class, 'destroyMahasiswa'])->name('mahasiswa.categories.destroy');
 });
+
+Route::get('/dashboard/dosen', [DosenController::class, 'index'])->name('dashboard.dosen');
 
 include __DIR__ . '/admin.php';
 include __DIR__ . '/mahasiswa.php';

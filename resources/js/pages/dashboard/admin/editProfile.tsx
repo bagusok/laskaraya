@@ -16,6 +16,7 @@ import type { UserRole } from "@/types/profile.d";
 import { useEffect, useState } from "react";
 import { Camera, ArrowLeft, X } from "lucide-react";
 import React from "react";
+import axios from "axios";
 
 // Tambahkan tipe untuk skills di form
 interface SkillForm {
@@ -31,8 +32,9 @@ export default function EditProfile() {
         setValue,
         onSubmit,
         isLoading,
-        user
-    } = useProfileForm() as any; // abaikan type error, atau update useProfileForm agar support 'skills'
+        user,
+        watch
+    } = useProfileForm() as any; // pastikan watch diambil dari sini
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const prodiList = (usePage().props.prodiList ?? []) as any[];
@@ -48,12 +50,24 @@ export default function EditProfile() {
     const [selectedSkills, setSelectedSkills] =
         useState<{ id: number; name: string; level: number }[]>(userSkills);
 
+    const [totalCompetitions, setTotalCompetitions] = useState<number>(
+        user?.dosen?.total_competitions ?? 0
+    );
+    const [totalWins, setTotalWins] = useState<number>(
+        user?.dosen?.total_wins ?? 0
+    );
+
     useEffect(() => {
         setValue(
             "skills",
             selectedSkills.map((s) => ({ id: s.id, level: s.level }))
         );
     }, [selectedSkills, setValue]);
+
+    useEffect(() => {
+        setValue("total_competitions", user?.dosen?.total_competitions ?? 0);
+        setValue("total_wins", user?.dosen?.total_wins ?? 0);
+    }, [setValue, user]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -86,9 +100,53 @@ export default function EditProfile() {
         );
     };
 
-    const handleSubmitWithLog = (data: any) => {
-        console.log("DATA YANG DIKIRIM:", data.skills);
-        onSubmit(data);
+    const handleSubmitWithLog = async (data: any) => {
+        // Buat FormData manual
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("identifier", data.identifier);
+        formData.append("phone", data.phone);
+        formData.append("role", data.role);
+        if (data.password) formData.append("password", data.password);
+        if (data.image && data.image[0])
+            formData.append("image", data.image[0]);
+        formData.append(
+            "is_verified",
+            data.is_verified === true || data.is_verified === "true" ? "1" : "0"
+        );
+        formData.append("address", data.address ?? "");
+        formData.append("faculty", data.faculty ?? "");
+        formData.append("major", data.major ?? "");
+        formData.append("gender", data.gender ?? "");
+        formData.append("birth_place", data.birth_place ?? "");
+        formData.append("birth_date", data.birth_date ?? "");
+        formData.append("total_competitions", String(totalCompetitions));
+        formData.append("total_wins", String(totalWins));
+        if (data.prodi_id) formData.append("prodi_id", data.prodi_id);
+        if (selectedSkills.length > 0)
+            formData.append(
+                "skills",
+                JSON.stringify(
+                    selectedSkills.map((s) => ({ id: s.id, level: s.level }))
+                )
+            );
+
+        // Debug
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ": " + pair[1]);
+        }
+
+        try {
+            await axios.post(route("profile.update"), formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                params: { _method: "PUT" }
+            });
+            window.location.href = route("profile.show");
+        } catch (err) {
+            alert("Gagal update profil. Cek console/log untuk detail.");
+            console.error(err);
+        }
     };
 
     return (
@@ -458,6 +516,76 @@ export default function EditProfile() {
                                             {errors.major && (
                                                 <p className="text-sm text-red-500">
                                                     {errors.major.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="total_competitions"
+                                                className="text-gray-700"
+                                            >
+                                                Total Lomba
+                                            </Label>
+                                            <Input
+                                                id="total_competitions"
+                                                type="text"
+                                                {...register(
+                                                    "total_competitions"
+                                                )}
+                                                value={totalCompetitions}
+                                                onChange={(e) =>
+                                                    setTotalCompetitions(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                placeholder="Masukkan total lomba"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="total_competitions"
+                                                value={totalCompetitions}
+                                            />
+                                            {errors.total_competitions && (
+                                                <p className="text-sm text-red-500">
+                                                    {
+                                                        errors
+                                                            .total_competitions
+                                                            .message
+                                                    }
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="total_wins"
+                                                className="text-gray-700"
+                                            >
+                                                Total Kemenangan
+                                            </Label>
+                                            <Input
+                                                id="total_wins"
+                                                type="text"
+                                                {...register("total_wins")}
+                                                value={totalWins}
+                                                onChange={(e) =>
+                                                    setTotalWins(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                placeholder="Masukkan total kemenangan"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="total_wins"
+                                                value={totalWins}
+                                            />
+                                            {errors.total_wins && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.total_wins.message}
                                                 </p>
                                             )}
                                         </div>
