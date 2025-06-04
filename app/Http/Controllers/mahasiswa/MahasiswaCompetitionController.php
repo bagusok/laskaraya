@@ -392,9 +392,8 @@ class MahasiswaCompetitionController extends Controller
             ]);
         }
 
-        // Hitung rekomendasi dosen menggunakan TOPSIS
         $topsisService = new TopsisService();
-        $recommendedDosen = $topsisService->calculateRecommendations(
+        $topsisResult = $topsisService->calculateRecommendations(
             $competition->skills->pluck('id')->toArray()
         );
 
@@ -404,10 +403,38 @@ class MahasiswaCompetitionController extends Controller
 
         return Inertia::render('dashboard/mahasiswa/competitions/join/index')->with([
             'competition' => $competition,
-            'dosen' => $recommendedDosen,
+            'dosen' => $topsisResult['rankedRecommendations'],
             'mahasiswa' => $mahasiswa,
             'category' => $competition->category,
             'skills' => $competition->skills
+        ]);
+    }
+
+    public function topsisDetail($id)
+    {
+        $user = auth()->user();
+
+        $competition = CompetitionModel::with('skills', 'category')->where([
+            'id' => $id,
+            'status' => 'ongoing',
+            'verified_status' => 'accepted',
+        ])->first();
+
+        if (!$competition) {
+            return redirect()->route('mahasiswa.competitions.index')->withErrors(
+                ['error' => 'Competition not found or not available.']
+            );
+        }
+
+        // Hitung detail TOPSIS
+        $topsisService = new TopsisService();
+        $topsisDetails = $topsisService->calculateRecommendations(
+            $competition->skills->pluck('id')->toArray()
+        );
+
+        return Inertia::render('dashboard/mahasiswa/competitions/join/topsis')->with([
+            'competition' => $competition,
+            'topsisDetails' => $topsisDetails
         ]);
     }
 

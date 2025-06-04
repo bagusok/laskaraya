@@ -3,6 +3,7 @@
 use App\Http\Controllers\dosen\DosenCompetitionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\dosen\DosenAchievementController;
 
 Route::group(['prefix' => 'dosen', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'competitions', 'middleware' => ['role:dosen']], function () {
@@ -16,4 +17,6 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['auth']], function () {
     });
 
     Route::get('/mahasiswa-bimbingan', [DosenController::class, 'mahasiswaBimbingan'])->name('dosen.bimbingan');
+    Route::get('/prestasi', [DosenAchievementController::class, 'mahasiswaAchievements'])->middleware('role:dosen')->name('dosen.prestasi');
+    Route::post('/bimbingan/status/{id}', [DosenController::class, 'updateStatus'])->name('dosen.bimbingan.status');
 });

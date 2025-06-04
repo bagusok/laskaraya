@@ -9,8 +9,9 @@ use App\Http\Controllers\SkillController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\DosenAchievementController;
-use App\Http\Controllers\RecommendationController; // Add this import
+use App\Http\Controllers\dosen\DosenAchievementController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\MahasiswaCompetitionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

@@ -137,6 +137,18 @@ class DosenController extends Controller
         $team->bimbingan_status = 'selesai';
         $team->save();
 
+        // Ambil dosen terkait
+        $dosenProfile = \App\Models\DosenModel::where('user_id', $team->dosen_id)->first();
+        if ($dosenProfile) {
+            // Tambah total lomba diikuti
+            $dosenProfile->increment('total_competitions');
+
+            // Jika dosen memilih menang, tambah total_wins
+            if ($request->has('is_win') && $request->input('is_win')) {
+                $dosenProfile->increment('total_wins');
+            }
+        }
+
         return back();
     }
 }

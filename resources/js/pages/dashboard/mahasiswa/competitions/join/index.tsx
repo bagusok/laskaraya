@@ -10,7 +10,8 @@ import {
     UserCheck,
     Users,
     X,
-    Calendar
+    Calendar,
+    Calculator
 } from "lucide-react";
 import { Competition } from "../competition-table/columns";
 import { Badge } from "@/components/ui/badge";
@@ -72,9 +73,9 @@ interface Dosen extends IUser {
 }
 
 function getRekomendasiLabel(score: number) {
-    if (score >= 0.8) return "Sangat Direkomendasikan";
-    if (score >= 0.6) return "Direkomendasikan";
-    if (score >= 0.4) return "Cukup";
+    if (score >= 80) return "Sangat Direkomendasikan";
+    if (score >= 60) return "Direkomendasikan";
+    if (score >= 40) return "Cukup";
     return "Kurang";
 }
 
@@ -292,6 +293,26 @@ export default function JoinCompetition({
                                             Dosen Pembimbing *
                                         </Label>
                                         <div className="mb-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        (window.location.href =
+                                                            route(
+                                                                "mahasiswa.competitions.join.topsis",
+                                                                {
+                                                                    id: competition.id
+                                                                }
+                                                            ))
+                                                    }
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <Calculator className="h-4 w-4" />
+                                                    Detail SPK
+                                                </Button>
+                                            </div>
                                             <Select<DosenOption>
                                                 id="dosen"
                                                 value={
@@ -303,7 +324,7 @@ export default function JoinCompetition({
                                                         )
                                                         .map((d) => ({
                                                             value: d.id,
-                                                            label: `${d.name} (${Math.round(d.score * 100)} - ${getRekomendasiLabel(d.score)})`,
+                                                            label: `${d.name} (${Math.round(d.score)} - ${getRekomendasiLabel(d.score)})`,
                                                             email: d.email,
                                                             identifier:
                                                                 d.identifier ||
@@ -320,7 +341,7 @@ export default function JoinCompetition({
                                                 }}
                                                 options={dosen.map((d) => ({
                                                     value: d.id,
-                                                    label: `${d.name} (${Math.round(d.score * 100)} - ${getRekomendasiLabel(d.score)})`,
+                                                    label: `${d.name} (${Math.round(d.score)} - ${getRekomendasiLabel(d.score)})`,
                                                     email: d.email,
                                                     identifier:
                                                         d.identifier || ""

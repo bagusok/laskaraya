@@ -18,6 +18,7 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
 
         Route::post('/join', [MahasiswaCompetitionController::class, 'postJoin'])->name('mahasiswa.competitions.join.post');
         Route::get('/join/{id}', [MahasiswaCompetitionController::class, 'join'])->name('mahasiswa.competitions.join');
+        Route::get('/join/{id}/topsis', [MahasiswaCompetitionController::class, 'topsisDetail'])->name('mahasiswa.competitions.join.topsis');
     });
 
     Route::group(['prefix' => 'teams', 'middleware' => ['role:mahasiswa']], function () {

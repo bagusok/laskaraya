@@ -180,7 +180,7 @@ export default function TeamDetail({
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
                                                     Apa kamu yakin untuk
-                                                    menerima prstasi ini?
+                                                    menerima prestasi ini?
                                                 </AlertDialogTitle>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>

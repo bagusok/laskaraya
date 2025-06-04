@@ -99,4 +99,33 @@ class DosenAchievementController extends Controller
 
         return back()->with('success', 'Status bimbingan berhasil diperbarui');
     }
+
+    public function mahasiswaAchievements()
+    {
+        $dosenId = auth()->user()->id;
+        // Ambil semua UserToCompetition (tim) yang dibimbing dosen ini
+        $teams = \App\Models\UserToCompetition::with(['competition', 'competitionMembers.user', 'achievement'])
+            ->where('dosen_id', $dosenId)
+            ->get();
+
+        $mahasiswaAchievements = [];
+        foreach ($teams as $team) {
+            foreach ($team->competitionMembers as $member) {
+                // Hanya tampilkan mahasiswa (bukan dosen)
+                if ($member->user && $member->user->role === 'mahasiswa') {
+                    $mahasiswaAchievements[] = [
+                        'mahasiswa_name' => $member->user->name,
+                        'team_name' => $team->name,
+                        'achievement_name' => $team->achievement ? $team->achievement->name : '-',
+                        'competition_name' => $team->competition ? $team->competition->name : '-',
+                        'year' => $team->competition ? date('Y', strtotime($team->competition->start_date)) : '-',
+                        'status' => $team->achievement ? 'Menang' : ($team->competition && $team->competition->status === 'completed' ? 'Kalah' : 'Belum Selesai'),
+                    ];
+                }
+            }
+        }
+        return Inertia::render('dashboard/dosen/mahasiswaAchievements', [
+            'mahasiswaAchievements' => $mahasiswaAchievements
+        ]);
+    }
 }

@@ -87,7 +87,7 @@ export const navItemsDosen = [
             },
             {
                 label: "Prestasi Mahasiswa",
-                href: "/dashboard/dosen/prestasi"
+                href: route("dosen.prestasi")
             }
         ]
     },
