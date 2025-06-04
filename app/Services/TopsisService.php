@@ -92,7 +92,7 @@ class TopsisService
         $normalized = [];
         $sumSquares = array_fill(0, count($matrix[0]), 0);
 
-        // Hitung jumlah kuadrat untuk setiap kriteria
+        // Hitung jumlah pembagi untuk setiap kriteria
         foreach ($matrix as $row) {
             foreach ($row as $i => $value) {
                 $sumSquares[$i] += pow($value, 2);
