@@ -8,7 +8,11 @@ use App\Models\CompetitionMember;
 use App\Models\CompetitionModel;
 use App\Models\PeriodModel;
 use App\Models\SkillModel;
+use App\Models\UserModel;
+use App\Models\UserToCompetition;
+use App\Services\TopsisService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
@@ -300,5 +304,169 @@ class AdminCompetitionController extends Controller
         }
 
         return back()->with('success', 'Competition response updated successfully.');
+    }
+
+    public function addTeam(Request $request, $id)
+    {
+        $user = auth()->user();
+        $teamMembersQuery = $request->query('team_members', null);
+
+
+        $teamMembers = UserModel::where('role', 'mahasiswa')
+            ->when($teamMembersQuery, function ($query) use ($teamMembersQuery) {
+                return $query->whereIn('id', explode(',', $teamMembersQuery));
+            })->get();
+
+
+        $competition = CompetitionModel::with('skills', 'category')->where([
+            'id' => $id,
+            'status' => 'ongoing',
+            'verified_status' => 'accepted',
+        ])->first();
+
+        if (!$competition) {
+            return redirect()->route('mahasiswa.competitions.index')->withErrors(
+                ['error' => 'Competition not found or not available for joining.']
+            );
+        }
+
+        // check if user already joined this competition
+        $alreadyJoined = CompetitionMember::where('user_id', $user->id)
+            ->whereHas('userToCompetition', function ($query) use ($competition) {
+                $query->where('competition_id', $competition->id);
+            })->exists();
+
+        if ($alreadyJoined) {
+            $team = CompetitionMember::where('user_id', $user->id)
+                ->whereHas('userToCompetition', function ($query) use ($competition) {
+                    $query->where('competition_id', $competition->id);
+                })->first();
+
+            return Inertia::render('dashboard/mahasiswa/competitions/join/joined')->with([
+                'team' => $team->userToCompetition,
+                'error' => 'You have already joined this competition.',
+            ]);
+        }
+
+        $topsisService = new TopsisService();
+        $topsisResult = $topsisService->calculateRecommendations(
+            $competition->skills->pluck('id')->toArray()
+        );
+
+        $mahasiswa = UserModel::where([
+            'role' => 'mahasiswa',
+        ])->whereNot('id', $user->id)->get();
+
+        return Inertia::render('dashboard/admin/competitions/teams/addTeam')->with([
+            'competition' => $competition,
+            'dosen' => $topsisResult['rankedRecommendations'],
+            'mahasiswa' => $mahasiswa,
+            'category' => $competition->category,
+            'skills' => $competition->skills,
+            '_teamMembers' => $teamMembers,
+        ]);
+    }
+
+    public function postAddTeam(Request $request)
+    {
+        $request->validate([
+            'registrant_id' => 'required|exists:users,id',
+            'competition_id' => 'required|exists:competitions,id',
+            'name' => 'required|string|min:3|max:255',
+            'dosen_id' => 'required|exists:users,id',
+            'competition_members' => 'array',
+            'competition_members.*.user_id' => 'required|exists:users,id|distinct',
+        ]);
+
+        $competitionId = $request->input('competition_id');
+        $name = $request->input('name');
+        $dosenId = $request->input('dosen_id');
+        $members = $request->input('competition_members', []);
+
+        $allUserIds = collect($members)->pluck('user_id')->push($request->input('registrant_id'))->unique()->toArray();
+
+        $competition = CompetitionModel::where('id', $competitionId)
+            ->where('status', 'ongoing')
+            ->where('verified_status', 'accepted')
+            ->first();
+
+        if (!$competition) {
+            return back()->withErrors([
+                'error' => 'Competition not found or not available for joining.'
+            ]);
+        }
+
+        $existingParticipants = CompetitionMember::whereIn('user_id', $allUserIds)
+            ->whereHas('userToCompetition', function ($query) use ($competitionId) {
+                $query->where('competition_id', $competitionId);
+            })
+            ->get();
+
+        if ($existingParticipants->isNotEmpty()) {
+            return back()->withErrors([
+                'error' => 'You or one of the selected members is already part of this competition.'
+            ]);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $userToCompetition = UserToCompetition::create([
+                'name' => $name,
+                'registrant_id' => $request->input('registrant_id'),
+                'competition_id' => $competitionId,
+                'dosen_id' => $dosenId,
+                'status' => 'accepted',
+            ]);
+
+            CompetitionMember::create([
+                'user_id' => $request->input('registrant_id'),
+                'user_to_competition_id' => $userToCompetition->id,
+            ]);
+
+            foreach ($members as $member) {
+                CompetitionMember::create([
+                    'user_id' => $member['user_id'],
+                    'user_to_competition_id' => $userToCompetition->id,
+                ]);
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Team successfully created and joined the competition.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // jangan lupa rollback
+            return back()->withErrors([
+                'error' => 'Failed to join the competition. Please try again later.'
+            ]);
+        }
+    }
+
+    public function topsisDetail($id)
+    {
+        $user = auth()->user();
+
+        $competition = CompetitionModel::with('skills', 'category')->where([
+            'id' => $id,
+            'status' => 'ongoing',
+            'verified_status' => 'accepted',
+        ])->first();
+
+        if (!$competition) {
+            return redirect()->route('mahasiswa.competitions.index')->withErrors(
+                ['error' => 'Competition not found or not available.']
+            );
+        }
+
+        // Hitung detail TOPSIS
+        $topsisService = new TopsisService();
+        $topsisDetails = $topsisService->calculateRecommendations(
+            $competition->skills->pluck('id')->toArray()
+        );
+
+        return Inertia::render('dashboard/admin/competitions/teams/topsis')->with([
+            'competition' => $competition,
+            'topsisDetails' => $topsisDetails
+        ]);
     }
 }
