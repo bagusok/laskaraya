@@ -414,20 +414,50 @@ class AdminAchievementController extends Controller
             return back()->withErrors(['message' => 'Tim atau kompetisi tidak ditemukan.']);
         }
 
-        if ($competition->verified_status !== 'pending' && $team->status !== 'pending' && $competition->status !== 'completed') {
-            return back()->withErrors(['status' => 'Respon prestasi hanya dapat diperbarui jika status kompetisi adalah pending atau completed.']);
+        // Validasi achievement sudah diisi
+        if (!$achievement->name || !$achievement->champion || !$achievement->score) {
+            return back()->withErrors(['message' => 'Prestasi belum diisi dengan lengkap.']);
+        }
+
+        // Validasi status kompetisi
+        if ($competition->status !== 'completed') {
+            return back()->withErrors(['message' => 'Kompetisi harus sudah selesai untuk diverifikasi.']);
         }
 
         DB::beginTransaction();
 
         try {
-
             $competition->verified_status = $request->input('status');
             $competition->notes = $request->input('reason', null);
             $competition->save();
 
             $team->status = $request->input('status');
             $team->notes = $request->input('reason', null);
+
+            // Update bimbingan_status jika accepted
+            if ($request->input('status') === 'accepted') {
+                $team->bimbingan_status = 'selesai';
+
+                // Update statistik dosen jika sebelumnya belum accepted
+                $dosen = $team->dosen;
+                if ($dosen && $team->getOriginal('status') !== 'accepted') {
+                    $dosenProfile = $dosen->dosen;
+                    if ($dosenProfile) {
+                        $dosenProfile->increment('total_wins');
+                        $dosenProfile->increment('total_competitions');
+
+                        // Notifikasi ke dosen
+                        $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'accepted'));
+                    }
+                }
+            } else {
+                // Notifikasi ke dosen jika ditolak
+                $dosen = $team->dosen;
+                if ($dosen) {
+                    $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'rejected', $request->input('reason')));
+                }
+            }
+
             $team->save();
 
             DB::commit();
@@ -457,7 +487,7 @@ class AdminAchievementController extends Controller
 
             $achievement->delete();
 
-            // delete team 
+            // delete team
             $team->competitionMembers()->delete(); // Hapus anggota tim
             $team->delete(); // Hapus tim
 

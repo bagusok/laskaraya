@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { mahasiswaAchievementColumns } from "./columns";
 import useAuth from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,6 +90,11 @@ export default function AchievementsPage({ periods }: Props) {
         setPage(1);
         achievements.refetch();
     };
+
+    useEffect(() => {
+        setAchievementStatus(MahasiswaAchievementStatus.VERIFY_PENDING);
+        setPage(1);
+    }, []);
 
     return (
         <AdminLayout title="Riwayat Prestasi">

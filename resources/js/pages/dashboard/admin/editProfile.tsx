@@ -1,4 +1,3 @@
-import AdminLayout from "@/components/layouts/adminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -150,8 +149,8 @@ export default function EditProfile() {
     };
 
     return (
-        <AdminLayout>
-            <div className="container mx-auto">
+        <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto py-8">
                 <div className="flex items-center gap-4 mb-6">
                     <Button
                         variant="outline"
@@ -762,6 +761,6 @@ export default function EditProfile() {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </div>
     );
 }

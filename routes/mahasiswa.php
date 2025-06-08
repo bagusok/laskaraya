@@ -36,7 +36,8 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'achievements', 'middleware' => ['role:mahasiswa']], function () {
         Route::get('/', [MahasiswaAchievementController::class, 'index'])->name('mahasiswa.achievements.index');
         Route::get('/get-all', [MahasiswaAchievementController::class, 'getAllAchievements'])->name('mahasiswa.achievements.getAll');
-        Route::get('/create', [MahasiswaAchievementController::class, 'createWithCompletedCompetition'])->name('mahasiswa.achievements.create');
-        Route::post('/create', [MahasiswaAchievementController::class, 'postCreateWithCompletedCompetition'])->name('mahasiswa.achievements.create.post');
+        Route::get('/create', [MahasiswaAchievementController::class, 'create'])->name('mahasiswa.achievements.create');
+        Route::post('/create', [MahasiswaAchievementController::class, 'postCreate'])->name('mahasiswa.achievements.create.post');
+        Route::delete('/delete/{id}', [MahasiswaAchievementController::class, 'destroy'])->name('mahasiswa.achievements.destroy');
     });
 });

@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('dosen_profiles', function (Blueprint $table) {
-            $table->integer('total_competitions')->default(0)->after('birth_date');
-            $table->integer('total_wins')->default(0)->after('total_competitions');
+            if (!Schema::hasColumn('dosen_profiles', 'total_competitions')) {
+                $table->integer('total_competitions')->default(0)->after('birth_date');
+            }
+            if (!Schema::hasColumn('dosen_profiles', 'total_wins')) {
+                $table->integer('total_wins')->default(0)->after('total_competitions');
+            }
         });
     }
 
