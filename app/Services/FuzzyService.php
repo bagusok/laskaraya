@@ -17,7 +17,6 @@ class FuzzyService
 
     public function __construct()
     {
-        // Aturan fuzzy yang diperbaiki dengan penekanan pada pengalaman lomba
         $this->fuzzyRules = [
             // Rules prioritas TINGGI untuk DR - harus ada pengalaman
             'R1' => [
@@ -110,7 +109,6 @@ class FuzzyService
             ->with(['skills', 'competitions'])
             ->get()
             ->map(function ($mahasiswa) use ($competitionSkills, $competitionCategory) {
-                // PERBAIKAN: Gabungkan skill match dan actual skill level
                 $skillMatch = $this->calculateSkillMatch($mahasiswa, $competitionSkills);
                 $actualSkillLevel = $this->getActualSkillLevel($mahasiswa);
 
@@ -153,7 +151,7 @@ class FuzzyService
         return $ranked;
     }
 
-    // METHOD BARU: Mengambil skill level sebenarnya dari database
+    // Mengambil skill level sebenarnya dari database
     private function getActualSkillLevel($mahasiswa)
     {
         // Ambil skill level tertinggi mahasiswa dari tabel user_skills
@@ -195,24 +193,43 @@ class FuzzyService
 
     private function getTotalCompetitions($mahasiswa)
     {
-        return DB::table('user_to_competitions')
+        // Ambil kompetisi di mana mahasiswa adalah registrant (ketua tim)
+        $asRegistrant = DB::table('user_to_competitions')
             ->where('registrant_id', $mahasiswa->id)
             ->count();
+
+        // Ambil kompetisi di mana mahasiswa adalah anggota tim
+        $asMember = DB::table('competition_members')
+            ->join('user_to_competitions', 'competition_members.user_to_competition_id', '=', 'user_to_competitions.id')
+            ->where('competition_members.user_id', $mahasiswa->id)
+            ->count();
+
+        return $asRegistrant + $asMember;
     }
 
     private function getTotalWins($mahasiswa)
     {
-        return DB::table('user_to_competitions')
+        // Ambil kemenangan di mana mahasiswa adalah registrant (ketua tim)
+        $winsAsRegistrant = DB::table('user_to_competitions')
             ->where('registrant_id', $mahasiswa->id)
             ->where('status', 'accepted')
             ->count();
+
+        // Ambil kemenangan di mana mahasiswa adalah anggota tim
+        $winsAsMember = DB::table('competition_members')
+            ->join('user_to_competitions', 'competition_members.user_to_competition_id', '=', 'user_to_competitions.id')
+            ->where('competition_members.user_id', $mahasiswa->id)
+            ->where('user_to_competitions.status', 'accepted')
+            ->count();
+
+        return $winsAsRegistrant + $winsAsMember;
     }
 
     private function fuzzification($alternative)
     {
         $fuzzy = [];
 
-        // Skill Level (0-5) - Sekarang menggunakan actual skill level
+        // Skill Level (0-5)
         $skill = $alternative['skill_level'];
 
         if ($skill == 0) {
@@ -220,7 +237,6 @@ class FuzzyService
             $fuzzy['skill_sedang'] = 0.0;
             $fuzzy['skill_tinggi'] = 0.0;
         } else {
-            // Perbaikan membership function untuk skill yang sebenarnya (1-5)
             // Skill rendah: 1-2
             $fuzzy['skill_rendah'] = $this->trapezoidalMembership($skill, 0, 0, 1.5, 2.5);
             // Skill sedang: 2-4
@@ -250,7 +266,7 @@ class FuzzyService
         $winRate = $alternative['win_rate'];
         if ($alternative['total_competitions'] == 0) {
             // Jika belum pernah lomba, set nilai yang mencerminkan kurangnya pengalaman
-            $fuzzy['winrate_rendah'] = 0.8; // Lebih tinggi untuk mencerminkan resiko
+            $fuzzy['winrate_rendah'] = 0.8;
             $fuzzy['winrate_sedang'] = 0.2;
             $fuzzy['winrate_tinggi'] = 0;
         } else {
@@ -406,7 +422,7 @@ class FuzzyService
             return -2; // Penalty kecil untuk pengalaman tanpa hasil
         }
 
-        return 0; // No modifier
+        return 0;
     }
 
     private function calculateImprovedBaselineScore($alternative)
@@ -430,12 +446,11 @@ class FuzzyService
         // Category bonus
         $categoryBonus = $categoryMatch * 8;
 
-        // Experience bonus (DIPERBAIKI - lebih signifikan)
         $experienceBonus = 0;
         if ($totalWins > 0) {
-            $experienceBonus = min($totalWins * 4, 12); // Bonus signifikan untuk kemenangan
+            $experienceBonus = min($totalWins * 4, 12);
         } elseif ($totalCompetitions > 0) {
-            $experienceBonus = min($totalCompetitions * 1, 4); // Bonus kecil untuk partisipasi
+            $experienceBonus = min($totalCompetitions * 1, 4);
         }
 
         $finalScore = $baseScore + $skillBonus + $categoryBonus + $experienceBonus;
@@ -528,7 +543,7 @@ class FuzzyService
             'rule_activations' => $ruleActivations,
             'recommendation_score' => $scoringDetails['final_score'],
             'recommendation_label' => $this->getRecommendationLabel($scoringDetails['final_score']),
-            'scoring_details' => $scoringDetails // Tambahan detail perhitungan
+            'scoring_details' => $scoringDetails
         ];
     }
 
@@ -576,7 +591,6 @@ class FuzzyService
             'experience_modifier' => round($experienceModifier, 2),
             'final_score' => $finalScore,
             'calculation_method' => $calculationMethod,
-            // Detail untuk debugging
             'weighted_average' => $totalWeight > 0 ? round($totalWeightedSum / $totalWeight, 2) : 0,
             'before_modifier' => $totalWeight > 0 ? round($baseScore, 2) : 0
         ];

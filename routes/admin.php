@@ -17,11 +17,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
         Route::post('/response/{id}', [AdminCompetitionController::class, 'responseCompetition'])->name('admin.competitions.response');
 
-        Route::get('/{id}/add-team', [AdminCompetitionController::class, 'addTeam'])->name('admin.competitions.addTeam');
-        Route::post('/{id}/add-team', [AdminCompetitionController::class, 'postAddTeam'])->name('admin.competitions.addTeam.post');
-        Route::get('/{id}/topsis', [AdminCompetitionController::class, 'topsisDetail'])->name('admin.competitions.topsis');
-
-
         Route::delete('/{id}', [AdminCompetitionController::class, 'destroy'])->name('admin.competitions.destroy');
     });
 

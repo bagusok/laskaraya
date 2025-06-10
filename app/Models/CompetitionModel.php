@@ -62,4 +62,26 @@ class CompetitionModel extends Model
 
         return Storage::url('competition_posters/' . $value);
     }
+
+    public function participants()
+    {
+        return $this->belongsToMany(
+            UserModel::class,
+            'user_to_competitions',
+            'competition_id',
+            'registrant_id'
+        )->withPivot('status', 'notes');
+    }
+
+    public function achievements()
+    {
+        return $this->hasManyThrough(
+            AchievementModel::class,
+            UserToCompetition::class,
+            'competition_id', // Foreign key on user_to_competitions table
+            'user_to_competition_id', // Foreign key on achievements table
+            'id', // Local key on competitions table
+            'id' // Local key on user_to_competitions table
+        );
+    }
 }

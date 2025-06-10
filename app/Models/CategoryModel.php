@@ -14,4 +14,9 @@ class CategoryModel extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function competitions()
+    {
+        return $this->hasMany(CompetitionModel::class, 'category_id');
+    }
 }
