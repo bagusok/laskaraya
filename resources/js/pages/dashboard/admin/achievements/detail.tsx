@@ -80,6 +80,11 @@ export default function TeamDetail({
     const query = useQueryClient();
 
     const handleVerify = async (status: "accepted" | "rejected") => {
+        if (!achievement) {
+            toast.error("Prestasi belum diisi");
+            return;
+        }
+
         if (status == "rejected" && !reason) {
             toast.error("Alasan penolakan harus diisi");
             return;
@@ -114,6 +119,11 @@ export default function TeamDetail({
             }
         );
     };
+
+    // Cek status pending
+    const isPending =
+        team.status === "pending" && competition.verified_status === "pending";
+
     return (
         <AdminLayout>
             <div className="container py-8">
@@ -140,30 +150,7 @@ export default function TeamDetail({
                     </div>
                 </div>
                 <div className="w-full grid gap-8">
-                    {team.status != "pending" && achievement !== null && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Verifikasi</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <span>
-                                    Status:{" "}
-                                    <Badge
-                                        className={cn({
-                                            "bg-green-100 text-green-800":
-                                                team.status == "accepted",
-                                            "bg-red-100 text-red-800":
-                                                team.status == "rejected"
-                                        })}
-                                    >
-                                        {team.status}
-                                    </Badge>
-                                </span>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {team.status == "pending" && !processing && (
+                    {isPending && !processing && (
                         <Card>
                             <CardContent className="flex flex-col gap-4 justify-center items-center">
                                 <p className="text-lg font-semibold">
@@ -172,8 +159,11 @@ export default function TeamDetail({
                                 <div className="inline-flex gap-2">
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <Button variant="destructive">
-                                                Setujui
+                                            <Button
+                                                variant="default"
+                                                className="bg-green-600 hover:bg-green-700"
+                                            >
+                                                Terima
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
@@ -197,19 +187,26 @@ export default function TeamDetail({
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
+
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <Button>Tolak Tim</Button>
+                                            <Button variant="destructive">
+                                                Tolak
+                                            </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Tolak Tim?
+                                                    Apa kamu yakin untuk menolak
+                                                    prestasi ini?
                                                 </AlertDialogTitle>
-                                                <AlertDialogDescription asChild>
-                                                    <div>
-                                                        <Label>Alasan</Label>
+                                                <AlertDialogDescription>
+                                                    <div className="mt-4">
+                                                        <Label>
+                                                            Alasan Penolakan
+                                                        </Label>
                                                         <textarea
+                                                            className="w-full mt-2 p-2 border rounded-md"
                                                             value={reason || ""}
                                                             onChange={(e) =>
                                                                 setReason(
@@ -217,10 +214,8 @@ export default function TeamDetail({
                                                                         .value
                                                                 )
                                                             }
-                                                            className="w-full mt-2 p-2 border rounded-md"
-                                                            rows={4}
-                                                            placeholder="Masukkan alasan penolakan"
-                                                        ></textarea>
+                                                            placeholder="Masukkan alasan penolakan..."
+                                                        />
                                                     </div>
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
@@ -239,6 +234,29 @@ export default function TeamDetail({
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {!isPending && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Verifikasi</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <span>
+                                    Status:{" "}
+                                    <Badge
+                                        className={cn({
+                                            "bg-green-100 text-green-800":
+                                                team.status == "accepted",
+                                            "bg-red-100 text-red-800":
+                                                team.status == "rejected"
+                                        })}
+                                    >
+                                        {team.status}
+                                    </Badge>
+                                </span>
                             </CardContent>
                         </Card>
                     )}

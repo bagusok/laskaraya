@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Eye, MoreHorizontal, Trash } from "lucide-react";
+import { Eye, MoreHorizontal, Notebook, Trash } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { User } from "@/types";
 import { Competition } from "../competition-table/columns";
@@ -191,6 +191,17 @@ export const teamColumns = (
                             >
                                 <Eye className="mr-2 h-4 w-4" />
                                 <span>Detail</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={route(
+                                    "admin.teams.logs",
+                                    row.original.id
+                                )}
+                            >
+                                <Notebook className="mr-2 h-4 w-4" />
+                                <span>Log Harian</span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

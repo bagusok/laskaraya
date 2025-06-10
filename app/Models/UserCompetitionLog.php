@@ -5,26 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AchievementModel extends Model
+class UserCompetitionLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'achievements';
+    protected $table = 'user_competition_logs';
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'user_to_competition_id',
         'name',
         'description',
-        'champion',
-        'score',
+        'date'
     ];
 
     public function userToCompetition()
     {
         return $this->belongsTo(UserToCompetition::class, 'user_to_competition_id');
-    }
-
-    public function certificates()
-    {
-        return $this->hasMany(CertificatesModel::class, 'achievement_id');
     }
 }

@@ -83,6 +83,10 @@ class DosenController extends Controller
 
         $teams = \App\Models\UserToCompetition::with(['competition', 'competitionMembers.user'])
             ->where('dosen_id', $dosenId)
+            ->where('status', 'accepted')
+            ->whereHas('competition', function ($q) {
+                $q->where('verified_status', 'accepted');
+            })
             ->when($searchQuery, function ($query) use ($search, $searchQuery) {
                 if ($search === 'name') {
                     $query->whereHas('competitionMembers.user', function ($q) use ($searchQuery) {

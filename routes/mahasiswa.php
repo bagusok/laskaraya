@@ -26,8 +26,13 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
         Route::get('/edit/{id}', [MahasiswaTeamController::class, 'edit'])->name('mahasiswa.teams.edit');
         Route::post('/edit', [MahasiswaTeamController::class, 'postEdit'])->name('mahasiswa.teams.edit.post');
         Route::get('/detail/{id}', [MahasiswaTeamController::class, 'detail'])->name('mahasiswa.teams.detail');
+        Route::get('/detail/{id}/logs', [MahasiswaTeamController::class, 'logs'])->name('mahasiswa.teams.logs');
+        Route::post('/detail/{id}/logs', [MahasiswaTeamController::class, 'postAddLog'])->name('mahasiswa.teams.logs.post');
+        Route::delete('/detail/{id}/logs/{logId}', [MahasiswaTeamController::class, 'deleteLog'])->name('mahasiswa.teams.logs.delete');
         Route::delete('/{id}', [MahasiswaTeamController::class, 'destroy'])->name('mahasiswa.teams.destroy');
         Route::get('/get-all', [MahasiswaTeamController::class, 'getAllTeams'])->name('mahasiswa.teams.getAll');
+
+
 
         Route::get('/{id}/achievement', [MahasiswaAchievementController::class, 'create'])->name('mahasiswa.teams.achievement.create');
         Route::post('/achievement', [MahasiswaAchievementController::class, 'postCreate'])->name('mahasiswa.teams.achievement.create.post');
@@ -36,7 +41,8 @@ Route::group(['prefix' => 'mahasiswa', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'achievements', 'middleware' => ['role:mahasiswa']], function () {
         Route::get('/', [MahasiswaAchievementController::class, 'index'])->name('mahasiswa.achievements.index');
         Route::get('/get-all', [MahasiswaAchievementController::class, 'getAllAchievements'])->name('mahasiswa.achievements.getAll');
-        Route::get('/create', [MahasiswaAchievementController::class, 'createWithCompletedCompetition'])->name('mahasiswa.achievements.create');
-        Route::post('/create', [MahasiswaAchievementController::class, 'postCreateWithCompletedCompetition'])->name('mahasiswa.achievements.create.post');
+        Route::get('/create', [MahasiswaAchievementController::class, 'create'])->name('mahasiswa.achievements.create');
+        Route::post('/create', [MahasiswaAchievementController::class, 'postCreate'])->name('mahasiswa.achievements.create.post');
+        Route::delete('/delete/{id}', [MahasiswaAchievementController::class, 'destroy'])->name('mahasiswa.achievements.destroy');
     });
 });

@@ -1,4 +1,3 @@
-import AdminLayout from "@/components/layouts/adminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { router, usePage } from "@inertiajs/react";
@@ -48,12 +47,12 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
     console.log("USER SKILLS:", userSkills);
 
     return (
-        <AdminLayout>
+        <div className="min-h-screen bg-gray-50">
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="container mx-auto "
+                className="container mx-auto py-8"
             >
                 {/* Header with navigation and actions */}
                 <motion.div
@@ -384,6 +383,6 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
                     </div>
                 </motion.div>
             </motion.div>
-        </AdminLayout>
+        </div>
     );
 }

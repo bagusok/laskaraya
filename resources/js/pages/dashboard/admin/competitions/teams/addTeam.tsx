@@ -86,7 +86,11 @@ export default function JoinCompetition({
         competition_id: competition.id,
         name: "",
         dosen_id: 0,
-        competition_members: []
+        competition_members: [
+            ..._teamMembers.map((member) => ({
+                user_id: member.id
+            }))
+        ]
     });
 
     const [registrant, setRegistrant] = useState<Partial<IUser> | null>(null);
