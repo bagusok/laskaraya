@@ -1,18 +1,17 @@
 <?php
 
+use App\Http\Controllers\admin\ReportController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProgramStudiController;
-use App\Http\Controllers\SkillController;
+use App\Http\Controllers\dosen\DosenAchievementController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\PeriodController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\dosen\DosenAchievementController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\RecommendationController;
-use App\Http\Controllers\mahasiswa\MahasiswaCompetitionController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

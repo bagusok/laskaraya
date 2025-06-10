@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Models\UserModel;
-use App\Models\CompetitionModel;
-use App\Models\UserToCompetition;
+use App\Http\Controllers\Controller;
 use App\Models\AchievementModel;
 use App\Models\CategoryModel;
-use App\Models\PeriodModel;
-use App\Models\SkillModel;
-use Carbon\Carbon;
+use App\Models\CompetitionModel;
+use App\Models\UserModel;
+use App\Models\UserToCompetition;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -451,29 +450,11 @@ class ReportController extends Controller
 
     public function export(Request $request)
     {
-        $format = $request->get('format', 'excel');
-        $year = $request->get('year', date('Y'));
-        $category = $request->get('category', 'all');
-        $level = $request->get('level', 'all');
+        $year = $request->input('year');
+        $category = $request->input('category');
+        $level = $request->input('level');
 
-        // Get all report data
-        $reportData = [
-            'summary' => $this->getSummaryStats($year, $category, $level),
-            'categoryStats' => $this->getCategoryStats($year, $level),
-            'levelDistribution' => $this->getLevelDistribution($year, $category),
-            'monthlyTrend' => $this->getMonthlyTrend($year, $category, $level),
-            'topPerformers' => $this->getTopPerformers($year, $category, $level, 10),
-            'recommendationStats' => $this->getRecommendationStats($year)
-        ];
-
-        switch ($format) {
-            case 'excel':
-                return $this->exportToExcel($reportData, $year, $category, $level);
-            case 'csv':
-                return $this->exportToCsv($reportData, $year, $category, $level);
-            default:
-                return response()->json(['success' => false, 'message' => 'Invalid format'], 400);
-        }
+        return Excel::download(new ReportExport($year, $category, $level), 'report.xlsx');
     }
 
     private function exportToExcel($data, $year, $category, $level)
@@ -553,4 +534,6 @@ class ReportController extends Controller
 
         return response()->download($filePath);
     }
+
+
 }

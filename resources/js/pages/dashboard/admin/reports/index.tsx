@@ -179,38 +179,22 @@ const AdminReportsPage = () => {
 
     const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'];
 
-    const handleExport = async () => {
-        setExportLoading(true);
-        try {
-            const params = new URLSearchParams({
-                format: 'excel',
-                year: exportYear === 'all' ? '' : exportYear,
-                category: exportCategory,
-                level: exportLevel
-            });
+    const handleExport = () => {
+        const yearParam = exportYear === 'all' ? null : exportYear;
+        const categoryParam = exportCategory === 'all' ? null : exportCategory;
+        const levelParam = exportLevel === 'all' ? null : exportLevel;
 
-            const response = await fetch(`/admin/reports/export?${params}`);
-            const data = await response.json();
+        const params = new URLSearchParams({
+            period: yearParam ?? '',
+            category: categoryParam ?? '',
+            level: levelParam ?? ''
+        });
 
-            if (data.success) {
-                // If the API returns a download URL, open it
-                if (data.download_url) {
-                    window.open(data.download_url, '_blank');
-                } else {
-                    // Fallback: direct download
-                    window.open(`/admin/reports/export?${params}`, '_blank');
-                }
-            } else {
-                console.error('Export failed:', data.message);
-                alert('Export failed. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error exporting report:', error);
-            alert('Export failed. Please try again.');
-        } finally {
-            setExportLoading(false);
-        }
+        window.open(`/admin/reports/export?${params.toString()}`, '_blank');
     };
+
+
+
 
     // Reusable StatCard component
     const StatCard = ({ title, value, icon: Icon, trend, color = "purple" }) => (
@@ -558,15 +542,13 @@ const AdminReportsPage = () => {
                                 </CardTitle>
                                 <Dialog>
                                     <DialogTrigger>
-                                        <FileDown
-                                            size="20"
-                                            className="hover:opacity-70"
-                                        />
+                                        <FileDown size="20" className="hover:opacity-70" />
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
                                             <DialogTitle>Ekspor ke Excel</DialogTitle>
                                         </DialogHeader>
+
                                         <div>
                                             <Label>Periode</Label>
                                             <Select
@@ -586,6 +568,7 @@ const AdminReportsPage = () => {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+
                                         <div>
                                             <Label>Kategori</Label>
                                             <Select
@@ -598,13 +581,17 @@ const AdminReportsPage = () => {
                                                 <SelectContent>
                                                     <SelectItem value="all">Semua Kategori</SelectItem>
                                                     {filterOptions.categories.map((category) => (
-                                                        <SelectItem key={category.id} value={category.id.toString()}>
+                                                        <SelectItem
+                                                            key={category.id}
+                                                            value={category.id.toString()}
+                                                        >
                                                             {category.name}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
+
                                         <div>
                                             <Label>Tingkat</Label>
                                             <Select
@@ -624,25 +611,27 @@ const AdminReportsPage = () => {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+
                                         <DialogFooter>
                                             <Button
                                                 variant="default"
                                                 className="w-full bg-green-600 hover:bg-green-700 text-white"
-                                                onClick={handleExport}
-                                                disabled={exportLoading}
+                                                onClick={() => {
+                                                    const params = new URLSearchParams({
+                                                        year: exportYear === "all" ? "" : exportYear,
+                                                        category: exportCategory === "all" ? "" : exportCategory,
+                                                        level: exportLevel === "all" ? "" : exportLevel,
+                                                        format: "excel",
+                                                    });
+                                                    window.open(`/admin/reports/export?${params.toString()}`, "_blank");
+                                                }}
                                             >
-                                                {exportLoading ? (
-                                                    <>
-                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                        Generating...
-                                                    </>
-                                                ) : (
-                                                    'Ekspor'
-                                                )}
+                                                Ekspor
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
+
                             </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-gray-600">
