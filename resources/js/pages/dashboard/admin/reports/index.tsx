@@ -6,7 +6,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AdminLayout from "@/components/layouts/adminLayout";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Calendar, Trophy, Users, TrendingUp, Filter, Activity, Award, Target, FileDown } from 'lucide-react';
+import { Download, FileText, Calendar, Trophy, Users, TrendingUp, Filter, Activity, Award, Target, FileDown, Loader2 } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -25,103 +25,194 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
+// Types for API responses
+interface SummaryStats {
+    totalStudents: number;
+    totalCompetitions: number;
+    totalAchievements: number;
+    winRate: number;
+}
+
+interface CategoryStat {
+    name: string;
+    competitions: number;
+    wins: number;
+    students: number;
+}
+
+interface LevelDistribution {
+    level: string;
+    count: number;
+    percentage: number;
+}
+
+interface MonthlyTrend {
+    month: string;
+    competitions: number;
+    achievements: number;
+}
+
+interface TopPerformer {
+    name: string;
+    nim: string;
+    achievements: number;
+    categories: string[];
+    prodi?: string;
+}
+
+interface RecommendationStats {
+    totalRecommendations: number;
+    acceptedRecommendations: number;
+    successRate: number;
+    averageMatchScore: number;
+}
+
+interface ReportData {
+    summary: SummaryStats;
+    categoryStats: CategoryStat[];
+    levelDistribution: LevelDistribution[];
+    monthlyTrend: MonthlyTrend[];
+    topPerformers: TopPerformer[];
+    recommendationStats: RecommendationStats;
+}
+
+interface FilterOptions {
+    years: string[];
+    categories: Array<{ id: number; name: string }>;
+    levels: Array<{ value: string; label: string }>;
+}
+
 const AdminReportsPage = () => {
-    const [selectedYear, setSelectedYear] = useState('2024');
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [selectedLevel, setSelectedLevel] = useState('all');
-    const [exportYear, setExportYear] = useState<string | null>('all');
+    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedLevel, setSelectedLevel] = useState<string>('all');
+    const [exportYear, setExportYear] = useState<string>('all');
     const [exportCategory, setExportCategory] = useState<string>('all');
     const [exportLevel, setExportLevel] = useState<string>('all');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [exportLoading, setExportLoading] = useState<boolean>(false);
+    const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
-    // Mock periods data similar to index.tsx
-    const periods = [
-        { id: 1, name: '2024' },
-        { id: 2, name: '2023' },
-        { id: 3, name: '2022' }
-    ];
+    // State for filter options and report data
+    const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+        years: [],
+        categories: [],
+        levels: []
+    });
 
+    const [reportData, setReportData] = useState<ReportData>({
+        summary: {
+            totalStudents: 0,
+            totalCompetitions: 0,
+            totalAchievements: 0,
+            winRate: 0
+        },
+        categoryStats: [],
+        levelDistribution: [],
+        monthlyTrend: [],
+        topPerformers: [],
+        recommendationStats: {
+            totalRecommendations: 0,
+            acceptedRecommendations: 0,
+            successRate: 0,
+            averageMatchScore: 0
+        }
+    });
+
+    // Fetch filter options
+    const fetchFilterOptions = async () => {
+        try {
+            const response = await fetch('/admin/reports/filters');
+            const data = await response.json();
+            if (data.success) {
+                setFilterOptions(data.data);
+                // Set default year to the most recent year if available
+                if (data.data.years.length > 0) {
+                    setSelectedYear(data.data.years[0].toString());
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching filter options:', error);
+        }
+    };
+
+    // Fetch report data
     const fetchReportData = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/admin/reports/data?year=${selectedYear}&category=${selectedCategory}&level=${selectedLevel}`);
+            const params = new URLSearchParams({
+                year: selectedYear,
+                category: selectedCategory,
+                level: selectedLevel
+            });
+
+            const response = await fetch(`/admin/reports/data?${params}`);
             const data = await response.json();
+
             if (data.success) {
                 setReportData(data.data);
+            } else {
+                console.error('Failed to fetch report data:', data.message);
             }
         } catch (error) {
             console.error('Error fetching report data:', error);
         } finally {
             setLoading(false);
+            setInitialLoading(false);
         }
     };
 
+    // Initialize data on component mount
     useEffect(() => {
-        fetchReportData();
-    }, [selectedYear, selectedCategory, selectedLevel]);
+        const initializeData = async () => {
+            await fetchFilterOptions();
+        };
+        initializeData();
+    }, []);
 
-    // Mock data - replace with actual API calls
-    const [reportData, setReportData] = useState({
-        summary: {
-            totalStudents: 1250,
-            totalCompetitions: 85,
-            totalAchievements: 156,
-            winRate: 68.2
-        },
-        categoryStats: [
-            { name: 'Programming', competitions: 25, wins: 18, students: 45 },
-            { name: 'Design', competitions: 15, wins: 12, students: 28 },
-            { name: 'Business', competitions: 20, wins: 14, students: 35 },
-            { name: 'Research', competitions: 12, wins: 8, students: 22 },
-            { name: 'Innovation', competitions: 13, wins: 9, students: 26 }
-        ],
-        levelDistribution: [
-            { level: 'Internasional', count: 15, percentage: 18 },
-            { level: 'Nasional', count: 32, percentage: 38 },
-            { level: 'Regional', count: 28, percentage: 33 },
-            { level: 'Lokal', count: 9, percentage: 11 }
-        ],
-        monthlyTrend: [
-            { month: 'Jan', competitions: 8, achievements: 5 },
-            { month: 'Feb', competitions: 12, achievements: 8 },
-            { month: 'Mar', competitions: 15, achievements: 12 },
-            { month: 'Apr', competitions: 10, achievements: 7 },
-            { month: 'May', competitions: 18, achievements: 14 },
-            { month: 'Jun', competitions: 22, achievements: 18 }
-        ],
-        topPerformers: [
-            { name: 'Ahmad Fauzi', nim: '2021001', achievements: 5, categories: ['Programming', 'Innovation'] },
-            { name: 'Sari Dewi', nim: '2021002', achievements: 4, categories: ['Design', 'Business'] },
-            { name: 'Budi Santoso', nim: '2021003', achievements: 4, categories: ['Research', 'Programming'] },
-            { name: 'Maya Sari', nim: '2021004', achievements: 3, categories: ['Business', 'Innovation'] },
-            { name: 'Eko Prabowo', nim: '2021005', achievements: 3, categories: ['Programming', 'Design'] }
-        ],
-        recommendationStats: {
-            totalRecommendations: 245,
-            acceptedRecommendations: 167,
-            successRate: 68.2,
-            averageMatchScore: 7.8
+    // Fetch report data when filters change
+    useEffect(() => {
+        if (selectedYear) {
+            fetchReportData();
         }
-    });
+    }, [selectedYear, selectedCategory, selectedLevel]);
 
     const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'];
 
-    const handleExport = () => {
-        setLoading(true);
-        // Construct the export URL similar to index.tsx
-        window.open(
-            `/admin/reports/export?${new URLSearchParams({
+    const handleExport = async () => {
+        setExportLoading(true);
+        try {
+            const params = new URLSearchParams({
                 format: 'excel',
                 year: exportYear === 'all' ? '' : exportYear,
                 category: exportCategory,
                 level: exportLevel
-            }).toString()}`,
-            '_blank'
-        );
-        setTimeout(() => setLoading(false), 2000);
+            });
+
+            const response = await fetch(`/admin/reports/export?${params}`);
+            const data = await response.json();
+
+            if (data.success) {
+                // If the API returns a download URL, open it
+                if (data.download_url) {
+                    window.open(data.download_url, '_blank');
+                } else {
+                    // Fallback: direct download
+                    window.open(`/admin/reports/export?${params}`, '_blank');
+                }
+            } else {
+                console.error('Export failed:', data.message);
+                alert('Export failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error exporting report:', error);
+            alert('Export failed. Please try again.');
+        } finally {
+            setExportLoading(false);
+        }
     };
 
-    // Reusable StatCard component inspired by index.tsx
+    // Reusable StatCard component
     const StatCard = ({ title, value, icon: Icon, trend, color = "purple" }) => (
         <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
             <CardContent className="p-6">
@@ -131,7 +222,7 @@ const AdminReportsPage = () => {
                         <p className="text-2xl font-bold text-gray-900">{value}</p>
                         {trend && (
                             <p className={`text-sm ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {trend > 0 ? '+' : ''}{trend}% dari bulan lalu
+                                {trend > 0 ? '+' : ''}{trend}% dari periode sebelumnya
                             </p>
                         )}
                     </div>
@@ -143,7 +234,7 @@ const AdminReportsPage = () => {
         </Card>
     );
 
-    // Component for Top Performers inspired by ProfileCard/EventList
+    // Component for Top Performers
     const TopPerformersList = ({ performers, className = "" }) => (
         <Card className={`border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all ${className}`}>
             <CardHeader>
@@ -152,34 +243,41 @@ const AdminReportsPage = () => {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-4">
-                    {performers.map((student, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-purple-50/30 rounded-lg hover:bg-purple-100/30 transition-all">
-                            <div>
-                                <p className="font-medium text-gray-900">{student.name}</p>
-                                <p className="text-sm text-gray-600">NIM: {student.nim}</p>
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                    {student.categories.map((cat, idx) => (
-                                        <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                            {cat}
-                                        </span>
-                                    ))}
+                {performers.length === 0 ? (
+                    <p className="text-gray-500 text-center py-4">Tidak ada data performer</p>
+                ) : (
+                    <div className="space-y-4">
+                        {performers.map((student, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-purple-50/30 rounded-lg hover:bg-purple-100/30 transition-all">
+                                <div>
+                                    <p className="font-medium text-gray-900">{student.name}</p>
+                                    <p className="text-sm text-gray-600">NIM: {student.nim}</p>
+                                    {student.prodi && (
+                                        <p className="text-sm text-gray-500">{student.prodi}</p>
+                                    )}
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                        {student.categories.map((cat, idx) => (
+                                            <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                                {cat}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="flex items-center gap-1">
+                                        <Trophy className="h-4 w-4 text-yellow-500" />
+                                        <span className="font-semibold">{student.achievements}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <div className="flex items-center gap-1">
-                                    <Trophy className="h-4 w-4 text-yellow-500" />
-                                    <span className="font-semibold">{student.achievements}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </CardContent>
         </Card>
     );
 
-    // Component for Recommendation Stats inspired by ProgramStudiList/PeriodList
+    // Component for Recommendation Stats
     const RecommendationStatsList = ({ stats, className = "" }) => (
         <Card className={`border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all ${className}`}>
             <CardHeader>
@@ -218,6 +316,19 @@ const AdminReportsPage = () => {
         </Card>
     );
 
+    if (initialLoading) {
+        return (
+            <AdminLayout>
+                <div className="flex items-center justify-center min-h-96">
+                    <div className="text-center">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                        <p className="text-gray-600">Memuat data laporan...</p>
+                    </div>
+                </div>
+            </AdminLayout>
+        );
+    }
+
     return (
         <AdminLayout>
             <section className="mb-10">
@@ -227,27 +338,23 @@ const AdminReportsPage = () => {
                         title="Total Mahasiswa Aktif"
                         value={reportData.summary.totalStudents.toLocaleString()}
                         icon={Users}
-                        trend={8.5}
                     />
                     <StatCard
                         title="Total Kompetisi"
                         value={reportData.summary.totalCompetitions}
                         icon={Trophy}
-                        trend={15.2}
                         color="green"
                     />
                     <StatCard
                         title="Total Prestasi"
                         value={reportData.summary.totalAchievements}
                         icon={Award}
-                        trend={12.8}
                         color="purple"
                     />
                     <StatCard
                         title="Tingkat Keberhasilan"
                         value={`${reportData.summary.winRate}%`}
                         icon={Target}
-                        trend={5.3}
                         color="orange"
                     />
                 </div>
@@ -276,9 +383,9 @@ const AdminReportsPage = () => {
                                             <SelectValue placeholder="Tahun" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {periods.map((period) => (
-                                                <SelectItem key={period.id} value={period.name}>
-                                                    {period.name}
+                                            {filterOptions.years.map((year) => (
+                                                <SelectItem key={year} value={year.toString()}>
+                                                    {year}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -295,10 +402,11 @@ const AdminReportsPage = () => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">Semua Kategori</SelectItem>
-                                            <SelectItem value="programming">Programming</SelectItem>
-                                            <SelectItem value="design">Design</SelectItem>
-                                            <SelectItem value="business">Business</SelectItem>
-                                            <SelectItem value="research">Research</SelectItem>
+                                            {filterOptions.categories.map((category) => (
+                                                <SelectItem key={category.id} value={category.id.toString()}>
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -313,18 +421,27 @@ const AdminReportsPage = () => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">Semua Tingkat</SelectItem>
-                                            <SelectItem value="5">Internasional</SelectItem>
-                                            <SelectItem value="4">Nasional</SelectItem>
-                                            <SelectItem value="3">Regional</SelectItem>
-                                            <SelectItem value="2">Provinsi</SelectItem>
-                                            <SelectItem value="1">Lokal</SelectItem>
+                                            {filterOptions.levels.map((level) => (
+                                                <SelectItem key={level.value} value={level.value}>
+                                                    {level.label}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="flex items-end">
-                                    <Button className="bg-purple-600 hover:bg-purple-700 text-white" type="button">
-                                        <Filter className="mr-2 h-4 w-4" />
-                                        Filter
+                                    <Button
+                                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                                        type="button"
+                                        disabled={loading}
+                                        onClick={fetchReportData}
+                                    >
+                                        {loading ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Filter className="mr-2 h-4 w-4" />
+                                        )}
+                                        {loading ? 'Memuat...' : 'Filter'}
                                     </Button>
                                 </div>
                             </div>
@@ -334,81 +451,105 @@ const AdminReportsPage = () => {
 
                 {/* Charts Section */}
                 <div className="lg:col-span-8 space-y-6">
-                    <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-gray-900">
-                                Prestasi Berdasarkan Kategori
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={reportData.categoryStats}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="competitions" fill="#8884d8" name="Total Kompetisi" />
-                                    <Bar dataKey="wins" fill="#82ca9d" name="Prestasi Diraih" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-gray-900">
-                                Tren Prestasi Bulanan
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <LineChart data={reportData.monthlyTrend}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="month" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Line type="monotone" dataKey="competitions" stroke="#8884d8" name="Kompetisi Diikuti" />
-                                    <Line type="monotone" dataKey="achievements" stroke="#82ca9d" name="Prestasi Diraih" />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-gray-900">
-                                Ringkasan Prestasi Kategori
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm text-left text-gray-700">
-                                    <thead className="text-xs text-gray-900 uppercase bg-purple-50">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3">Kategori</th>
-                                        <th scope="col" className="px-6 py-3">Total Kompetisi</th>
-                                        <th scope="col" className="px-6 py-3">Prestasi Diraih</th>
-                                        <th scope="col" className="px-6 py-3">Tingkat Kemenangan</th>
-                                        <th scope="col" className="px-6 py-3">Prestasi Bulan Ini</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {reportData.categoryStats.map((category, index) => (
-                                        <tr key={index} className="bg-white border-b hover:bg-purple-50">
-                                            <td className="px-6 py-4 font-medium">{category.name}</td>
-                                            <td className="px-6 py-4">{category.competitions}</td>
-                                            <td className="px-6 py-4">{category.wins}</td>
-                                            <td className="px-6 py-4">{((category.wins / category.competitions) * 100).toFixed(1)}%</td>
-                                            <td className="px-6 py-4">
-                                                {reportData.monthlyTrend[reportData.monthlyTrend.length - 1].achievements || 0}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                    {loading ? (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                                <p className="text-gray-600">Memuat data chart...</p>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    ) : (
+                        <>
+                            <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-semibold text-gray-900">
+                                        Prestasi Berdasarkan Kategori
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {reportData.categoryStats.length === 0 ? (
+                                        <p className="text-gray-500 text-center py-8">Tidak ada data kategori untuk periode yang dipilih</p>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <BarChart data={reportData.categoryStats}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="name" />
+                                                <YAxis />
+                                                <Tooltip />
+                                                <Legend />
+                                                <Bar dataKey="competitions" fill="#8884d8" name="Total Kompetisi" />
+                                                <Bar dataKey="wins" fill="#82ca9d" name="Prestasi Diraih" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-semibold text-gray-900">
+                                        Tren Prestasi Bulanan
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <LineChart data={reportData.monthlyTrend}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="month" />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Legend />
+                                            <Line type="monotone" dataKey="competitions" stroke="#8884d8" name="Kompetisi Diikuti" />
+                                            <Line type="monotone" dataKey="achievements" stroke="#82ca9d" name="Prestasi Diraih" />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-semibold text-gray-900">
+                                        Ringkasan Prestasi Kategori
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {reportData.categoryStats.length === 0 ? (
+                                        <p className="text-gray-500 text-center py-4">Tidak ada data untuk ditampilkan</p>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm text-left text-gray-700">
+                                                <thead className="text-xs text-gray-900 uppercase bg-purple-50">
+                                                <tr>
+                                                    <th scope="col" className="px-6 py-3">Kategori</th>
+                                                    <th scope="col" className="px-6 py-3">Total Kompetisi</th>
+                                                    <th scope="col" className="px-6 py-3">Prestasi Diraih</th>
+                                                    <th scope="col" className="px-6 py-3">Tingkat Kemenangan</th>
+                                                    <th scope="col" className="px-6 py-3">Mahasiswa Terlibat</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {reportData.categoryStats.map((category, index) => (
+                                                    <tr key={index} className="bg-white border-b hover:bg-purple-50">
+                                                        <td className="px-6 py-4 font-medium">{category.name}</td>
+                                                        <td className="px-6 py-4">{category.competitions}</td>
+                                                        <td className="px-6 py-4">{category.wins}</td>
+                                                        <td className="px-6 py-4">
+                                                            {category.competitions > 0
+                                                                ? ((category.wins / category.competitions) * 100).toFixed(1)
+                                                                : 0}%
+                                                        </td>
+                                                        <td className="px-6 py-4">{category.students}</td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </>
+                    )}
+
                     <div className="lg:col-span-12">
                         <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
                             <CardHeader className="flex flex-row justify-between items-center">
@@ -430,16 +571,16 @@ const AdminReportsPage = () => {
                                             <Label>Periode</Label>
                                             <Select
                                                 onValueChange={(value) => setExportYear(value)}
-                                                value={exportYear ?? 'all'}
+                                                value={exportYear}
                                             >
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue placeholder="Periode" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="all">Semua Periode</SelectItem>
-                                                    {periods.map((period) => (
-                                                        <SelectItem key={period.id} value={period.name}>
-                                                            {period.name}
+                                                    {filterOptions.years.map((year) => (
+                                                        <SelectItem key={year} value={year.toString()}>
+                                                            {year}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -456,10 +597,11 @@ const AdminReportsPage = () => {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="all">Semua Kategori</SelectItem>
-                                                    <SelectItem value="programming">Programming</SelectItem>
-                                                    <SelectItem value="design">Design</SelectItem>
-                                                    <SelectItem value="business">Business</SelectItem>
-                                                    <SelectItem value="research">Research</SelectItem>
+                                                    {filterOptions.categories.map((category) => (
+                                                        <SelectItem key={category.id} value={category.id.toString()}>
+                                                            {category.name}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -474,11 +616,11 @@ const AdminReportsPage = () => {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="all">Semua Tingkat</SelectItem>
-                                                    <SelectItem value="5">Internasional</SelectItem>
-                                                    <SelectItem value="4">Nasional</SelectItem>
-                                                    <SelectItem value="3">Regional</SelectItem>
-                                                    <SelectItem value="2">Provinsi</SelectItem>
-                                                    <SelectItem value="1">Lokal</SelectItem>
+                                                    {filterOptions.levels.map((level) => (
+                                                        <SelectItem key={level.value} value={level.value}>
+                                                            {level.label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -487,9 +629,16 @@ const AdminReportsPage = () => {
                                                 variant="default"
                                                 className="w-full bg-green-600 hover:bg-green-700 text-white"
                                                 onClick={handleExport}
-                                                disabled={loading}
+                                                disabled={exportLoading}
                                             >
-                                                {loading ? 'Generating...' : 'Ekspor'}
+                                                {exportLoading ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Generating...
+                                                    </>
+                                                ) : (
+                                                    'Ekspor'
+                                                )}
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>
@@ -506,36 +655,51 @@ const AdminReportsPage = () => {
 
                 {/* Sidebar Section */}
                 <div className="lg:col-span-4 space-y-6">
-                    <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-gray-900">
-                                Distribusi Tingkat Kompetisi
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <PieChart>
-                                    <Pie
-                                        data={reportData.levelDistribution}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        label={({ level, percentage }) => `${level} (${percentage}%)`}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="count"
-                                    >
-                                        {reportData.levelDistribution.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                    <TopPerformersList performers={reportData.topPerformers} />
-                    <RecommendationStatsList stats={reportData.recommendationStats} />
+                    {loading ? (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                                <p className="text-gray-600 text-sm">Memuat...</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <Card className="border-2 border-purple-200 hover:shadow-md shadow-purple-100 transition-all">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-semibold text-gray-900">
+                                        Distribusi Tingkat Kompetisi
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {reportData.levelDistribution.length === 0 ? (
+                                        <p className="text-gray-500 text-center py-8">Tidak ada data distribusi tingkat</p>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <PieChart>
+                                                <Pie
+                                                    data={reportData.levelDistribution}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    labelLine={false}
+                                                    label={({ level, percentage }) => `${level} (${percentage}%)`}
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="count"
+                                                >
+                                                    {reportData.levelDistribution.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </CardContent>
+                            </Card>
+                            <TopPerformersList performers={reportData.topPerformers} />
+                            <RecommendationStatsList stats={reportData.recommendationStats} />
+                        </>
+                    )}
                 </div>
             </div>
         </AdminLayout>

@@ -160,11 +160,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             ->name('admin.recommendations.export');
 
         // Reports routes - perbaikan yang perlu ditambahkan
-        Route::get('admin.reports', [ReportController::class, 'showReportsPage'])->name('admin.reports.index');
-        Route::get('admin.reports.data', [ReportController::class, 'index'])->name('admin.reports.data');
-        Route::get('admin.reports.filters', [ReportController::class, 'getFilters'])->name('admin.reports.filters');
-        Route::get('admin.reports.export', [ReportController::class, 'export'])->name('admin.reports.export');
-        Route::get('/admin/reports/download/{filename}', [ReportController::class, 'downloadReport'])->name('admin.reports.download');
+    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+
+// API endpoints for AJAX calls
+    Route::get('/admin/reports/data', [ReportController::class, 'getData'])->name('admin.reports.data');
+    Route::get('/admin/reports/filters', [ReportController::class, 'getFilters'])->name('admin.reports.filters');
+    Route::get('/admin/reports/export', [ReportController::class, 'export'])->name('admin.reports.export');
+    Route::get('/admin/reports/download/{filename}', [ReportController::class, 'downloadReport'])->name('admin.reports.download');
 });
 
 Route::get('/dashboard/dosen', [DosenController::class, 'index'])->name('dashboard.dosen');
