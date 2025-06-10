@@ -193,17 +193,36 @@ class FuzzyService
 
     private function getTotalCompetitions($mahasiswa)
     {
-        return DB::table('user_to_competitions')
+        // Ambil kompetisi di mana mahasiswa adalah registrant (ketua tim)
+        $asRegistrant = DB::table('user_to_competitions')
             ->where('registrant_id', $mahasiswa->id)
             ->count();
+
+        // Ambil kompetisi di mana mahasiswa adalah anggota tim
+        $asMember = DB::table('competition_members')
+            ->join('user_to_competitions', 'competition_members.user_to_competition_id', '=', 'user_to_competitions.id')
+            ->where('competition_members.user_id', $mahasiswa->id)
+            ->count();
+
+        return $asRegistrant + $asMember;
     }
 
     private function getTotalWins($mahasiswa)
     {
-        return DB::table('user_to_competitions')
+        // Ambil kemenangan di mana mahasiswa adalah registrant (ketua tim)
+        $winsAsRegistrant = DB::table('user_to_competitions')
             ->where('registrant_id', $mahasiswa->id)
             ->where('status', 'accepted')
             ->count();
+
+        // Ambil kemenangan di mana mahasiswa adalah anggota tim
+        $winsAsMember = DB::table('competition_members')
+            ->join('user_to_competitions', 'competition_members.user_to_competition_id', '=', 'user_to_competitions.id')
+            ->where('competition_members.user_id', $mahasiswa->id)
+            ->where('user_to_competitions.status', 'accepted')
+            ->count();
+
+        return $winsAsRegistrant + $winsAsMember;
     }
 
     private function fuzzification($alternative)
