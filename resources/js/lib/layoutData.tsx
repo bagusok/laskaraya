@@ -30,10 +30,6 @@ export const navItems: NavItem[] = [
                 href: route("admin.competitions.index")
             },
             {
-                label: "Verifikasi Data",
-                href: "/dashboard/competitions/verify"
-            },
-            {
                 label: "Manajemen Periode",
                 href: route("period")
             },
@@ -61,7 +57,10 @@ export const navItems: NavItem[] = [
                 label: "Rekomendasi Peserta",
                 href: route("admin.recommendations.index")
             },
-            { label: "Laporan & Analisis", href: "/dashboard/reports" }
+            {
+                label: "Laporan & Analisis",
+                href: route("admin.reports.index")
+            }
         ]
     },
     {
