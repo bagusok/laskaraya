@@ -46,4 +46,9 @@ class UserToCompetition extends Model
     {
         return $this->hasOne(AchievementModel::class, 'user_to_competition_id');
     }
+
+    public function logs()
+    {
+        return $this->hasMany(UserCompetitionLog::class, 'user_to_competition_id');
+    }
 }

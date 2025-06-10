@@ -9,7 +9,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, Medal, MoreHorizontal, Trash } from "lucide-react";
+import {
+    Edit,
+    Eye,
+    Medal,
+    MoreHorizontal,
+    Notebook,
+    Trash
+} from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { User } from "@/types";
 import { Competition } from "../competition-table/columns";
@@ -234,6 +241,17 @@ export const teamColumns = (
                                     <span>Hapus</span>
                                 </DropdownMenuItem>
                             )}
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={route(
+                                    "mahasiswa.teams.logs",
+                                    row.original.id
+                                )}
+                            >
+                                <Notebook className="mr-2 h-4 w-4" />
+                                <span>Log Harian</span>
+                            </Link>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

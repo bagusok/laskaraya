@@ -30,6 +30,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
         Route::get('/edit/{id}', [AdminTeamController::class, 'edit'])->name('admin.teams.edit');
         Route::post('/edit', [AdminTeamController::class, 'postEdit'])->name('admin.teams.edit.post');
         Route::get('/detail/{id}', [AdminTeamController::class, 'detail'])->name('admin.teams.detail');
+        Route::get('/detail/{id}/logs', [AdminTeamController::class, 'logs'])->name('admin.teams.logs');
 
         Route::post('/response/{id}', [AdminTeamController::class, 'responseTeam'])->name('admin.teams.response');
 

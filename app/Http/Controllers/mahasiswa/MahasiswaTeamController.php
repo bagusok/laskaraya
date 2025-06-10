@@ -4,6 +4,7 @@ namespace App\Http\Controllers\mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\CompetitionMember;
+use App\Models\UserCompetitionLog;
 use App\Models\UserModel;
 use App\Models\UserToCompetition;
 use Exception;
@@ -174,5 +175,54 @@ class MahasiswaTeamController extends Controller
             'achievement' => $achievement,
             'certificates' => $achievement ? $achievement->certificates : [],
         ]);
+    }
+
+    public function logs(Request $request, $id)
+    {
+        $team = UserToCompetition::with(['competitionMembers', 'competition', 'competitionMembers.user'])
+            ->findOrFail($id);
+
+        $logs = $team->logs()->orderBy('created_at', 'desc')->get();
+
+        return Inertia::render('dashboard/mahasiswa/competitions/teams/logs/index', [
+            'team' => $team,
+            'competition' => $team->competition,
+            'members' => $team->competitionMembers->pluck('user')->toArray(),
+            'logs' => $logs,
+        ]);
+    }
+
+    public function postAddLog(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'date' => 'required|date',
+        ]);
+
+        $team = UserToCompetition::findOrFail($id);
+
+        $add =  UserCompetitionLog::create([
+            'user_to_competition_id' => $team->id,
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'date' => $request->input('date'),
+        ]);
+
+        if (!$add) {
+            return back()->withErrors(['error' => 'Gagal menambahkan log.']);
+        }
+
+        return back()->with('success', 'Log berhasil ditambahkan.');
+    }
+
+    public function deleteLog(Request $request, $teamId, $logId)
+
+    {
+        $log = UserCompetitionLog::find($logId);
+
+        $log->delete();
+
+        return back()->with('success', 'Log berhasil dihapus.');
     }
 }

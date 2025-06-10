@@ -110,4 +110,19 @@ class AdminTeamController extends Controller
 
         return back()->with('success', 'Team deleted successfully.');
     }
+
+    public function logs(Request $request, $id)
+    {
+        $team = UserToCompetition::with(['competitionMembers', 'competition', 'competitionMembers.user'])
+            ->findOrFail($id);
+
+        $logs = $team->logs()->orderBy('created_at', 'desc')->get();
+
+        return Inertia::render('dashboard/admin/competitions/teams/logs/index', [
+            'team' => $team,
+            'competition' => $team->competition,
+            'members' => $team->competitionMembers->pluck('user')->toArray(),
+            'logs' => $logs,
+        ]);
+    }
 }
