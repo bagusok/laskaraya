@@ -6,10 +6,42 @@ import MahasiswaChart from "@/components/ui/mahasiswaChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useAuth from "@/hooks/use-auth";
 import { upcomingEvents } from "@/lib/adminData";
-import { stats } from "@/lib/mahasiswaData";
+import { User, Award, Trophy, Flag } from "lucide-react";
 
-export default function MahasiswaDashboard() {
+interface Stat {
+    label: string;
+    value: string;
+    icon: string;
+}
+
+interface MahasiswaDashboardProps {
+    stats: Stat[];
+}
+
+// Helper function to get icon component
+const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+        case 'User':
+            return <User className="text-blue-500" />;
+        case 'Flag':
+            return <Flag className="text-purple-500" />;
+        case 'Trophy':
+            return <Trophy className="text-green-500" />;
+        case 'Award':
+            return <Award className="text-amber-500" />;
+        default:
+            return <User className="text-blue-500" />;
+    }
+};
+
+export default function MahasiswaDashboard({ stats }: MahasiswaDashboardProps) {
     const { user } = useAuth();
+
+    // Convert stats to include proper icons
+    const statsWithIcons = stats.map(stat => ({
+        ...stat,
+        icon: getIconComponent(stat.icon)
+    }));
 
     // Get values from stats
     const wins = parseInt(stats.find(stat => stat.label === "Menang")?.value || "0");
@@ -42,7 +74,7 @@ export default function MahasiswaDashboard() {
                     <ProfileCard user={user} className="" />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
-                    {stats.map((stat, index) => (
+                    {statsWithIcons.map((stat, index) => (
                         <StatCard
                             key={index}
                             label={stat.label}

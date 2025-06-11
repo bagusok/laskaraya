@@ -5,15 +5,51 @@ import ProgramStudiList from "@/components/ui/admin/dashboard/programStudiList";
 import PeriodList from "@/components/ui/admin/dashboard/periodList";
 import AdminLayout from "@/components/layouts/adminLayout";
 import useAuth from "@/hooks/use-auth";
-import { stats, upcomingEvents, programStudi, periods } from "@/lib/adminData";
+import { upcomingEvents, programStudi, periods } from "@/lib/adminData";
+import { User, Users, Award, Trophy, Flag, BookOpen, Calendar, Target } from "lucide-react";
 
-export default function AdminDashboard() {
+interface Stat {
+    label: string;
+    value: string;
+    icon: string;
+}
+
+interface AdminDashboardProps {
+    stats: Stat[];
+}
+
+// Helper function to get icon component
+const getIconComponent = (iconName: string) => {
+    const iconProps = "w-5 h-5";
+
+    switch (iconName) {
+        case 'User':
+            return <User className={iconProps} />;
+        case 'Users':
+            return <Users className={iconProps} />;
+        case 'Award':
+            return <Award className={iconProps} />;
+        case 'Trophy':
+            return <Trophy className={iconProps} />;
+        case 'Flag':
+            return <Flag className={iconProps} />;
+        case 'BookOpen':
+            return <BookOpen className={iconProps} />;
+        case 'Calendar':
+            return <Calendar className={iconProps} />;
+        case 'Target':
+            return <Target className={iconProps} />;
+        default:
+            return <User className={iconProps} />;
+    }
+};
+
+export default function AdminDashboard({ stats }: AdminDashboardProps) {
     const { user } = useAuth();
 
     return (
         <AdminLayout>
             {/* Statistics cards */}
-
             <section className="mb-10">
                 <div className="lg:hidden space-y-6">
                     <ProfileCard user={user} className="" />
@@ -24,7 +60,7 @@ export default function AdminDashboard() {
                             key={index}
                             label={stat.label}
                             value={stat.value}
-                            icon={stat.icon}
+                            icon={getIconComponent(stat.icon)} // Pass actual icon component
                             className=""
                         />
                     ))}

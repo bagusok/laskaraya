@@ -7,7 +7,7 @@ import LombaKompetisiList from "@/components/ui/dosen/dashboard/lombaKompetisiLi
 import { Head, Link } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Award, Trophy, Users } from "lucide-react";
+import { Award, Trophy, Users, Target } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { User } from "@/types/profile";
@@ -69,12 +69,15 @@ interface Lomba {
 
 export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
     console.log("STATS DARI BACKEND:", stats);
+
+    // Provide fallback values untuk safety
     const safeStats = stats ?? {
         total_competitions: 0,
         total_wins: 0,
         total_students: 0,
         win_rate: 0
     };
+
     const { user } = useAuth();
 
     const lombaKompetisi = useQuery({
@@ -85,26 +88,27 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
         }
     });
 
+    // Ubah format stats untuk konsistensi dengan format lain
     const statsData = [
         {
             label: "Total Lomba",
-            value: safeStats.total_competitions,
-            icon: <Award className="w-5 h-5" />
+            value: safeStats.total_competitions.toString(), // Convert to string untuk konsistensi
+            icon: <Award className="w-5 h-5 text-blue-500" />
         },
         {
             label: "Total Kemenangan",
-            value: safeStats.total_wins,
-            icon: <Trophy className="w-5 h-5" />
+            value: safeStats.total_wins.toString(),
+            icon: <Trophy className="w-5 h-5 text-amber-500" />
         },
         {
             label: "Total Mahasiswa",
-            value: safeStats.total_students,
-            icon: <Users className="w-5 h-5" />
+            value: safeStats.total_students.toString(),
+            icon: <Users className="w-5 h-5 text-green-500" />
         },
         {
             label: "Win Rate",
             value: `${safeStats.win_rate}%`,
-            icon: <Trophy className="w-5 h-5" />
+            icon: <Target className="w-5 h-5 text-purple-500" />
         }
     ];
 
@@ -112,12 +116,12 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
 
     return (
         <DosenLayout>
-            <Head title="Dosen" />
+            <Head title="Dosen Dashboard" />
             <motion.section
                 className="mb-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
             >
                 <div className="lg:hidden space-y-6">
                     <ProfileCard user={user as User} />
@@ -126,18 +130,19 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
                     {statsData.map((stat, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{
-                                duration: 0.4,
+                                duration: 0.5,
                                 ease: "easeOut",
-                                delay: index * 0.05
+                                delay: index * 0.1
                             }}
                         >
                             <StatCard
                                 label={stat.label}
                                 value={stat.value}
                                 icon={stat.icon}
+                                className="shadow-sm"
                             />
                         </motion.div>
                     ))}
@@ -147,9 +152,9 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
             {/* Main content grid */}
             <motion.div
                 className="grid grid-cols-1 lg:grid-cols-12 gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
             >
                 <div className="lg:col-span-8 space-y-6">
                     {/* <MahasiswaBimbinganList data={mahasiswaBimbingan} /> */}

@@ -168,6 +168,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/reports/download/{filename}', [ReportController::class, 'downloadReport'])->name('admin.reports.download');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::get('/dashboard/dosen', [DosenController::class, 'index'])->name('dashboard.dosen');
 
 include __DIR__ . '/admin.php';
