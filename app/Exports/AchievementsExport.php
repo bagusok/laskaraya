@@ -20,7 +20,7 @@ class ReportExport implements FromView
 
     public function view(): View
     {
-        $query = \App\Models\Achievement::query();
+        $query = \App\Models\AchievementModel::query();
 
         if ($this->year) {
             $query->whereYear('date', $this->year);

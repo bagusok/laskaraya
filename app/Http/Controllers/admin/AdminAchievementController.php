@@ -97,20 +97,26 @@ class AdminAchievementController extends Controller
             'end_date' => 'required|date|after:start_date',
             'skills' => 'required|array|min:1',
             'skills.*' => 'exists:skills,id',
+
             'team' => 'required|array',
             'team.name' => 'required|string|max:255|min:3',
             'team.dosen_id' => 'required|exists:users,id',
-            'team.competition_members' => 'required|array|min:0',
-            'team.competition_members.*.user_id' => 'required|exists:users,id',
+
+
+            'team.competition_members' => 'sometimes|array',
+            'team.competition_members.*.user_id' => 'sometimes|nullable|exists:users,id',
+
             'achievement' => 'required|array',
             'achievement.name' => 'required|string|max:255|min:3',
             'achievement.description' => 'nullable|string|max:1000',
             'achievement.champion' => 'required|in:1,2,3,4,5',
             'achievement.score' => 'required|numeric|min:0|max:100',
+
             'certificates' => 'required|array|min:1',
             'certificates.*.user_id' => 'required|exists:users,id',
             'certificates.*.file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
 
         try {
             DB::beginTransaction();
@@ -447,14 +453,14 @@ class AdminAchievementController extends Controller
                         $dosenProfile->increment('total_competitions');
 
                         // Notifikasi ke dosen
-                        $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'accepted'));
+                        // $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'accepted'));
                     }
                 }
             } else {
                 // Notifikasi ke dosen jika ditolak
                 $dosen = $team->dosen;
                 if ($dosen) {
-                    $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'rejected', $request->input('reason')));
+                    // $dosen->notify(new \App\Notifications\AchievementVerified($achievement, 'rejected', $request->input('reason')));
                 }
             }
 
@@ -603,7 +609,7 @@ class AdminAchievementController extends Controller
         $filename = 'achievements_' . date('Ymd_His') . '.xlsx';
 
         return Excel::download(
-            new \App\Exports\AchievementsExport($exportData),
+            AchievementsExport($exportData),
             $filename,
             \Maatwebsite\Excel\Excel::XLSX,
             ['Content-Disposition' => 'attachment; filename="' . $filename . '"']

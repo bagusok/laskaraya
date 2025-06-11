@@ -89,7 +89,7 @@ class ProfileController extends Controller
             'gender' => 'nullable|in:L,P',
             'birth_place' => 'nullable|string|max:255',
             'birth_date' => 'nullable|date',
-            'prodi_id' => 'nullable|exists:program_studi,id',
+            'prodi_id' => 'nullable|number|exists:program_studi,id',
             'skills' => 'nullable|array',
             'skills.*.id' => 'required|exists:skills,id',
             'skills.*.level' => 'required|integer|min:1|max:5',
@@ -149,7 +149,7 @@ class ProfileController extends Controller
             // Update mahasiswa data if role is mahasiswa
             if ($validated['role'] === 'mahasiswa' && isset($validated['prodi_id'])) {
                 $mahasiswaData = [
-                    'prodi_id' => $validated['prodi_id']
+                    'prodi_id' => (int) $validated['prodi_id']
                 ];
 
                 if ($user->mahasiswa) {
