@@ -100,7 +100,7 @@ export const navItemsDosen = [
             },
             {
                 label: "Tambah Lomba",
-                href: "/dashboard/dosen/lomba/tambah"
+                href: route("dosen.competitions.create")
             },
             {
                 label: "Manajemen Ketrampilan",
