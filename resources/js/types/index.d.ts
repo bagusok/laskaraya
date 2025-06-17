@@ -62,6 +62,8 @@ export interface MahasiswaProfile {
     gender: "L" | "P";
     birth_date: Date | string;
     birth_place: string;
+    total_competitions?: number;
+    total_wins?: number;
 }
 
 export interface DosenProfile {

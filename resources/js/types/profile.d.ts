@@ -25,6 +25,8 @@ export interface MahasiswaProfile {
     major: string | null;
     created_at: string;
     updated_at: string;
+    total_competitions?: number;
+    total_wins?: number;
 }
 
 export interface User {

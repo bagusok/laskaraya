@@ -100,6 +100,13 @@ export default function EditProfile() {
     };
 
     const handleSubmitWithLog = async (data: any) => {
+        console.log("Form Data before submit:", {
+            data,
+            totalCompetitions,
+            totalWins,
+            role: data.role
+        });
+
         // Buat FormData manual
         const formData = new FormData();
         formData.append("name", data.name);
@@ -120,9 +127,29 @@ export default function EditProfile() {
         formData.append("gender", data.gender ?? "");
         formData.append("birth_place", data.birth_place ?? "");
         formData.append("birth_date", data.birth_date ?? "");
-        formData.append("total_competitions", String(totalCompetitions));
-        formData.append("total_wins", String(totalWins));
-        if (data.prodi_id) formData.append("prodi_id", data.prodi_id);
+
+        // Tambahkan data untuk mahasiswa
+        if (data.role === "mahasiswa") {
+            console.log("Adding mahasiswa data:", {
+                totalCompetitions,
+                totalWins,
+                prodi_id: data.prodi_id
+            });
+            formData.append("total_competitions", String(totalCompetitions));
+            formData.append("total_wins", String(totalWins));
+            if (data.prodi_id) formData.append("prodi_id", data.prodi_id);
+        }
+
+        // Tambahkan data untuk dosen
+        if (data.role === "dosen" || data.role === "admin") {
+            console.log("Adding dosen data:", {
+                totalCompetitions,
+                totalWins
+            });
+            formData.append("total_competitions", String(totalCompetitions));
+            formData.append("total_wins", String(totalWins));
+        }
+
         if (selectedSkills.length > 0)
             formData.append(
                 "skills",
@@ -132,19 +159,29 @@ export default function EditProfile() {
             );
 
         // Debug
+        console.log("Form Data being sent:");
         for (let pair of formData.entries()) {
             console.log(pair[0] + ": " + pair[1]);
         }
 
         try {
-            await axios.post(route("profile.update"), formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                params: { _method: "PUT" }
-            });
+            const response = await axios.post(
+                route("profile.update"),
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    params: { _method: "PUT" }
+                }
+            );
+            console.log("Response:", response.data);
             window.location.href = route("profile.show");
-        } catch (err) {
+        } catch (err: any) {
+            console.error("Error details:", {
+                message: err.message,
+                response: err.response?.data,
+                status: err.response?.status
+            });
             alert("Gagal update profil. Cek console/log untuk detail.");
-            console.error(err);
         }
     };
 
@@ -592,46 +629,122 @@ export default function EditProfile() {
                                 )}
 
                                 {user?.role === "mahasiswa" && (
-                                    <div className="space-y-2">
-                                        <Label
-                                            htmlFor="prodi_id"
-                                            className="text-gray-700"
-                                        >
-                                            Prodi
-                                        </Label>
-                                        <Select
-                                            onValueChange={(value) =>
-                                                setValue("prodi_id", value)
-                                            }
-                                            defaultValue={
-                                                user?.mahasiswa?.prodi_id
-                                                    ? String(
-                                                          user?.mahasiswa
-                                                              ?.prodi_id
-                                                      )
-                                                    : ""
-                                            }
-                                        >
-                                            <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
-                                                <SelectValue placeholder="Pilih Program Studi" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {prodiList.map((prodi: any) => (
-                                                    <SelectItem
-                                                        key={prodi.id}
-                                                        value={String(prodi.id)}
-                                                    >
-                                                        {prodi.nama}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.prodi_id && (
-                                            <p className="text-sm text-red-500">
-                                                {errors.prodi_id.message}
-                                            </p>
-                                        )}
-                                    </div>
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="prodi_id"
+                                                className="text-gray-700"
+                                            >
+                                                Prodi
+                                            </Label>
+                                            <Select
+                                                onValueChange={(value) =>
+                                                    setValue("prodi_id", value)
+                                                }
+                                                defaultValue={
+                                                    user?.mahasiswa?.prodi_id
+                                                        ? String(
+                                                              user?.mahasiswa
+                                                                  ?.prodi_id
+                                                          )
+                                                        : ""
+                                                }
+                                            >
+                                                <SelectTrigger className="border-purple-200 focus:border-purple-400 focus:ring-purple-400">
+                                                    <SelectValue placeholder="Pilih Program Studi" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {prodiList.map(
+                                                        (prodi: any) => (
+                                                            <SelectItem
+                                                                key={prodi.id}
+                                                                value={String(
+                                                                    prodi.id
+                                                                )}
+                                                            >
+                                                                {prodi.nama}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.prodi_id && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.prodi_id.message}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="total_competitions"
+                                                className="text-gray-700"
+                                            >
+                                                Total Lomba
+                                            </Label>
+                                            <Input
+                                                id="total_competitions"
+                                                type="text"
+                                                {...register(
+                                                    "total_competitions"
+                                                )}
+                                                value={totalCompetitions}
+                                                onChange={(e) =>
+                                                    setTotalCompetitions(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                placeholder="Masukkan total lomba"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="total_competitions"
+                                                value={totalCompetitions}
+                                            />
+                                            {errors.total_competitions && (
+                                                <p className="text-sm text-red-500">
+                                                    {
+                                                        errors
+                                                            .total_competitions
+                                                            .message
+                                                    }
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="total_wins"
+                                                className="text-gray-700"
+                                            >
+                                                Total Kemenangan
+                                            </Label>
+                                            <Input
+                                                id="total_wins"
+                                                type="text"
+                                                {...register("total_wins")}
+                                                value={totalWins}
+                                                onChange={(e) =>
+                                                    setTotalWins(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                placeholder="Masukkan total kemenangan"
+                                                className="border-purple-200 focus:border-purple-400 focus:ring-purple-400"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="total_wins"
+                                                value={totalWins}
+                                            />
+                                            {errors.total_wins && (
+                                                <p className="text-sm text-red-500">
+                                                    {errors.total_wins.message}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </>
                                 )}
 
                                 {/* Field Skill tanpa Card */}

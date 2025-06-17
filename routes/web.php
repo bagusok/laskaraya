@@ -56,6 +56,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/competition-status/{id}', [ProfileController::class, 'updateCompetitionStatus'])
+        ->name('profile.competition-status')
+        ->middleware(['auth']);
 });
 
 Route::group(['prefix' => 'prodi', 'middleware' => ['auth', 'role:admin']], function () {
@@ -71,7 +74,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/dashboard/skills', [SkillController::class, 'store'])->name('skills.store');
     Route::put('/dashboard/skills/{id}', [SkillController::class, 'update'])->name('skills.update');
     Route::delete('/dashboard/skills/{id}', [SkillController::class, 'destroy'])->name('skills.destroy');
-
 });
 
 // CRUD Skill untuk dosen
@@ -139,29 +141,29 @@ Route::prefix('dashboard/mahasiswa/categories')->middleware(['auth'])->group(fun
 
 //Route admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
-        Route::get('/admin/recommendations', [RecommendationController::class, 'index'])
-            ->name('admin.recommendations.index');
+    Route::get('/admin/recommendations', [RecommendationController::class, 'index'])
+        ->name('admin.recommendations.index');
 
-        // Route untuk mendapatkan rekomendasi berdasarkan kompetisi (AJAX)
-        Route::get('/admin/recommendations/get', [RecommendationController::class, 'getRecommendations'])
-            ->name('admin.recommendations.get');
+    // Route untuk mendapatkan rekomendasi berdasarkan kompetisi (AJAX)
+    Route::get('/admin/recommendations/get', [RecommendationController::class, 'getRecommendations'])
+        ->name('admin.recommendations.get');
 
-        // Route untuk halaman analisis detail (GET request)
-        Route::get('/admin/recommendations/analysis', [RecommendationController::class, 'showAnalysis'])
-            ->name('admin.recommendations.analysis');
+    // Route untuk halaman analisis detail (GET request)
+    Route::get('/admin/recommendations/analysis', [RecommendationController::class, 'showAnalysis'])
+        ->name('admin.recommendations.analysis');
 
-        // Route untuk mendapatkan analisis detail mahasiswa (AJAX - if needed)
-        Route::get('/admin/recommendations/analysis/data', [RecommendationController::class, 'getDetailedAnalysis'])
-            ->name('admin.recommendations.analysis.data');
+    // Route untuk mendapatkan analisis detail mahasiswa (AJAX - if needed)
+    Route::get('/admin/recommendations/analysis/data', [RecommendationController::class, 'getDetailedAnalysis'])
+        ->name('admin.recommendations.analysis.data');
 
-        // Route untuk export CSV
-        Route::get('/admin/recommendations/export', [RecommendationController::class, 'exportRecommendations'])
-            ->name('admin.recommendations.export');
+    // Route untuk export CSV
+    Route::get('/admin/recommendations/export', [RecommendationController::class, 'exportRecommendations'])
+        ->name('admin.recommendations.export');
 
-        // Reports routes - perbaikan yang perlu ditambahkan
+    // Reports routes - perbaikan yang perlu ditambahkan
     Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
 
-// API endpoints for AJAX calls
+    // API endpoints for AJAX calls
     Route::get('/admin/reports/data', [ReportController::class, 'getData'])->name('admin.reports.data');
     Route::get('/admin/reports/filters', [ReportController::class, 'getFilters'])->name('admin.reports.filters');
     Route::get('/admin/reports/export', [ReportController::class, 'export'])->name('admin.reports.export');

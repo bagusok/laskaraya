@@ -271,6 +271,25 @@ export default function ProfileDetail({ user }: ProfileDetailProps) {
                                                     </p>
                                                 </div>
                                             )}
+                                            <div>
+                                                <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                    Total Lomba
+                                                </h3>
+                                                <p className="text-base">
+                                                    {user.mahasiswa
+                                                        .total_competitions ??
+                                                        0}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-medium text-gray-500 mb-1">
+                                                    Total Kemenangan
+                                                </h3>
+                                                <p className="text-base">
+                                                    {user.mahasiswa
+                                                        .total_wins ?? 0}
+                                                </p>
+                                            </div>
                                         </>
                                     )}
                                     {user.mahasiswa && user.prodi && (

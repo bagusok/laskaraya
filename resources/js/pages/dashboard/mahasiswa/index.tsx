@@ -21,13 +21,13 @@ interface MahasiswaDashboardProps {
 // Helper function to get icon component
 const getIconComponent = (iconName: string) => {
     switch (iconName) {
-        case 'User':
+        case "User":
             return <User className="text-blue-500" />;
-        case 'Flag':
+        case "Flag":
             return <Flag className="text-purple-500" />;
-        case 'Trophy':
+        case "Trophy":
             return <Trophy className="text-green-500" />;
-        case 'Award':
+        case "Award":
             return <Award className="text-amber-500" />;
         default:
             return <User className="text-blue-500" />;
@@ -38,32 +38,46 @@ export default function MahasiswaDashboard({ stats }: MahasiswaDashboardProps) {
     const { user } = useAuth();
 
     // Convert stats to include proper icons
-    const statsWithIcons = stats.map(stat => ({
+    const statsWithIcons = stats.map((stat) => ({
         ...stat,
         icon: getIconComponent(stat.icon)
     }));
 
     // Get values from stats
-    const wins = parseInt(stats.find(stat => stat.label === "Menang")?.value || "0");
-    const totalCompetitions = parseInt(stats.find(stat => stat.label === "Riwayat Lomba")?.value || "0");
-    const ongoingCompetitions = parseInt(stats.find(stat => stat.label === "Kompetisi Yang Diikuti")?.value || "0");
+    const wins = parseInt(
+        stats.find((stat) => stat.label === "Menang")?.value || "0"
+    );
+    const totalCompetitions = parseInt(
+        stats.find((stat) => stat.label === "Riwayat Lomba")?.value || "0"
+    );
+    const ongoingCompetitions = parseInt(
+        stats.find((stat) => stat.label === "Kompetisi Yang Diikuti")?.value ||
+            "0"
+    );
 
     // Calculate losses
     const losses = totalCompetitions - wins;
+
+    // Calculate win rate
+    const winRate =
+        totalCompetitions > 0 ? (wins / totalCompetitions) * 100 : 0;
 
     // Create chart data for win rate visualization
     const chartData = [
         {
             label: "Menang",
-            value: wins
+            value: wins,
+            color: "bg-green-500"
         },
         {
             label: "Kalah",
-            value: losses
+            value: losses,
+            color: "bg-red-500"
         },
         {
             label: "Sedang Diikuti",
-            value: ongoingCompetitions
+            value: ongoingCompetitions,
+            color: "bg-blue-500"
         }
     ];
 
@@ -98,7 +112,9 @@ export default function MahasiswaDashboard({ stats }: MahasiswaDashboardProps) {
             <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
                 <div className="lg:col-span-8 space-y-6">
                     <div className="admin-card">
-                        <div className="admin-card-header">Statistik Kompetisi</div>
+                        <div className="admin-card-header">
+                            Statistik Kompetisi
+                        </div>
                         <div className="admin-card-content">
                             <Card className="border-1 border-purple-300 hover:shadow-md shadow-purple-300 transition-all bg-gradient-to-br from-white to-blue-50/20">
                                 <CardHeader className="pb-3">
@@ -109,10 +125,38 @@ export default function MahasiswaDashboard({ stats }: MahasiswaDashboardProps) {
                                 <CardContent className="pt-0">
                                     <MahasiswaChart data={chartData} />
                                     <div className="mt-6 text-center p-3 bg-purple-100/30 rounded-md">
-                                        <span className="text-sm text-gray-500">Win Rate: </span>
-                                        <span className="text-lg font-bold text-purple-700">
-                                            {totalCompetitions > 0 ? ((wins / totalCompetitions) * 100).toFixed(1) : 0}%
+                                        <span className="text-sm text-gray-500">
+                                            Win Rate:{" "}
                                         </span>
+                                        <span className="text-lg font-bold text-purple-700">
+                                            {winRate.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                    <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+                                        <div className="p-2 bg-green-50 rounded-md">
+                                            <div className="text-sm text-gray-500">
+                                                Menang
+                                            </div>
+                                            <div className="text-lg font-bold text-green-600">
+                                                {wins}
+                                            </div>
+                                        </div>
+                                        <div className="p-2 bg-red-50 rounded-md">
+                                            <div className="text-sm text-gray-500">
+                                                Kalah
+                                            </div>
+                                            <div className="text-lg font-bold text-red-600">
+                                                {losses}
+                                            </div>
+                                        </div>
+                                        <div className="p-2 bg-blue-50 rounded-md">
+                                            <div className="text-sm text-gray-500">
+                                                Sedang Diikuti
+                                            </div>
+                                            <div className="text-lg font-bold text-blue-600">
+                                                {ongoingCompetitions}
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
