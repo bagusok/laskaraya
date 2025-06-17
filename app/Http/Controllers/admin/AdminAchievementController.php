@@ -609,7 +609,7 @@ class AdminAchievementController extends Controller
         $filename = 'achievements_' . date('Ymd_His') . '.xlsx';
 
         return Excel::download(
-            AchievementsExport($exportData),
+            new \App\Exports\AchievementsExport($exportData),
             $filename,
             \Maatwebsite\Excel\Excel::XLSX,
             ['Content-Disposition' => 'attachment; filename="' . $filename . '"']
