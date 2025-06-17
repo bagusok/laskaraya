@@ -16,8 +16,8 @@ type Props = {
     stats: {
         total_competitions: number;
         total_wins: number;
-        total_students: number;
-        win_rate: number;
+        total_students?: number;
+        win_rate?: number;
     };
     mahasiswaBimbingan: CompetitionMember[];
 };
@@ -71,11 +71,11 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
     console.log("STATS DARI BACKEND:", stats);
 
     // Provide fallback values untuk safety
-    const safeStats = stats ?? {
-        total_competitions: 0,
-        total_wins: 0,
-        total_students: 0,
-        win_rate: 0
+    const safeStats = {
+        total_competitions: stats?.total_competitions ?? 0,
+        total_wins: stats?.total_wins ?? 0,
+        total_students: stats?.total_students ?? 0,
+        win_rate: stats?.win_rate ?? 0
     };
 
     const { user } = useAuth();
@@ -92,7 +92,7 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
     const statsData = [
         {
             label: "Total Lomba",
-            value: safeStats.total_competitions.toString(), // Convert to string untuk konsistensi
+            value: safeStats.total_competitions.toString(),
             icon: <Award className="w-5 h-5 text-blue-500" />
         },
         {
@@ -100,17 +100,17 @@ export default function DosenDashboard({ stats, mahasiswaBimbingan }: Props) {
             value: safeStats.total_wins.toString(),
             icon: <Trophy className="w-5 h-5 text-amber-500" />
         },
-        {
+        safeStats.total_students !== undefined && {
             label: "Total Mahasiswa",
             value: safeStats.total_students.toString(),
             icon: <Users className="w-5 h-5 text-green-500" />
         },
-        {
+        safeStats.win_rate !== undefined && {
             label: "Win Rate",
             value: `${safeStats.win_rate}%`,
             icon: <Target className="w-5 h-5 text-purple-500" />
         }
-    ];
+    ].filter(Boolean);
 
     if (!user) return null;
 

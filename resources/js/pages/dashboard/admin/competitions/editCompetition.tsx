@@ -267,7 +267,7 @@ export default function EditCompetition({
                                         required
                                     />
                                     <CustomInput
-                                        label="Author"
+                                        label="PENYELENGGARA"
                                         onChange={(e) =>
                                             setData("author", e.target.value)
                                         }

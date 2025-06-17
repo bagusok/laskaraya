@@ -411,7 +411,7 @@ export default function AddCompetition({
                                                 required
                                             />
                                             <CustomInput
-                                                label="Author"
+                                                label="PENYELENGGARA"
                                                 onChange={(e) =>
                                                     setData(
                                                         "author",

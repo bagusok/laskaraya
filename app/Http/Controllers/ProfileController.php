@@ -155,6 +155,29 @@ class ProfileController extends Controller
                 }
             }
 
+            // Update dosen data if role is dosen
+            if ($user->role === 'dosen') {
+                $dosenData = [
+                    'total_competitions' => $request->input('total_competitions', 0),
+                    'total_wins' => $request->input('total_wins', 0)
+                ];
+
+                Log::info('Dosen Data to be saved:', $dosenData);
+
+                try {
+                    if ($user->dosen) {
+                        $user->dosen->update($dosenData);
+                        Log::info('Dosen profile updated successfully');
+                    } else {
+                        $user->dosen()->create($dosenData);
+                        Log::info('New dosen profile created successfully');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error saving dosen data: ' . $e->getMessage());
+                    throw $e;
+                }
+            }
+
             // Update user skills
             if (isset($validated['skills'])) {
                 // Hapus semua skill lama

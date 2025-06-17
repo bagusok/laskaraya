@@ -120,9 +120,33 @@ class DashboardController extends Controller
 
     private function dosenDashboard($user)
     {
-        // Logic untuk dosen dashboard
+        $user->load('dosen');
+        $dosen = $user->dosen;
+
+        $totalCompetitions = $dosen ? $dosen->total_competitions : 0;
+        $totalWins = $dosen ? $dosen->total_wins : 0;
+        $winRate = $totalCompetitions > 0 ? round(($totalWins / $totalCompetitions) * 100, 1) : 0;
+
+        // Hitung total mahasiswa bimbingan
+        $totalStudents = \App\Models\UserToCompetition::where('dosen_id', $user->id)
+            ->with('competitionMembers')
+            ->get()
+            ->pluck('competitionMembers')
+            ->flatten()
+            ->pluck('user_id')
+            ->unique()
+            ->count();
+
+        $stats = [
+            'total_competitions' => $totalCompetitions,
+            'total_wins' => $totalWins,
+            'total_students' => $totalStudents,
+            'win_rate' => $winRate,
+        ];
+
         return Inertia::render('dashboard/dosen/index', [
-            'user' => $user->load(['dosen', 'prodi'])
+            'user' => $user,
+            'stats' => $stats
         ]);
     }
 }
