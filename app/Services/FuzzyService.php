@@ -204,7 +204,10 @@ class FuzzyService
             ->where('competition_members.user_id', $mahasiswa->id)
             ->count();
 
-        return $asRegistrant + $asMember;
+        // return $asRegistrant + $asMember;
+        $user = UserModel::with('mahasiswa', 'dosen')->find($mahasiswa->id);
+
+        return $user->mahasiswa->total_competitions;
     }
 
     private function getTotalWins($mahasiswa)
@@ -222,7 +225,11 @@ class FuzzyService
             ->where('user_to_competitions.status', 'accepted')
             ->count();
 
-        return $winsAsRegistrant + $winsAsMember;
+        $user = UserModel::with('mahasiswa', 'dosen')->find($mahasiswa->id);
+
+        return $user->mahasiswa->total_wins;
+
+        // return $winsAsRegistrant + $winsAsMember;
     }
 
     private function fuzzification($alternative)
