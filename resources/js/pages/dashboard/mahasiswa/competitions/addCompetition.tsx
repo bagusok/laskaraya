@@ -219,7 +219,7 @@ export default function AddCompetition({ categories, periods, skills }: Props) {
                                 required
                             />
                             <CustomInput
-                                label="Author"
+                                label="PENYELENGGARA"
                                 onChange={(e) =>
                                     setData("author", e.target.value)
                                 }

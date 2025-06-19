@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
 use App\Models\ProgramStudiModel;
+use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
@@ -64,6 +68,9 @@ class ProfileController extends Controller
 
         $data = $request->all();
         Log::info('DATA YANG DITERIMA:', $data);
+        Log::info('USER ROLE:', ['role' => $user->role]);
+        Log::info('MAHASISWA DATA:', ['mahasiswa' => $user->mahasiswa]);
+
         if (array_key_exists('password', $data) && $data['password'] === '') {
             unset($data['password']);
         }
@@ -97,6 +104,8 @@ class ProfileController extends Controller
             'total_wins' => 'nullable|numeric',
         ])->validate();
 
+        Log::info('VALIDATED DATA:', $validated);
+
         try {
             // Hapus password dari data jika kosong
             if (empty($validated['password'])) {
@@ -121,41 +130,51 @@ class ProfileController extends Controller
 
             // Update user data
             $user->update($validated);
+            Log::info('USER UPDATED:', ['user' => $user->toArray()]);
 
-            // Update dosen data if role is dosen or admin
-            if (in_array($validated['role'], ['dosen', 'admin'])) {
-                $dosenData = [
-                    'address' => $validated['address'] ?? null,
-                    'faculty' => $validated['faculty'] ?? null,
-                    'major' => $validated['major'] ?? null,
-                    'gender' => $validated['gender'] ?? null,
-                    'birth_place' => $validated['birth_place'] ?? null,
-                    'birth_date' => $validated['birth_date'] ?? null,
-                    'total_competitions' => isset($validated['total_competitions'])
-                        ? (int)$validated['total_competitions']
-                        : ($user->dosen ? $user->dosen->total_competitions : 0),
-                    'total_wins' => isset($validated['total_wins'])
-                        ? (int)$validated['total_wins']
-                        : ($user->dosen ? $user->dosen->total_wins : 0),
+            // Update mahasiswa data if role is mahasiswa
+            if ($user->role === 'mahasiswa') {
+                $mahasiswaData = [
+                    'total_competitions' => $request->input('total_competitions', 0),
+                    'total_wins' => $request->input('total_wins', 0)
                 ];
 
-                if ($user->dosen) {
-                    $user->dosen->update($dosenData);
-                } else {
-                    $user->dosen()->create($dosenData);
+                Log::info('Mahasiswa Data to be saved:', $mahasiswaData);
+
+                try {
+                    if ($user->mahasiswa) {
+                        $user->mahasiswa->update($mahasiswaData);
+                        Log::info('Mahasiswa profile updated successfully');
+                    } else {
+                        $user->mahasiswa()->create($mahasiswaData);
+                        Log::info('New mahasiswa profile created successfully');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error saving mahasiswa data: ' . $e->getMessage());
+                    throw $e;
                 }
             }
 
-            // Update mahasiswa data if role is mahasiswa
-            if ($validated['role'] === 'mahasiswa' && isset($validated['prodi_id'])) {
-                $mahasiswaData = [
-                    'prodi_id' => (int) $validated['prodi_id']
+            // Update dosen data if role is dosen
+            if ($user->role === 'dosen') {
+                $dosenData = [
+                    'total_competitions' => $request->input('total_competitions', 0),
+                    'total_wins' => $request->input('total_wins', 0)
                 ];
 
-                if ($user->mahasiswa) {
-                    $user->mahasiswa->update($mahasiswaData);
-                } else {
-                    $user->mahasiswa()->create($mahasiswaData);
+                Log::info('Dosen Data to be saved:', $dosenData);
+
+                try {
+                    if ($user->dosen) {
+                        $user->dosen->update($dosenData);
+                        Log::info('Dosen profile updated successfully');
+                    } else {
+                        $user->dosen()->create($dosenData);
+                        Log::info('New dosen profile created successfully');
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error saving dosen data: ' . $e->getMessage());
+                    throw $e;
                 }
             }
 
@@ -178,6 +197,7 @@ class ProfileController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating profile: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 Log::error('VALIDATION ERRORS: ' . json_encode($e->errors()));
             }

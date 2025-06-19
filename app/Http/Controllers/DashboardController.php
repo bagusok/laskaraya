@@ -29,31 +29,22 @@ class DashboardController extends Controller
 
     private function mahasiswaDashboard($user)
     {
-        // Hitung total mahasiswa aktif (untuk statistik umum)
+        $user->load('mahasiswa');
+        $mahasiswa = $user->mahasiswa;
+
         $totalMahasiswaAktif = UserModel::where('role', 'mahasiswa')
             ->where('is_verified', true)
             ->count();
 
-        // Hitung kompetisi yang sedang diikuti oleh mahasiswa ini
         $kompetisiDiikuti = UserToCompetition::where('registrant_id', $user->id)
             ->whereIn('status', ['pending', 'approved', 'ongoing'])
             ->count();
 
-        // Hitung total riwayat lomba (semua kompetisi yang pernah diikuti)
-        $riwayatLomba = UserToCompetition::where('registrant_id', $user->id)
-            ->count();
-
-        // Hitung jumlah kemenangan (achievements)
-        $jumlahMenang = AchievementModel::whereHas('userToCompetition', function($query) use ($user) {
-            $query->where('registrant_id', $user->id);
-        })->count();
-
-        // Format data untuk frontend
         $stats = [
             [
                 'label' => 'Mahasiswa Aktif',
                 'value' => (string) $totalMahasiswaAktif,
-                'icon' => 'User' // Frontend akan mengkonversi ke icon component
+                'icon' => 'User'
             ],
             [
                 'label' => 'Kompetisi Yang Diikuti',
@@ -62,18 +53,18 @@ class DashboardController extends Controller
             ],
             [
                 'label' => 'Riwayat Lomba',
-                'value' => (string) $riwayatLomba,
+                'value' => (string) ($mahasiswa ? $mahasiswa->total_competitions : 0),
                 'icon' => 'Trophy'
             ],
             [
                 'label' => 'Menang',
-                'value' => (string) $jumlahMenang,
+                'value' => (string) ($mahasiswa ? $mahasiswa->total_wins : 0),
                 'icon' => 'Award'
             ]
         ];
 
         return Inertia::render('dashboard/mahasiswa/index', [
-            'user' => $user->load(['mahasiswa', 'prodi']),
+            'user' => $user,
             'stats' => $stats
         ]);
     }
@@ -129,9 +120,33 @@ class DashboardController extends Controller
 
     private function dosenDashboard($user)
     {
-        // Logic untuk dosen dashboard
+        $user->load('dosen');
+        $dosen = $user->dosen;
+
+        $totalCompetitions = $dosen ? $dosen->total_competitions : 0;
+        $totalWins = $dosen ? $dosen->total_wins : 0;
+        $winRate = $totalCompetitions > 0 ? round(($totalWins / $totalCompetitions) * 100, 1) : 0;
+
+        // Hitung total mahasiswa bimbingan
+        $totalStudents = \App\Models\UserToCompetition::where('dosen_id', $user->id)
+            ->with('competitionMembers')
+            ->get()
+            ->pluck('competitionMembers')
+            ->flatten()
+            ->pluck('user_id')
+            ->unique()
+            ->count();
+
+        $stats = [
+            'total_competitions' => $totalCompetitions,
+            'total_wins' => $totalWins,
+            'total_students' => $totalStudents,
+            'win_rate' => $winRate,
+        ];
+
         return Inertia::render('dashboard/dosen/index', [
-            'user' => $user->load(['dosen', 'prodi'])
+            'user' => $user,
+            'stats' => $stats
         ]);
     }
 }
