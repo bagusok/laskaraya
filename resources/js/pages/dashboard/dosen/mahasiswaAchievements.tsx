@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DosenLayout from "@/components/layouts/dosenLayout";
 import DataTable from "@/components/ui/shared/dataTable";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "@inertiajs/react";
+import { Eye } from "lucide-react";
 
 export default function MahasiswaAchievementsPage({
     mahasiswaAchievements
@@ -34,6 +37,24 @@ export default function MahasiswaAchievementsPage({
             {
                 header: "Status",
                 accessorKey: "status"
+            },
+            {
+                accessorKey: "detail",
+                header: "Detail",
+                cell: ({ row }) => (
+                    <Button variant="outline" size="sm" asChild>
+                        <Link
+                            href={route(
+                                "dosen.prestasi.detail",
+                                row.original.team_id
+                            )}
+                            className="flex items-center gap-2"
+                        >
+                            <Eye className="h-4 w-4" />
+                            Detail
+                        </Link>
+                    </Button>
+                )
             }
         ],
         []

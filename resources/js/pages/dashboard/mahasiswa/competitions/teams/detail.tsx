@@ -63,6 +63,7 @@ type FormData = {
         user_id: number;
         file: File | null;
     }[];
+    dosen_certificate?: File | null;
 };
 
 export default function TeamDetail({
@@ -82,9 +83,9 @@ export default function TeamDetail({
         certificates: members.map((member) => ({
             user_id: member.id,
             file: null
-        }))
+        })),
+        dosen_certificate: null
     });
-
     const urlToFile = async (
         url: string,
         filename: string,
@@ -97,23 +98,47 @@ export default function TeamDetail({
 
     const getFileCertificates = async () => {
         if (achievement?.certificates) {
+            // Set certificates untuk anggota tim
             const updatedCertificates = await Promise.all(
-                achievement.certificates.map(async (cert) => ({
-                    user_id: cert.user_id,
-                    file: cert.file_url
-                        ? await urlToFile(
-                              cert.file_url,
-                              cert.file_url.split("/").pop() ||
-                                  "certificate.pdf",
-                              "application/pdf"
-                          )
-                        : null
-                }))
+                members.map(async (member) => {
+                    const cert = achievement.certificates.find(
+                        (c) => c.user_id === member.id
+                    );
+                    return {
+                        user_id: member.id,
+                        file: cert?.file_url
+                            ? await urlToFile(
+                                  cert.file_url,
+                                  cert.file_url.split("/").pop() ||
+                                      "certificate.pdf",
+                                  "application/pdf"
+                              )
+                            : null
+                    };
+                })
             );
             setData("certificates", updatedCertificates);
+
+            // Set certificate untuk dosen (jika ada)
+            if (dosen && dosen.id) {
+                const certDosen = achievement.certificates.find(
+                    (c) => c.user_id === dosen.id
+                );
+                if (certDosen?.file_url) {
+                    const dosenFile = await urlToFile(
+                        certDosen.file_url,
+                        certDosen.file_url.split("/").pop() ||
+                            "certificate.pdf",
+                        "application/pdf"
+                    );
+                    setData("dosen_certificate", dosenFile);
+                } else {
+                    setData("dosen_certificate", null);
+                }
+            }
         }
     };
-    // Convert existing certificates URLs to File objects if they exist
+
     useEffect(() => {
         if (achievement?.certificates && achievement.certificates.length > 0) {
             getFileCertificates();
@@ -125,7 +150,9 @@ export default function TeamDetail({
                     file: null
                 }))
             );
+            setData("dosen_certificate", null);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [achievement?.certificates]);
 
     return (
@@ -548,6 +575,53 @@ export default function TeamDetail({
                                                         </div>
                                                     );
                                                 })}
+
+                                                <div>
+                                                    <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                        Sertifikat untuk Dosen
+                                                        Pembimbing ({dosen.name}
+                                                        )
+                                                    </Label>
+                                                    <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 transition overflow-hidden">
+                                                        <div className="text-sm text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
+                                                            {data.dosen_certificate
+                                                                ? data
+                                                                      .dosen_certificate
+                                                                      .name
+                                                                : "Belum ada sertifikat dosen"}
+                                                        </div>
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,.jpg,.jpeg,.png"
+                                                            className="hidden"
+                                                            disabled
+                                                        />
+                                                    </label>
+                                                    {/* Preview/Link jika sudah pernah upload */}
+                                                    {achievement?.certificates?.find(
+                                                        (c) =>
+                                                            c.user_id ===
+                                                            dosen.id
+                                                    )?.file_url && (
+                                                        <a
+                                                            className="mt-2 text-blue-400 hover:underline text-xs"
+                                                            href={
+                                                                achievement.certificates.find(
+                                                                    (c) =>
+                                                                        c.user_id ===
+                                                                        dosen.id
+                                                                )?.file_url
+                                                            }
+                                                            target="_blank"
+                                                        >
+                                                            Lihat Sertifikat
+                                                            Dosen
+                                                        </a>
+                                                    )}
+                                                    <div className="text-xs text-gray-400 mt-1">
+                                                        Tidak wajib diisi
+                                                    </div>
+                                                </div>
                                             </div>
                                         </CardContent>
                                     </Card>

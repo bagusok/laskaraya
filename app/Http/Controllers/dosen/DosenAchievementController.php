@@ -114,6 +114,7 @@ class DosenAchievementController extends Controller
                 // Hanya tampilkan mahasiswa (bukan dosen)
                 if ($member->user && $member->user->role === 'mahasiswa') {
                     $mahasiswaAchievements[] = [
+                        'team_id' => $team->id,
                         'mahasiswa_name' => $member->user->name,
                         'team_name' => $team->name,
                         'achievement_name' => $team->achievement ? $team->achievement->name : '-',
@@ -126,6 +127,24 @@ class DosenAchievementController extends Controller
         }
         return Inertia::render('dashboard/dosen/mahasiswaAchievements', [
             'mahasiswaAchievements' => $mahasiswaAchievements
+        ]);
+    }
+
+    public function detail($teamId)
+    {
+        $team = UserToCompetition::with(['competitionMembers', 'competition', 'competitionMembers.user', 'dosen'])
+            ->findOrFail($teamId);
+
+        $achievement = $team->achievement;
+
+        return Inertia::render('dashboard/dosen/achievements/detail', [
+            'team' => $team,
+            'competition' => $team->competition,
+            'members' => $team->competitionMembers->pluck('user')->toArray(),
+            'dosen' => $team->dosen,
+            'registrant' => $team->registrant,
+            'achievement' => $achievement,
+            'certificates' => $achievement ? $achievement->certificates : [],
         ]);
     }
 }

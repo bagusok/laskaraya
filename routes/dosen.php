@@ -18,5 +18,6 @@ Route::group(['prefix' => 'dosen', 'middleware' => ['auth']], function () {
 
     Route::get('/mahasiswa-bimbingan', [DosenController::class, 'mahasiswaBimbingan'])->name('dosen.bimbingan');
     Route::get('/prestasi', [DosenAchievementController::class, 'mahasiswaAchievements'])->middleware('role:dosen')->name('dosen.prestasi');
+    Route::get('/prestasi/{teamId}', [DosenAchievementController::class, 'detail'])->name('dosen.prestasi.detail');
     Route::post('/bimbingan/status/{id}', [DosenController::class, 'updateStatus'])->name('dosen.bimbingan.status');
 });

@@ -23,6 +23,9 @@ export type Achievement = {
         champion: number;
         score: number;
     };
+    user_to_competition: {
+        id: number;
+    };
     bimbingan_status: string;
     created_at: string;
 };
@@ -140,5 +143,23 @@ export const achievementColumns = (): ColumnDef<Achievement>[] => [
                 </Button>
             );
         }
+    },
+    {
+        id: "detailButton",
+        header: "Detail",
+        cell: ({ row }) => (
+            <Button variant="outline" size="sm" asChild>
+                <Link
+                    href={route(
+                        "dosen.achievements.detail",
+                        row.original.user_to_competition.id
+                    )}
+                    className="flex items-center gap-2"
+                >
+                    <Eye className="h-4 w-4" />
+                    Detail
+                </Link>
+            </Button>
+        )
     }
 ];

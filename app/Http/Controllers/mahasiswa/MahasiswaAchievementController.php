@@ -92,7 +92,8 @@ class MahasiswaAchievementController extends Controller
             'achievement.score' => 'required|numeric|min:0|max:100',
             'certificates' => 'required|array|min:1',
             'certificates.*.user_id' => 'required|exists:users,id',
-            'certificates.*.file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'certificates.*.file' => 'required|file|mimes:pdf,jpg,jpeg,png,webp|max:2048',
+            'dosen_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:2048',
         ];
 
         if (!$request->competition_id) {
@@ -189,7 +190,7 @@ class MahasiswaAchievementController extends Controller
                 $hash = hash('sha256', $userId . "_" . $team->id);
 
                 // Proses gambar ke .webp
-                if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'webp'])) {
                     $webp = Image::read($file)->toWebp(80);
                     $filename = $hash . '.webp';
                     Storage::disk('public')->put('certificates/' . $filename, $webp);
@@ -200,6 +201,27 @@ class MahasiswaAchievementController extends Controller
 
                 $achievement->certificates()->create([
                     'user_id' => $userId,
+                    'file_url' => $filename,
+                ]);
+            }
+
+            if ($request->hasFile('dosen_certificate') && $request->team['dosen_id']) {
+                $dosenFile = $request->file('dosen_certificate');
+                $dosenId = $request->team['dosen_id'];
+                $ext = $dosenFile->getClientOriginalExtension();
+                $hash = hash('sha256', $dosenId . "_" . $team->id . "_dosen");
+
+                if (in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $webp = Image::read($dosenFile)->toWebp(80);
+                    $filename = $hash . '.webp';
+                    Storage::disk('public')->put('certificates/' . $filename, $webp);
+                } else {
+                    $filename = $hash . '.' . $ext;
+                    $dosenFile->storeAs('certificates', $filename, 'public');
+                }
+
+                $achievement->certificates()->create([
+                    'user_id' => $dosenId,
                     'file_url' => $filename,
                 ]);
             }
@@ -233,7 +255,6 @@ class MahasiswaAchievementController extends Controller
             'skills' => $skills,
             'mahasiswa' => $mahasiswa,
             'dosen' => $dosen,
-
         ]);
     }
 
@@ -310,8 +331,9 @@ class MahasiswaAchievementController extends Controller
             'champion' => 'nullable|in:1,2,3,4,5',
             'score' => 'required|numeric|min:0|max:100',
             'certificates' => 'nullable|array',
-            'certificates.*.file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'certificates.*.file' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:2048',
             'certificates.*.user_id' => 'required|exists:users,id',
+            'dosen_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:2048',
         ]);
 
         $team = UserToCompetition::where('status', 'accepted')
@@ -358,7 +380,7 @@ class MahasiswaAchievementController extends Controller
                     $hash = hash('sha256', $userId . "_" . $team->id);
 
                     // Proses gambar ke .webp
-                    if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+                    if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'webp'])) {
                         $webp = Image::read($file)->toWebp(80); // 90 adalah kualitas kompresi
                         $filename = $hash . '.webp';
                         Storage::disk('public')->put('certificates/' . $filename, $webp);
@@ -372,6 +394,27 @@ class MahasiswaAchievementController extends Controller
                         'file_url' => $filename,
                     ]);
                 }
+            }
+
+            if ($request->hasFile('dosen_certificate') && $team->dosen_id) {
+                $dosenFile = $request->file('dosen_certificate');
+                $dosenId = $team->dosen_id;
+                $ext = $dosenFile->getClientOriginalExtension();
+                $hash = hash('sha256', $dosenId . "_" . $team->id . "_dosen");
+
+                if (in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp'])) {
+                    $webp = Image::read($dosenFile)->toWebp(80);
+                    $filename = $hash . '.webp';
+                    Storage::disk('public')->put('certificates/' . $filename, $webp);
+                } else {
+                    $filename = $hash . '.' . $ext;
+                    $dosenFile->storeAs('certificates', $filename, 'public');
+                }
+
+                $achievement->certificates()->create([
+                    'user_id' => $dosenId,
+                    'file_url' => $filename,
+                ]);
             }
 
             DB::commit();

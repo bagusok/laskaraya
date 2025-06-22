@@ -62,6 +62,7 @@ type FormData = {
         user_id: number;
         file: File | null;
     }[];
+    dosen_certificate?: File | null;
 };
 
 export default function TeamAchievement({
@@ -81,7 +82,8 @@ export default function TeamAchievement({
         certificates: members.map((member) => ({
             user_id: member.id,
             file: null
-        }))
+        })),
+        dosen_certificate: null
     });
 
     const urlToFile = async (
@@ -96,20 +98,44 @@ export default function TeamAchievement({
 
     const getFileCertificates = async () => {
         if (achievement?.certificates) {
+            // Untuk anggota
             const updatedCertificates = await Promise.all(
-                achievement.certificates.map(async (cert) => ({
-                    user_id: cert.user_id,
-                    file: cert.file_url
-                        ? await urlToFile(
-                              cert.file_url,
-                              cert.file_url.split("/").pop() ||
-                                  "certificate.pdf",
-                              "application/pdf"
-                          )
-                        : null
-                }))
+                members.map(async (member) => {
+                    const cert = achievement.certificates.find(
+                        (c) => c.user_id === member.id
+                    );
+                    return {
+                        user_id: member.id,
+                        file: cert?.file_url
+                            ? await urlToFile(
+                                  cert.file_url,
+                                  cert.file_url.split("/").pop() ||
+                                      "certificate.pdf",
+                                  "application/pdf"
+                              )
+                            : null
+                    };
+                })
             );
             setData("certificates", updatedCertificates);
+
+            // Untuk dosen
+            if (dosen && dosen.id) {
+                const certDosen = achievement.certificates.find(
+                    (c) => c.user_id === dosen.id
+                );
+                if (certDosen?.file_url) {
+                    const dosenFile = await urlToFile(
+                        certDosen.file_url,
+                        certDosen.file_url.split("/").pop() ||
+                            "certificate.pdf",
+                        "application/pdf"
+                    );
+                    setData("dosen_certificate", dosenFile);
+                } else {
+                    setData("dosen_certificate", null);
+                }
+            }
         }
     };
 
@@ -124,7 +150,9 @@ export default function TeamAchievement({
                     file: null
                 }))
             );
+            setData("dosen_certificate", null); // reset juga dosen_certificate
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [achievement?.certificates]);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -484,6 +512,53 @@ export default function TeamAchievement({
                                         </div>
                                     );
                                 })}
+
+                                <div>
+                                    <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                        Sertifikat untuk Dosen Pembimbing (
+                                        {dosen.name})
+                                    </Label>
+                                    <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 hover:border-primary transition overflow-hidden">
+                                        <div className="text-sm text-gray-600 group-hover:text-primary overflow-hidden text-ellipsis whitespace-nowrap">
+                                            {data.dosen_certificate
+                                                ? data.dosen_certificate.name
+                                                : "Pilih file sertifikat (Opsional)"}
+                                        </div>
+                                        <div className="text-primary font-medium text-sm">
+                                            Unggah
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.jpg,.jpeg,.png"
+                                            onChange={(e) =>
+                                                setData(
+                                                    "dosen_certificate",
+                                                    e.target.files?.[0] || null
+                                                )
+                                            }
+                                            className="hidden"
+                                        />
+                                    </label>
+                                    {achievement?.certificates?.find(
+                                        (c) => c.user_id === dosen.id
+                                    )?.file_url && (
+                                        <a
+                                            className="mt-2 text-blue-400 hover:underline text-xs"
+                                            href={
+                                                achievement.certificates.find(
+                                                    (c) =>
+                                                        c.user_id === dosen.id
+                                                )?.file_url
+                                            }
+                                            target="_blank"
+                                        >
+                                            Lihat Sertifikat
+                                        </a>
+                                    )}
+                                    <div className="text-xs text-gray-400 mt-1">
+                                        Tidak wajib diisi
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

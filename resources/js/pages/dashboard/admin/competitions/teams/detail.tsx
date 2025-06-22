@@ -522,6 +522,48 @@ export default function TeamDetail({
                                                 </div>
                                             );
                                         })}
+
+                                        <div>
+                                            <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                Sertifikat untuk Dosen
+                                                Pembimbing ({dosen.name})
+                                            </Label>
+                                            <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 transition overflow-hidden">
+                                                <div className="text-sm text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
+                                                    {achievement?.certificates?.find(
+                                                        (c) =>
+                                                            c.user_id ===
+                                                            dosen.id
+                                                    )?.file_url
+                                                        ? achievement.certificates.find(
+                                                              (c) =>
+                                                                  c.user_id ===
+                                                                  dosen.id
+                                                          )?.file_url
+                                                        : "Belum ada sertifikat dosen"}
+                                                </div>
+                                            </label>
+                                            {achievement?.certificates?.find(
+                                                (c) => c.user_id === dosen.id
+                                            )?.file_url && (
+                                                <a
+                                                    className="mt-2 text-blue-400 hover:underline text-xs"
+                                                    href={
+                                                        achievement.certificates.find(
+                                                            (c) =>
+                                                                c.user_id ===
+                                                                dosen.id
+                                                        )?.file_url
+                                                    }
+                                                    target="_blank"
+                                                >
+                                                    Lihat Sertifikat Dosen
+                                                </a>
+                                            )}
+                                            <div className="text-xs text-gray-400 mt-1">
+                                                Tidak wajib diisi
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>

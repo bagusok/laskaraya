@@ -93,6 +93,7 @@ type FormData = {
         user_id: number;
         file: File | null;
     }[];
+    dosen_certificate?: File | null;
 };
 
 type TeamMember = User;
@@ -147,7 +148,8 @@ export default function AddCompetition({
                 user_id: user?.id ?? 0,
                 file: null
             }
-        ]
+        ],
+        dosen_certificate: null
     });
 
     const [date, setDate] = useState<DateRange | undefined>({
@@ -1140,6 +1142,42 @@ export default function AddCompetition({
                                             </div>
                                         );
                                     })}
+
+                                    {data.team.dosen_id !== 0 && (
+                                        <div>
+                                            <Label className="mb-2 block text-sm font-medium text-gray-700">
+                                                Sertifikat untuk Dosen
+                                                Pembimbing
+                                            </Label>
+                                            <label className="cursor-pointer group flex items-center justify-between gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-3 hover:border-primary transition overflow-hidden">
+                                                <div className="text-sm text-gray-600 group-hover:text-primary overflow-hidden text-ellipsis whitespace-nowrap">
+                                                    {data.dosen_certificate
+                                                        ? data.dosen_certificate
+                                                              .name
+                                                        : "Pilih file sertifikat (Opsional)"}
+                                                </div>
+                                                <div className="text-primary font-medium text-sm">
+                                                    Unggah
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf,.jpg,.jpeg,.png"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "dosen_certificate",
+                                                            e.target
+                                                                .files?.[0] ||
+                                                                null
+                                                        )
+                                                    }
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                            <div className="text-xs text-gray-400 mt-1">
+                                                Tidak wajib diisi
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
